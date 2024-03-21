@@ -1,0 +1,28 @@
+body {
+  font-size: 1.2rem;
+}
+h1 {
+  font-size: 2rem;
+  color: brown;
+  font-weight: 900;
+  text-transform: uppercase;
+  text-align: center;
+
+  /* // <uniquifier>: Use a unique and descriptive class name
+// <weight>: Use a value from 100 to 900 */
+
+  font-family: "Handjet", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  font-variation-settings: "ELGR" 1, "ELSH" 2;
+}
+h2 {
+  font-size: 1.7rem;
+  color: coral;
+  padding-bottom: 10px;
+  padding-top: 10px;
+}
+p {
+  line-height: 1.4;
+}
