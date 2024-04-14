@@ -1,0 +1,65 @@
+
+:root {
+    --background:  #F8F8FF;
+}
+
+* {
+    margin: 0;
+    padding: 10;
+    box-sizing: border-box;  
+}
+
+body {
+    background-color: var(--background);
+    display: grid;
+    place-items: center;
+    height: 100vh;
+}
+
+.gallery {
+    justify-content: center;
+    align-content: center;
+    display: flex;
+    gap: 2.5rem;
+    max-width: 50rem;
+    max-height: 50rem;
+    margin: 1rem;
+    /* min-width: 40; */
+}
+
+.card {
+    padding: 1rem;
+    font-weight: bold;
+    line-height: 7;
+    justify-content: space-around;
+    text-align: center;
+    position: relative;
+    left: 0;
+    width: 20rem;
+    border-radius: 1.2rem;
+    height: 10rem;
+    overflow: hidden;
+    background-color: var(--background);
+    transition: 1s ease-in-out;
+    box-shadow: 0 5px 12px rgba(0, 0, 0, 0.3);
+    flex: 1;
+}
+
+.answer {
+    opacity: 0%;
+    transition: 0.4s ease-in-out;
+}
+
+.answer:hover {
+    opacity: 100%;
+}
+
+.card:hover {
+    line-height: 1;
+    opacity: 100%;
+    flex: 5;
+    font-weight: 400;
+    cursor: pointer;
+    border-radius: 1rem;
+    
+}
