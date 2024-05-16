@@ -4,6 +4,10 @@ const videoList = [
     { name: "Stardust", link: "stardust.mp4" },
   ];
   
+  const muteButton = document.querySelector("#mute-btn");
+  muteButton.addEventListener("click", toggleMute);
+  const muteButtonImg = document.querySelector("#mute-btn-img")
+
   const playPauseButton = document.querySelector("#play-pause-btn");
   playPauseButton.addEventListener("click", togglePlay);
   const playPauseImg = document.querySelector("#play-pause-img");
@@ -30,6 +34,10 @@ const videoList = [
     myVideo.pause();
     playVideo(1);
   });
+
+  function toggleMute() {
+    if (myVideo)
+  }
   
   function togglePlay() {
     if (myVideo.paused || myVideo.ended) {
