@@ -32,6 +32,10 @@ document.addEventListener("DOMContentLoaded", function() {
         { name: 'fullscreenBtn', element: fullscreenBtn }
     ];
 
+    // The reason i've implemented a lot of these debugging sections is to make sure that I am able to specificlally
+    // find the reason for some of my errors. I cam across an error where none of the buttons would work, after implementing
+    // these debugging techniques I could pinpoint where the issue was coming from and address it correctly
+
     // Check for missing elements
     const missingElements = elements.filter(e => !e.element);
     if (missingElements.length > 0) {
@@ -46,7 +50,8 @@ document.addEventListener("DOMContentLoaded", function() {
     video.volume = 1;
     volumeBarFill.style.width = '100%';
 
-    // Function to play pop sound on button click
+    // Function to play pop sound on button click. However It seems that in some itterations there must be an error
+    // which is preventing this! It only seems to work on special occasions.
     function playPopSound() {
         popSound.currentTime = 0;
         popSound.play();
@@ -84,7 +89,10 @@ document.addEventListener("DOMContentLoaded", function() {
         playPopSound();
     });
 
-    // Update the volume bar based on current volume
+    // Update the volume bar based on current volume.
+    // I had to also make sure that the volume bar started at 
+    // max because before I made this change it wouldnt show 
+    // what it was up to until the user pressed up or down
     function updateVolumeBar() {
         const value = video.volume * 100;
         volumeBarFill.style.width = value + "%";
