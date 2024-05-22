@@ -35,9 +35,9 @@ const videoList = [
     playVideo(1);
   });
 
-  function toggleMute() {
-    if (myVideo)
-  }
+  // function toggleMute() {
+  //   if (myVideo)
+  //   }
   
   function togglePlay() {
     if (myVideo.paused || myVideo.ended) {
