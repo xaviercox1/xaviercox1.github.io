@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", function() {
-    // Grab all the elements we need for control
     const video = document.querySelector("#custom-video-player");
+    const videoSource = document.querySelector("#video-source");
     const playPauseBtn = document.querySelector("#play-pause-btn");
     const playPauseImg = document.querySelector("#play-pause-img");
     const progressBar = document.querySelector("#progress-bar-fill");
@@ -13,51 +13,21 @@ document.addEventListener("DOMContentLoaded", function() {
     const rewindBtn = document.querySelector("#rewind-btn");
     const fastForwardBtn = document.querySelector("#fast-forward-btn");
     const fullscreenBtn = document.querySelector("#fullscreen-btn");
+    const downloadBtn = document.querySelector("#download-btn");
     const popSound = document.querySelector("#pop-sound");
+    const youtubeUrlInput = document.querySelector("#youtube-url");
+    const loadVideoBtn = document.querySelector("#load-video-btn");
 
-    // Ensure all elements are available in the DOM
-    const elements = [
-        { name: 'video', element: video },
-        { name: 'playPauseBtn', element: playPauseBtn },
-        { name: 'playPauseImg', element: playPauseImg },
-        { name: 'progressBar', element: progressBar },
-        { name: 'volumeLowBtn', element: volumeLowBtn },
-        { name: 'volumeHighBtn', element: volumeHighBtn },
-        { name: 'volumeBarFill', element: volumeBarFill },
-        { name: 'replayBtn', element: replayBtn },
-        { name: 'repeatBtn', element: repeatBtn },
-        { name: 'skipStartBtn', element: skipStartBtn },
-        { name: 'rewindBtn', element: rewindBtn },
-        { name: 'fastForwardBtn', element: fastForwardBtn },
-        { name: 'fullscreenBtn', element: fullscreenBtn }
-    ];
-
-    // The reason i've implemented a lot of these debugging sections is to make sure that I am able to specificlally
-    // find the reason for some of my errors. I cam across an error where none of the buttons would work, after implementing
-    // these debugging techniques I could pinpoint where the issue was coming from and address it correctly
-
-    // Check for missing elements
-    const missingElements = elements.filter(e => !e.element);
-    if (missingElements.length > 0) {
-        console.error("Missing elements from the DOM:", missingElements.map(e => e.name));
-        return;
-    }
-
-    // Remove default video controls for a custom look
-    video.removeAttribute("controls");
-
-    // Initialize volume to max and update the volume bar
-    video.volume = 1;
-    volumeBarFill.style.width = '100%';
-
-    // Function to play pop sound on button click. However It seems that in some itterations there must be an error
-    // which is preventing this! It only seems to work on special occasions. Hopefully you can hear it!
     function playPopSound() {
         popSound.currentTime = 0;
         popSound.play();
     }
 
-    // Play/Pause functionality with a pop sound effect for feedback
+    function updateVolumeBar() {
+        const value = video.volume * 100;
+        volumeBarFill.style.width = value + "%";
+    }
+
     playPauseBtn.addEventListener("click", function() {
         if (video.paused || video.ended) {
             video.play();
@@ -69,68 +39,58 @@ document.addEventListener("DOMContentLoaded", function() {
         playPopSound();
     });
 
-    // Update progress bar as video plays
     video.addEventListener("timeupdate", function() {
         const value = (video.currentTime / video.duration) * 100;
         progressBar.style.width = value + "%";
     });
 
-    // Volume down functionality with visual feedback and pop sound
+    document.querySelector(".progress-bar").addEventListener("click", function(e) {
+        const rect = this.getBoundingClientRect();
+        const offsetX = e.clientX - rect.left;
+        const percentage = offsetX / rect.width;
+        video.currentTime = percentage * video.duration;
+        progressBar.style.width = percentage * 100 + "%";
+    });
+
     volumeLowBtn.addEventListener("click", function() {
         video.volume = Math.max(0, video.volume - 0.1);
         updateVolumeBar();
         playPopSound();
     });
 
-    // Volume up functionality with visual feedback and pop sound
     volumeHighBtn.addEventListener("click", function() {
         video.volume = Math.min(1, video.volume + 0.1);
         updateVolumeBar();
         playPopSound();
     });
 
-    // Update the volume bar based on current volume.
-    // I had to also make sure that the volume bar started at 
-    // max because before I made this change it wouldnt show 
-    // what it was up to until the user pressed up or down
-    function updateVolumeBar() {
-        const value = video.volume * 100;
-        volumeBarFill.style.width = value + "%";
-    }
-
-    // Replay button functionality to restart video from the beginning
     replayBtn.addEventListener("click", function() {
         video.currentTime = 0;
         video.play();
         playPopSound();
     });
 
-    // Toggle repeat functionality with visual feedback
     repeatBtn.addEventListener("click", function() {
         video.loop = !video.loop;
         repeatBtn.style.backgroundColor = video.loop ? "gray" : "";
         playPopSound();
     });
 
-    // Skip to start functionality to quickly jump to the beginning
     skipStartBtn.addEventListener("click", function() {
         video.currentTime = 0;
         playPopSound();
     });
 
-    // Rewind functionality to go back 10 seconds
     rewindBtn.addEventListener("click", function() {
         video.currentTime = Math.max(0, video.currentTime - 10);
         playPopSound();
     });
 
-    // Fast forward functionality to skip ahead 10 seconds
     fastForwardBtn.addEventListener("click", function() {
         video.currentTime = Math.min(video.duration, video.currentTime + 10);
         playPopSound();
     });
 
-    // Fullscreen toggle functionality for immersive viewing
     fullscreenBtn.addEventListener("click", function() {
         if (video.requestFullscreen) {
             video.requestFullscreen();
@@ -143,4 +103,38 @@ document.addEventListener("DOMContentLoaded", function() {
         }
         playPopSound();
     });
+
+    downloadBtn.addEventListener("click", function() {
+        const link = document.createElement("a");
+        link.href = video.currentSrc;
+        link.download = "video.mp4";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    });
+
+    loadVideoBtn.addEventListener("click", function() {
+        const youtubeUrl = youtubeUrlInput.value.trim();
+        if (youtubeUrl) {
+            const videoId = youtubeUrl.split("v=")[1].split("&")[0];
+            const apiUrl = `https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoId}&format=json`;
+            
+            fetch(apiUrl)
+                .then(response => response.json())
+                .then(data => {
+                    const embedUrl = `https://www.youtube.com/embed/${videoId}`;
+                    video.src = embedUrl;
+                    videoSource.src = embedUrl;
+                    video.load();
+                    video.play();
+                })
+                .catch(error => {
+                    console.error("Error loading YouTube video:", error);
+                });
+        }
+    });
+
+    video.removeAttribute("controls");
+    video.volume = 1;
+    updateVolumeBar();
 });

@@ -2,19 +2,19 @@
 
 :root {
     margin: 2rem;
-    --primary-bg-color: #692b5a;
-    --text-color: #2e2e2e;
-    --main-bg-color: #ffe4e1;
-    --main-text-color: #2e2e2e;
-    --main-btn-bg-color: #ffb6c1;
-    --highlight-color: #ff69b4;
-    --accent-color: #ff1493;
+    --primary-bg-color: #282c34;
+    --text-color: #ffffff;
+    --main-bg-color: #444c56;
+    --main-text-color: #ffffff;
+    --main-btn-bg-color: #61dafb;
+    --highlight-color: #61dafb;
+    --accent-color: #21a1f1;
     --header-font: 'Montserrat', sans-serif;
     --body-font: 'Roboto', sans-serif;
-    --big-object-shadow: 0 10px 12px rgba(0, 0, 0, 0.1);
+    --big-object-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
     --button-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     --progress-bar-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    --transparency: 0.80;
+    --transparency: 0.8;
 }
 
 body,
@@ -33,56 +33,73 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
     height: 100vh;
-    overflow: hidden;
 }
 
 .container {
     max-width: 1000px;
     width: 100%;
     padding: 20px;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    /* The container holds the media player and centers it on the page */
     border-radius: 10px;
 }
 
 .media-player {
     width: 100%;
-    margin: 20px auto;
-    background-color: rgba(255, 228, 225, var(--transparency));
+    background-color: var(--main-bg-color);
     padding: 20px;
     border-radius: 10px;
-    /* Applying a shadow to give it a lifted effect */
     box-shadow: var(--big-object-shadow);
     position: relative;
+}
+
+#youtube-url {
+    width: calc(100% - 40px);
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    border: none;
+    box-shadow: var(--button-shadow);
+}
+
+#load-video-btn {
+    background-color: var(--main-btn-bg-color);
+    color: var(--main-text-color);
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    font-size: 16px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: var(--button-shadow);
+}
+
+#load-video-btn:hover {
+    background-color: var(--accent-color);
+    box-shadow: var(--big-object-shadow);
 }
 
 .media-player video {
     max-width: 100%;
     border-radius: 10px;
-    /* Adding shadow to the video for a consistent look */
     box-shadow: var(--big-object-shadow);
 }
 
 .progress-bar {
     width: 100%;
     height: 10px;
-    background-color: var(--main-bg-color);
+    background-color: #ddd;
     margin: 10px 0;
     overflow: hidden;
     border-radius: 5px;
-    /* Shadow for the progress bar for a slight 3D effect */
     box-shadow: var(--progress-bar-shadow);
+    cursor: pointer;
 }
 
 .progress-bar span {
     display: block;
     height: 100%;
-    background-color: #160505;
+    background-color: var(--highlight-color);
     width: 0;
     transition: width 0.3s ease;
 }
@@ -114,14 +131,12 @@ body {
     align-items: center;
     border-radius: 5px;
     transition: background-color 0.3s ease, box-shadow 0.3s ease;
-    /* Shadow for buttons to make them stand out */
     box-shadow: var(--button-shadow);
 }
 
 .controls-left button:hover,
 .controls-right button:hover {
     background-color: var(--accent-color);
-    /* Bigger shadow on hover for a popping effect */
     box-shadow: var(--big-object-shadow);
 }
 
@@ -132,27 +147,12 @@ body {
     border-radius: 5px;
     overflow: hidden;
     display: flex;
-    /* Shadow for volume bar for consistency */
     box-shadow: var(--progress-bar-shadow);
 }
 
 .volume-bar-fill {
     height: 100%;
-    background-color: #160505;
+    background-color: var(--highlight-color);
     width: 100%;
     transition: width 0.3s ease;
 }
-
-/* Footer styling */
-/* footer {
-    background-color: var(--main-bg-color);
-    color: var(--main-text-color);
-    text-align: center;
-    padding: 20px 0;
-    width: 100%;
-    font-family: var(--body-font);
-    font-size: 1em;
-    box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.1);
-    position: fixed;
-    bottom: 100;
-} */
