@@ -62,7 +62,7 @@ body {
     align-self: flex-end;
 }
 
-.other-message {
+.bot-message {
     background-color: #f1f0f0;
     align-self: flex-start;
 }
