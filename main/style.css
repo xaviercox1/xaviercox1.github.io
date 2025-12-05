@@ -1,4 +1,4 @@
-/* === Reset & base === */
+/* === Reset === */
 *,
 *::before,
 *::after {
@@ -12,7 +12,7 @@ body {
   height: 100%;
 }
 
-/* Dark theme + global cursor hidden */
+/* === Dark theme + hide native cursor === */
 body {
   background: #000;
   color: #f5f5f5;
@@ -20,10 +20,9 @@ body {
     "SF Pro Text", "Segoe UI", sans-serif;
   font-size: 15px;
   line-height: 1.4;
-  cursor: none; /* hide default cursor */
+  cursor: none;
 }
 
-/* Also hide cursor over interactive stuff so the hand doesn't show */
 a,
 button,
 input,
@@ -31,15 +30,17 @@ textarea {
   cursor: none;
 }
 
-/* === Page layout: text locked towards the left === */
+/* === Left‑locked text column === */
+
 .page {
   max-width: 460px;
   margin-top: 40px;
-  margin-left: 60px;  /* keeps everything over on the left side */
+  margin-left: 60px;
   padding-bottom: 80px;
+  position: relative;
+  z-index: 1; /* keep text above background/sim but below cursor */
 }
 
-/* Small screens: pull it in a bit */
 @media (max-width: 600px) {
   .page {
     margin-top: 24px;
@@ -47,8 +48,6 @@ textarea {
     max-width: calc(100% - 48px);
   }
 }
-
-/* === Typography === */
 
 .intro-line {
   font-size: 1rem;
@@ -62,12 +61,11 @@ textarea {
   color: #cccccc;
 }
 
-/* Each line is just a tight block of text */
 .line {
   margin: 0 0 0.4rem;
 }
 
-/* Links: white, simple underline */
+/* Simple link style */
 a {
   color: #f5f5f5;
   text-decoration: none;
@@ -76,6 +74,22 @@ a {
 
 a:hover {
   border-bottom-color: rgba(245, 245, 245, 0.9);
+}
+
+/* === Cursor blur lens (blurs everything under it) === */
+
+.cursor-blur {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 48px;   /* ~4x cursor radius area */
+  height: 48px;
+  border-radius: 999px;
+  pointer-events: none;
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(8px);
+  transform: translate(-50%, -50%);
+  z-index: 19;   /* below cursor dot, above sim/text */
 }
 
 /* === Custom cursor dot === */
@@ -87,7 +101,7 @@ a:hover {
   width: 12px;
   height: 12px;
   border-radius: 999px;
-  border: 1px solid #f5f5f5;  /* white on black */
+  border: 1px solid #f5f5f5;
   background: transparent;
   pointer-events: none;
   transform: translate(-50%, -50%) scale(1);
@@ -97,38 +111,41 @@ a:hover {
     background 0.2s ease-out,
     border-color 0.2s ease-out,
     transform 0.2s ease-out;
+  z-index: 20;  /* ALWAYS above the simulation */
 }
 
-/* When the mouse has moved at least once */
 .cursor-dot.is-visible {
   opacity: 1;
 }
 
-/* When hovering links / clicking, make it “pop” */
 .cursor-dot--link {
   background: #f5f5f5;
   border-color: #f5f5f5;
   transform: translate(-50%, -50%) scale(1.6);
 }
 
-/* === Falling balls === */
+/* === Centered sandpile simulation === */
 
-.cursor-ball {
+.sim-wrapper {
   position: fixed;
-  left: 0;
-  top: 0;
-  border-radius: 999px;
-  background: #f5f5f5;          /* white ball on black background */
-  pointer-events: none;
+  top: 50%;
+  left: 50%;
+  width: min(60vmin, 480px);
+  height: min(60vmin, 480px);
   transform: translate(-50%, -50%);
-  opacity: 1;
-  transition:
-    opacity 0.18s ease-out,
-    transform 0.18s ease-out;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 0; /* behind everything except background */
 }
 
-/* When it "pops" after the last bounce */
-.cursor-ball--pop {
-  opacity: 0;
-  transform: translate(-50%, -50%) scale(0.4);
+#sandpile {
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;  /* keep it crisp blocky */
+  border-radius: 8px;
+  box-shadow: 0 0 24px rgba(0, 0, 0, 0.7);
+  border: none;               /* remove faint border */
+  outline: none;
+  display: block;
 }

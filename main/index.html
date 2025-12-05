@@ -7,67 +7,46 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <!-- Blur "lens" under the cursor -->
+  <div class="cursor-blur"></div>
   <!-- Custom cursor dot -->
   <div class="cursor-dot"></div>
 
+  <!-- Left‑locked text content -->
   <main class="page">
-    <!-- Header line -->
-    <h1 class="intro-line">
-      Xavier Cox.
-    </h1>
-
-    <!-- Little quote / blurb -->
+    <h1 class="intro-line">Your Name b. 2000</h1>
     <p class="quote-line">
-      “Art and design”
+      “Short line about what you do.” – you
     </p>
 
-    <!-- Main content: keep it compact and text-only -->
     <p class="line">
       Latest work:
       <a href="https://example.com/project-1" target="_blank" rel="noreferrer">
-        Project One (short description)
-      </a>
-    </p>
-
-    <p class="line">
-      <a href="https://example.com/project-2" target="_blank" rel="noreferrer">
-        Recap of recent residency / show
+        Project One – short description
       </a>
     </p>
 
     <p class="line">
       <a href="https://example.com/portfolio.pdf" target="_blank" rel="noreferrer">
-        Download visual portfolio
+        Visual portfolio (PDF)
       </a>
       (~10–20Mb)
     </p>
 
     <p class="line">
-      <a href="https://example.com/mailing-list" target="_blank" rel="noreferrer">
-        Mailing list
-      </a>
-      for new work and experiments.
-    </p>
-
-    <p class="line">
-      commissions / lessons / collabs / etc →
-      <br />
-      you (at) email.com /
-      <a href="https://twitter.com/yourhandle" target="_blank" rel="noreferrer">
-        twitter
-      </a>
+      Contact:
+      <a href="mailto:you@example.com">you@example.com</a>
       /
       <a href="https://instagram.com/yourhandle" target="_blank" rel="noreferrer">
         instagram
       </a>
     </p>
-
-    <p class="line">
-      <a href="https://example.com/archive" target="_blank" rel="noreferrer">
-        old website 
-      </a>
-    </p>
   </main>
+
+  <!-- Centered sandpile simulation -->
+  <div class="sim-wrapper">
+    <canvas id="sandpile"></canvas>
+  </div>
 
   <script src="script.js"></script>
 </body>
