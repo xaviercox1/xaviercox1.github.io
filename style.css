@@ -1,55 +1,104 @@
+/* Basic reset */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+}
+
 body {
-  font-family: "Nunito", sans-serif;
-  font-optical-sizing: auto;
-  font-weight: 500;
-  font-style: normal;
-  font-size: 1.2rem;
-
-  background-image: linear-gradient(
-    to top,
-    #cd1b80,
-    #c445a2,
-    #b563be,
-    #a47bd3,
-    #9390e0,
-    #82a1ec,
-    #73b0f4,
-    #69bff8,
-    #52cffe,
-    #41dfff,
-    #46eefa,
-    #5ffbf1
-  );
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+    "Segoe UI", sans-serif;
+  background: #fdfdfd;
+  color: #111;
+  line-height: 1.5;
 }
-h1 {
-  font-size: 4rem;
-  color: darkslategray;
-  font-weight: 900;
+
+/* Layout */
+.page {
+  max-width: 720px;
+  margin: 40px auto;
+  padding: 0 20px 80px;
+}
+
+/* Typography + spacing */
+.header {
+  margin-bottom: 24px;
+}
+
+.name {
+  font-size: 1.6rem;
+  font-weight: 600;
+}
+
+.meta {
+  font-size: 0.9rem;
+  color: #666;
+  margin-top: 4px;
+}
+
+.quote-block {
+  margin: 24px 0 32px;
+}
+
+.quote {
+  font-style: italic;
+  font-size: 1rem;
+  color: #222;
+}
+
+/* Sections */
+.section {
+  margin-bottom: 20px;
+}
+
+.section-title {
+  font-size: 0.9rem;
   text-transform: uppercase;
-  text-align: center;
-
-  /* // <uniquifier>: Use a unique and descriptive class name
-// <weight>: Use a value from 100 to 900 */
-
-  font-family: "Handjet", sans-serif;
-  font-optical-sizing: auto;
-  font-weight: 700;
-  font-style: normal;
-  font-variation-settings: "ELGR" 1, "ELSH" 2;
+  letter-spacing: 0.08em;
+  color: #777;
+  margin-bottom: 4px;
 }
-h2 {
-  font-size: 2rem;
-  color: slategray;
-  padding-bottom: 10px;
-  padding-top: 10px;
 
-  font-family: "Handjet", sans-serif;
-  font-optical-sizing: auto;
-  font-weight: 400;
-  font-style: normal;
-  font-variation-settings: "ELGR" 1, "ELSH" 2;
-  text-align: center;
+.link-list {
+  list-style: none;
 }
-p {
-  line-height: 1.4;
+
+.link-list li + li {
+  margin-top: 4px;
+}
+
+/* Links */
+a {
+  color: #0055ff;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(0, 85, 255, 0.3);
+}
+
+a:hover {
+  border-bottom-color: rgba(0, 85, 255, 0.8);
+}
+
+/* Footer */
+.footer {
+  margin-top: 40px;
+  font-size: 0.85rem;
+  color: #777;
+}
+
+/* Small screens */
+@media (max-width: 600px) {
+  .page {
+    margin: 24px auto 48px;
+    padding: 0 16px 48px;
+  }
+
+  .name {
+    font-size: 1.4rem;
+  }
 }
