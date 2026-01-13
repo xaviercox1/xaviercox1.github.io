@@ -78,19 +78,23 @@ a:hover {
 
 /* === Cursor blur lens (blurs everything under it) === */
 
-.cursor-blur {
+/* .cursor-blur {
   position: fixed;
   top: 0;
   left: 0;
-  width: 48px;   /* ~4x cursor radius area */
+  width: 48px;
   height: 48px;
   border-radius: 999px;
   pointer-events: none;
-  backdrop-filter: blur(2px);
-  -webkit-backdrop-filter: blur(8px);
   transform: translate(-50%, -50%);
-  z-index: 19;   /* below cursor dot, above sim/text */
-}
+  z-index: 19;
+
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+
+  /* important: no background color */
+  /*background: transparent;
+} */
 
 /* === Custom cursor dot === */
 
@@ -148,4 +152,161 @@ a:hover {
   border: none;               /* remove faint border */
   outline: none;
   display: block;
+}
+
+/* === Project page (video-focused) === */
+
+.project-nav {
+  position: fixed;
+  top: 24px;
+  left: 24px;
+  z-index: 2;
+}
+
+.project-nav a {
+  color: #f5f5f5;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(245, 245, 245, 0.4);
+}
+
+.project-nav a:hover {
+  border-bottom-color: rgba(245, 245, 245, 0.9);
+}
+
+.project-hero {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 64px 24px;
+  box-sizing: border-box;
+}
+
+.video-hero {
+  width: min(90vw, 1200px);
+  aspect-ratio: 16 / 9;
+  background: #000;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.85);
+}
+
+.video-hero iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+}
+
+.project-meta {
+  margin-top: 20px;
+  max-width: 720px;
+  text-align: center;
+}
+
+.project-meta h1 {
+  font-size: 1.2rem;
+  font-weight: 500;
+  margin: 0 0 6px;
+}
+
+.project-meta p {
+  margin: 0;
+  color: #cccccc;
+  font-size: 0.95rem;
+}
+
+/* === Project text block === */
+
+.project-text {
+  margin-top: 20px;
+  max-width: 860px;   /* keeps paragraphs square & readable */
+}
+
+.project-text p {
+  margin: 0 0 14px;
+  max-width: 860px;
+
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: #e0e0e0;
+
+  text-align: justify;
+  text-justify: inter-word;
+
+  /* These are the key bits */
+  hyphens: auto;
+  -webkit-hyphens: auto;
+  -ms-hyphens: auto;
+
+  word-break: normal;
+  overflow-wrap: break-word;
+}
+
+.project-text p:last-child {
+  margin-bottom: 0;
+}
+
+/* === Blur + fade reveal animation (Microcosm page) === */
+
+/* === Blur + fade reveal (general) === */
+.reveal {
+  opacity: 0;
+  filter: blur(14px);
+  transform: translateY(10px);
+  transition:
+    opacity 700ms ease,
+    filter 900ms ease,
+    transform 700ms ease;
+  will-change: opacity, filter, transform;
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  filter: blur(0px);
+  transform: translateY(0);
+}
+
+/* === Slide in from RIGHT to LEFT (matches ← arrow direction) === */
+.reveal-right {
+  opacity: 0;
+  filter: blur(14px);
+  transform: translateX(18px);
+  transition:
+    opacity 700ms ease,
+    filter 900ms ease,
+    transform 700ms ease;
+  will-change: opacity, filter, transform;
+}
+
+.reveal-right.is-visible {
+  opacity: 1;
+  filter: blur(0px);
+  transform: translateX(0);
+}
+.reveal-left.is-visible {
+  opacity: 1;
+  filter: blur(0px);
+  transform: translateX(0);
+}
+
+/* On narrow screens, don't vertically center project pages */
+@media (max-width: 900px) {
+  .project-hero {
+    justify-content: flex-start;
+    padding-top: 96px;   /* space for the fixed back button */
+    padding-bottom: 48px;
+  }
+}
+
+/* === Project subheading (references / context) === */
+
+.project-subhead {
+  margin: 4px 0 16px;
+  font-size: 0.8rem;
+  font-style: italic;
+  color: rgba(245, 245, 245, 0.65);
+  line-height: 1.4;
 }

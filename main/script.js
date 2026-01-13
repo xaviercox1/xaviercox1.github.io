@@ -74,7 +74,7 @@ if (cursorDot) {
 
   // >>> Adjust this to control speed <<<
   // Higher SPEED -> more grains and topples per frame -> faster, more intense sim
-  const SPEED =  60; // try values between 1 and ~10
+  const SPEED =  40; // try values between 1 and ~10
 
   // Logical grid size (rendered pixelated & scaled via CSS)
   const N = 220;
@@ -88,7 +88,7 @@ if (cursorDot) {
 
   // Colour palette by local height (mod 8)
   const palette = [
-    [5, 5, 5],        // 0
+    [0, 0, 0],        // 0
     [60, 80, 200],    // 1
     [80, 160, 240],   // 2
     [180, 220, 255],  // 3
@@ -194,4 +194,23 @@ if (cursorDot) {
   }
 
   step();
+})();
+
+// === Page reveal animation (blur + opacity + optional directional slide) ===
+(function () {
+  const items = Array.from(document.querySelectorAll(".reveal, .reveal-right"));
+  if (!items.length) return;
+
+  const autoStagger = 120; // ms per item if no data-delay is provided
+
+  requestAnimationFrame(() => {
+    items.forEach((el, i) => {
+      const delayAttr = el.getAttribute("data-delay");
+      const delay = delayAttr !== null ? Number(delayAttr) : i * autoStagger;
+
+      setTimeout(() => {
+        el.classList.add("is-visible");
+      }, delay);
+    });
+  });
 })();
