@@ -196,6 +196,7 @@ if (cursorDot) {
   step();
 })();
 
+
 // === Page reveal animation (blur + opacity + optional directional slide) ===
 (function () {
   const items = Array.from(document.querySelectorAll(".reveal, .reveal-right"));
@@ -213,4 +214,159 @@ if (cursorDot) {
       }, delay);
     });
   });
+})();
+
+// === Live VJ: 3D carousel + grid toggle (placeholders) ===
+// === Live VJ: Sphere carousel + FLIP grid toggle ===
+// === Live VJ: Click-to-expand grid with FLIP animation ===
+(function () {
+  const grid = document.getElementById("vjGrid");
+  if (!grid) return;
+
+  const cards = Array.from(grid.querySelectorAll(".vj-card"));
+  let expanded = null;
+
+  function flip(applyLayoutChange) {
+    const first = new Map();
+    cards.forEach((c) => first.set(c, c.getBoundingClientRect()));
+
+    applyLayoutChange();
+
+    const last = new Map();
+    cards.forEach((c) => last.set(c, c.getBoundingClientRect()));
+
+    cards.forEach((c) => {
+      const f = first.get(c);
+      const l = last.get(c);
+      if (!f || !l) return;
+
+      const dx = f.left - l.left;
+      const dy = f.top - l.top;
+      const sx = f.width / l.width;
+      const sy = f.height / l.height;
+
+      c.classList.add("is-flipping");
+      c.style.transformOrigin = "top left";
+      c.style.transform = `translate(${dx}px, ${dy}px) scale(${sx}, ${sy})`;
+    });
+
+    requestAnimationFrame(() => {
+      cards.forEach((c) => {
+        c.style.transform = "";
+        c.style.transformOrigin = "";
+      });
+
+      setTimeout(() => {
+        cards.forEach((c) => c.classList.remove("is-flipping"));
+      }, 650);
+    });
+  }
+
+  cards.forEach((card) => {
+    card.addEventListener("click", () => {
+      flip(() => {
+        // toggle expanded state
+        if (expanded === card) {
+          card.classList.remove("is-expanded");
+          expanded = null;
+        } else {
+          if (expanded) expanded.classList.remove("is-expanded");
+          card.classList.add("is-expanded");
+          expanded = card;
+        }
+      });
+    });
+  });
+
+  // optional: ESC to close expanded
+  window.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && expanded) {
+      flip(() => {
+        expanded.classList.remove("is-expanded");
+        expanded = null;
+      });
+    }
+  });
+})();
+
+// === Live VJ video forward / back navigation ===
+(function () {
+  const video = document.getElementById("vjVideo");
+  if (!video) return;
+
+  const sources = [
+    "landscape-promo.mp4",
+    "landscape-promo2.mp4",
+  ];
+
+  let index = 0;
+
+  function swapVideo(newIndex) {
+    index = (newIndex + sources.length) % sources.length;
+
+    // soft fade out
+    video.style.transition = "opacity 300ms ease, filter 300ms ease";
+    video.style.opacity = "0";
+    video.style.filter = "blur(6px)";
+
+    setTimeout(() => {
+      video.src = sources[index];
+      video.load();
+      video.play();
+
+      // fade back in
+      video.style.opacity = "1";
+      video.style.filter = "blur(0px)";
+    }, 300);
+  }
+
+  document.getElementById("nextVideo")?.addEventListener("click", () => {
+    swapVideo(index + 1);
+  });
+
+  document.getElementById("prevVideo")?.addEventListener("click", () => {
+    swapVideo(index - 1);
+  });
+})();
+
+// === Live VJ: sound bar (muted by default) + cursor solid on clickable UI ===
+// === Live VJ: simple sound toggle (muted by default) + cursor feedback ===
+(function () {
+  const video = document.getElementById("vjVideo");
+  if (!video) return;
+
+  const soundToggle = document.getElementById("soundToggle");
+  const cursorDot = document.querySelector(".cursor-dot");
+
+  // ensure muted on load
+  video.muted = true;
+
+  function updateLabel() {
+    soundToggle.textContent = video.muted ? "sound" : "muted";
+    soundToggle.setAttribute(
+      "aria-label",
+      video.muted ? "Enable sound" : "Mute sound"
+    );
+  }
+
+  soundToggle.addEventListener("click", () => {
+    video.muted = !video.muted;
+    updateLabel();
+  });
+
+  updateLabel();
+
+  // cursor goes solid over arrows + sound toggle
+  if (cursorDot) {
+    document
+      .querySelectorAll(".video-arrow, .sound-toggle")
+      .forEach((el) => {
+        el.addEventListener("mouseenter", () =>
+          cursorDot.classList.add("cursor-dot--link")
+        );
+        el.addEventListener("mouseleave", () =>
+          cursorDot.classList.remove("cursor-dot--link")
+        );
+      });
+  }
 })();

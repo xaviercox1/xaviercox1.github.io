@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Live VJ Performance — Xavier Cox</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" type="image/png" href="favicon.png" />
+</head>
+<body>
+  <!-- Blur "lens" under the cursor -->
+  <div class="cursor-blur"></div>
+  <!-- Custom cursor dot -->
+  <div class="cursor-dot"></div>
+
+  <!-- Back UI -->
+  <header class="project-nav">
+    <a href="index.html" class="reveal-right" data-delay="0">← back</a>
+  </header>
+
+  <main class="project-hero">
+    <!-- Local video (autoplay, no controls) -->
+    <div class="video-hero reveal" data-delay="120">
+      <video
+        id="vjVideo"
+        class="project-video"
+        autoplay
+        muted
+        loop
+        playsinline
+        preload="auto"
+      >
+        <source src="landscape-promo.mp4" type="video/mp4" />
+      </video>
+    </div>
+
+    <!-- Forward / Back arrows + Sound toggle (below video, above title) -->
+    <div class="video-nav reveal" data-delay="200">
+      <button class="video-arrow" id="prevVideo" type="button" aria-label="Previous video">←</button>
+
+      <button class="sound-toggle" id="soundToggle" type="button" aria-label="Enable sound">
+        sound
+      </button>
+
+      <button class="video-arrow" id="nextVideo" type="button" aria-label="Next video">→</button>
+    </div>
+
+    <div class="project-meta">
+      <h1 class="reveal" data-delay="240">Live VJ Performance</h1>
+
+      <p class="project-subhead reveal" data-delay="180">
+        Real-time visuals · TouchDesigner · MIDI
+      </p>
+
+      <div class="project-text">
+        <p class="reveal" data-delay="360">
+          
+        </p>
+      </div>
+    </div>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
