@@ -342,7 +342,7 @@ if (cursorDot) {
   video.muted = true;
 
   function updateLabel() {
-    soundToggle.textContent = video.muted ? "sound" : "muted";
+    soundToggle.textContent = video.muted ? "sound" : "mute";
     soundToggle.setAttribute(
       "aria-label",
       video.muted ? "Enable sound" : "Mute sound"
