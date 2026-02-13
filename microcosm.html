@@ -8,41 +8,68 @@
   <link rel="icon" type="image/png" href="favicon.png" />
 </head>
 <body>
-  <!-- Blur "lens" under the cursor -->
   <div class="cursor-blur"></div>
-  <!-- Custom cursor dot -->
   <div class="cursor-dot"></div>
 
-<header class="project-nav">
-  <a href="index.html" class="reveal-right" data-delay="0">← back</a>
-</header>
+  <header class="project-nav">
+    <a href="index.html" class="reveal-right" data-delay="0">← back</a>
+  </header>
 
-  <!-- Centered video hero -->
   <main class="project-hero">
- <div class="video-hero reveal" data-delay="120">
-  <iframe
-    src="https://www.youtube.com/embed/LRPcRyhFEEs"
-    title="Microcosm — Xavier Cox"
-    frameborder="0"
-    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-    allowfullscreen
-  ></iframe>
-</div>
+    <div class="video-hero video-hero--microcosm reveal" data-delay="120">
+      <video
+        id="microVideo"
+        class="project-video microcosm-video"
+        autoplay
+        muted
+        playsinline
+        preload="auto"
+      >
+        <source src="Microcosm/Title.mp4" type="video/mp4" />
+      </video>
+      <button class="microcosm-audio-btn is-muted" id="microSound" type="button" aria-label="Enable sound">
+        <svg class="microcosm-audio-icon microcosm-audio-icon-muted" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M10 8L6.4 10.8H4v2.4h2.4L10 16V8z"></path>
+          <path d="M14.8 10.2l4.2 4.2"></path>
+          <path d="M19 10.2l-4.2 4.2"></path>
+        </svg>
+        <svg class="microcosm-audio-icon microcosm-audio-icon-unmuted" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M10 8L6.4 10.8H4v2.4h2.4L10 16V8z"></path>
+          <path d="M15.2 10.2c1.2 1.1 1.2 2.5 0 3.6"></path>
+          <path d="M17.5 8.6c2.2 2 2.2 4.8 0 6.8"></path>
+        </svg>
+      </button>
+      <div class="microcosm-audio-hotspot" id="microSoundHotspot" aria-hidden="true"></div>
+    </div>
 
-   <div class="project-meta">
-<h1 class="reveal" data-delay="240">Microcosm</h1>
-<p class="project-subhead reveal" data-delay="180">
-  Ableton · TouchDesigner
-</p>
-  
-
-  <div class="project-text">
-    <p class="reveal" data-delay="140">
-     Microcosm presents a speculative microscope, framing a digital environment as a living system. The viewer drifts through forms that feel biological, unstable, and constantly in flux. Sound and visuals are generated together, designed to continuously react and influence one another.
-  </div>
-</div>
+    <div class="project-meta microcosm-meta">
+      <h1 class="reveal" data-delay="240">
+        <button id="microTitleJump" class="microcosm-title-jump" type="button" aria-label="Play title scene">
+          Microcosm
+        </button>
+      </h1>
+      <div class="microcosm-controls reveal" data-delay="260">
+        <div class="microcosm-scenes" aria-label="Microcosm scene navigation">
+          <button class="microcosm-scene-btn" type="button" data-scene="1" aria-label="Play scene 1">1</button>
+          <button class="microcosm-scene-btn" type="button" data-scene="2" aria-label="Play scene 2">2</button>
+          <button class="microcosm-scene-btn" type="button" data-scene="3" aria-label="Play scene 3">3</button>
+          <button class="microcosm-scene-btn" type="button" data-scene="4" aria-label="Play scene 4">4</button>
+          <button class="microcosm-scene-btn" type="button" data-scene="5" aria-label="Play scene 5">5</button>
+          <button class="microcosm-scene-btn" type="button" data-scene="6" aria-label="Play scene 6">6</button>
+        </div>
+      </div>
+      <p class="project-subhead reveal" data-delay="180">
+        Ableton · TouchDesigner
+      </p>
+      <div class="project-text">
+        <p class="reveal" data-delay="320">
+          Microcosm presents a speculative microscope, framing a digital environment as a living system. The viewer drifts through forms that feel biological, unstable, and constantly in flux. Sound and visuals are generated together, designed to continuously react and influence one another.
+        </p>
+      </div>
+    </div>
   </main>
 
   <script src="script.js"></script>
+  <script src="microcosm.js"></script>
 </body>
 </html>

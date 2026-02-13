@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Gallery — Xavier Cox</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" type="image/png" href="favicon.png" />
+</head>
+<body>
+  <div class="cursor-blur"></div>
+  <div class="cursor-dot"></div>
+
+  <header class="project-nav">
+    <a href="index.html" class="reveal-right" data-delay="0">← back</a>
+  </header>
+
+  <main class="gallery-wrap">
+    <div class="gallery-head reveal" data-delay="120">
+      <h1><span class="hl">Gallery</span></h1>
+
+      <div class="gallery-size">
+        <input
+          id="sizeSlider"
+          class="gallery-slider"
+          type="range"
+          min="0"
+          max="1"
+          step="any"
+          value="0.52"
+          aria-label="Grid size"
+        />
+      </div>
+    </div>
+
+    <section class="gallery-grid reveal" data-delay="200" id="galleryGrid" aria-label="Gallery grid"></section>
+  </main>
+
+  <script src="script.js"></script>
+  <script src="gallery.js?v=20260213d"></script>
+</body>
+</html>

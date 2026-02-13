@@ -15,26 +15,18 @@ if (cursorDot) {
   let dotX = mouseX;
   let dotY = mouseY;
   const followSpeed = 0.2;
+  let overEmbeddedFrame = false;
 
   window.addEventListener("mousemove", (event) => {
     mouseX = event.clientX;
     mouseY = event.clientY;
-    cursorDot.classList.add("is-visible");
+    if (!overEmbeddedFrame) {
+      cursorDot.classList.add("is-visible");
+    }
   });
 
   document.addEventListener("mouseleave", () => {
     cursorDot.classList.remove("is-visible");
-  });
-
-  // Hover effect on links
-  const links = document.querySelectorAll("a");
-  links.forEach((link) => {
-    link.addEventListener("mouseenter", () => {
-      cursorDot.classList.add("cursor-dot--link");
-    });
-    link.addEventListener("mouseleave", () => {
-      cursorDot.classList.remove("cursor-dot--link");
-    });
   });
 
   document.addEventListener("mousedown", (event) => {
@@ -45,6 +37,25 @@ if (cursorDot) {
 
   document.addEventListener("mouseup", () => {
     cursorDot.classList.remove("cursor-dot--link");
+  });
+
+  const embeddedFrames = document.querySelectorAll(".video-hero iframe");
+  embeddedFrames.forEach((frame) => {
+    frame.addEventListener("mouseenter", () => {
+      overEmbeddedFrame = true;
+      cursorDot.classList.remove("is-visible");
+      cursorDot.classList.remove("cursor-dot--link");
+      if (cursorBlur) {
+        cursorBlur.style.opacity = "0";
+      }
+    });
+
+    frame.addEventListener("mouseleave", () => {
+      overEmbeddedFrame = false;
+      if (cursorBlur) {
+        cursorBlur.style.opacity = "";
+      }
+    });
   });
 
   function animateCursor() {
@@ -336,8 +347,6 @@ if (cursorDot) {
   if (!video) return;
 
   const soundToggle = document.getElementById("soundToggle");
-  const cursorDot = document.querySelector(".cursor-dot");
-
   // ensure muted on load
   video.muted = true;
 
@@ -356,17 +365,4 @@ if (cursorDot) {
 
   updateLabel();
 
-  // cursor goes solid over arrows + sound toggle
-  if (cursorDot) {
-    document
-      .querySelectorAll(".video-arrow, .sound-toggle")
-      .forEach((el) => {
-        el.addEventListener("mouseenter", () =>
-          cursorDot.classList.add("cursor-dot--link")
-        );
-        el.addEventListener("mouseleave", () =>
-          cursorDot.classList.remove("cursor-dot--link")
-        );
-      });
-  }
 })();
