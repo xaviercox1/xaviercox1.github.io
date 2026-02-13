@@ -122,6 +122,7 @@
       thumbFallback: defaultThumbFallback(item.src),
       alt: item.alt || cleanTitle(item.src),
       created: item.created || "",
+      hasAudio: typeof item.hasAudio === "boolean" ? item.hasAudio : null,
       sourceOrder: idx,
     });
   });
@@ -138,6 +139,7 @@
       thumbFallback: defaultThumbFallback(file),
       alt: cleanTitle(file),
       created: "",
+      hasAudio: null,
       sourceOrder: 1000 + idx,
     });
   });
@@ -151,10 +153,11 @@
       const thumb = encodeURI(item.thumb);
       const thumbFallback = encodeURI(item.thumbFallback);
       const label = esc(item.alt);
+      const hasAudioAttr = item.hasAudio === false ? "0" : item.hasAudio === true ? "1" : "auto";
       const pairClass = item.key === "jacy.mp4" || item.key === "crtb.mp4" ? " pair-jc" : "";
 
       return `
-      <button type="button" class="g-tile${pairClass}" data-src="${src}" aria-label="${label}">
+      <button type="button" class="g-tile${pairClass}" data-src="${src}" data-has-audio="${hasAudioAttr}" aria-label="${label}">
         <div class="g-media">
           <img class="g-thumb" src="${thumb}" data-fallback="${thumbFallback}" alt="${label}" loading="lazy" decoding="async" />
           <video class="g-vid" muted playsinline loop preload="none"></video>
@@ -244,15 +247,50 @@
     const hotspot = tile.querySelector(".g-audio-hotspot");
     const icon = tile.querySelector(".g-audio-icon");
     if (!thumb || !video || !icon || !hotspot) return;
+    let hasAudio = tile.dataset.hasAudio === "1" ? true : tile.dataset.hasAudio === "0" ? false : null;
     let cornerPinned = false;
     let tileHovered = false;
 
+    function inferHasAudioFromVideo() {
+      if (typeof video.mozHasAudio === "boolean") {
+        return video.mozHasAudio;
+      }
+      if (video.audioTracks && typeof video.audioTracks.length === "number") {
+        return video.audioTracks.length > 0;
+      }
+      if (typeof video.webkitAudioDecodedByteCount === "number" && video.webkitAudioDecodedByteCount > 0) {
+        return true;
+      }
+      return null;
+    }
+
+    function syncAudioAvailability() {
+      if (hasAudio !== null) return;
+      const inferred = inferHasAudioFromVideo();
+      if (typeof inferred !== "boolean") return;
+      hasAudio = inferred;
+      tile.dataset.hasAudio = inferred ? "1" : "0";
+      applyAudioAvailability();
+    }
+
+    function applyAudioAvailability() {
+      const hideAudioUI = hasAudio === false;
+      icon.hidden = hideAudioUI;
+      hotspot.hidden = hideAudioUI;
+      if (hideAudioUI) {
+        cornerPinned = false;
+        hideSoundIcon(true);
+      }
+    }
+
     function setSoundIcon(muted) {
+      if (hasAudio === false) return;
       icon.classList.toggle("is-muted", muted);
       icon.classList.toggle("is-unmuted", !muted);
     }
 
     function showSoundIcon({ persistent = false } = {}) {
+      if (hasAudio === false) return;
       const prevTimer = iconTimers.get(icon);
       if (prevTimer) clearTimeout(prevTimer);
 
@@ -272,6 +310,7 @@
     }
 
     function hideSoundIcon(force = false) {
+      if (hasAudio === false) return;
       if (!force && cornerPinned) return;
       const prevTimer = iconTimers.get(icon);
       if (prevTimer) clearTimeout(prevTimer);
@@ -280,6 +319,7 @@
     }
 
     function syncCornerState(event) {
+      if (hasAudio === false) return;
       const rect = tile.getBoundingClientRect();
       const x = event.clientX - rect.left;
       const y = event.clientY - rect.top;
@@ -297,8 +337,11 @@
       }
     }
 
-    setSoundIcon(true);
-    hideSoundIcon();
+    applyAudioAvailability();
+    if (hasAudio !== false) {
+      setSoundIcon(true);
+      hideSoundIcon();
+    }
 
     thumb.addEventListener("load", () => {
       setGeometry(tile, thumb.naturalWidth, thumb.naturalHeight);
@@ -317,15 +360,21 @@
 
     video.addEventListener("loadedmetadata", () => {
       setGeometry(tile, video.videoWidth, video.videoHeight);
+      syncAudioAvailability();
     });
+    video.addEventListener("loadeddata", syncAudioAvailability);
+    video.addEventListener("canplay", syncAudioAvailability);
+    video.addEventListener("timeupdate", syncAudioAvailability);
 
     function startPreview(withSound) {
       if (!video.dataset.loaded) {
         video.src = tile.dataset.src || "";
         video.dataset.loaded = "1";
       }
-      video.muted = !withSound;
-      setSoundIcon(video.muted);
+      video.muted = !(withSound && hasAudio !== false);
+      if (hasAudio !== false) {
+        setSoundIcon(video.muted);
+      }
       tile.classList.add("is-playing");
       const playPromise = video.play();
       if (playPromise && typeof playPromise.catch === "function") {
@@ -336,7 +385,9 @@
     function stopPreview() {
       tile.classList.remove("is-playing");
       video.muted = true;
-      setSoundIcon(true);
+      if (hasAudio !== false) {
+        setSoundIcon(true);
+      }
       video.pause();
       video.currentTime = 0;
     }
@@ -344,37 +395,46 @@
     tile.addEventListener("mouseenter", (event) => {
       tileHovered = true;
       startPreview(false);
-      showSoundIcon();
-      syncCornerState(event);
+      if (hasAudio !== false) {
+        showSoundIcon();
+        syncCornerState(event);
+      }
     });
 
     tile.addEventListener("mouseleave", () => {
       tileHovered = false;
       cornerPinned = false;
       stopPreview();
-      hideSoundIcon(true);
-    });
-
-    tile.addEventListener("mousemove", (event) => {
-      syncCornerState(event);
-    });
-
-    hotspot.addEventListener("mouseenter", () => {
-      cornerPinned = true;
-      showSoundIcon({ persistent: true });
-    });
-
-    hotspot.addEventListener("mouseleave", () => {
-      cornerPinned = false;
-      if (tileHovered) {
-        showSoundIcon();
-      } else {
+      if (hasAudio !== false) {
         hideSoundIcon(true);
       }
     });
 
+    tile.addEventListener("mousemove", (event) => {
+      if (hasAudio !== false) {
+        syncCornerState(event);
+      }
+    });
+
+    if (hasAudio !== false) {
+      hotspot.addEventListener("mouseenter", () => {
+        cornerPinned = true;
+        showSoundIcon({ persistent: true });
+      });
+
+      hotspot.addEventListener("mouseleave", () => {
+        cornerPinned = false;
+        if (tileHovered) {
+          showSoundIcon();
+        } else {
+          hideSoundIcon(true);
+        }
+      });
+    }
+
     // Click toggles sound on/off for the selected tile.
     tile.addEventListener("click", () => {
+      if (hasAudio === false) return;
       const soundIsOn = tile.classList.contains("is-playing") && !video.muted;
       if (soundIsOn) {
         video.muted = true;

@@ -5,70 +5,88 @@
       "thumb": "Content/Thumbnails/Magma.png",
       "type": "video",
       "created": "2026-02-10T12:00:00+11:00",
-      "alt": "Magma"
+      "alt": "Magma",
+      "hasAudio": false
     },
     {
       "src": "Creature.mp4",
       "thumb": "Content/Thumbnails/Creature.png",
       "type": "video",
       "created": "2025-11-20T19:30:00+11:00",
-      "alt": "Creature"
+      "alt": "Creature",
+      "hasAudio": false
     },
     {
      "src": "Dune.mp4",
      "thumb": "Content/Thumbnails/Dune.png",
      "created": "2025-11-20T19:30:00+11:00",
      "alt": "Dune",
-     "scale": 1
+     "scale": 1,
+     "hasAudio": false
     },
     {
      "src": "Sunreactor.mp4",
      "thumb": "Content/Thumbnails/Sunreactor.png",
      "created": "2025-11-20T19:30:00+11:00",
      "alt": "Sunreactor",
-     "scale": 1
+     "scale": 1,
+     "hasAudio": false
     },
     {
      "src": "promo.mp4",
      "thumb": "Content/Thumbnails/Promo.png",
      "created": "2025-11-20T19:30:00+11:00",
      "alt": "Promo",
-     "scale": 1
+     "scale": 1,
+     "hasAudio": true
     },
     {
      "src": "promo2.mp4",
      "thumb": "Content/Thumbnails/Promo2.png",
      "created": "2025-11-20T19:30:00+11:00",
      "alt": "Promo2",
-     "scale": 1
+     "scale": 1,
+     "hasAudio": true
     },
     {
      "src": "Jacy.mp4",
      "thumb": "Content/Thumbnails/Jacy.png",
      "created": "2025-11-20T19:30:00+11:00",
      "alt": "Jacy",
-     "scale": 1
+     "scale": 1,
+     "hasAudio": true
+    },
+    {
+     "src": "CRTB.mp4",
+     "thumb": "Content/Thumbnails/CRTB.png",
+     "created": "2025-11-20T19:30:00+11:00",
+     "alt": "CRTB",
+     "scale": 1,
+     "hasAudio": true
     },
     {
      "src": "klf.mp4",
      "thumb": "Content/Thumbnails/KLF.png",
      "created": "2025-11-20T19:30:00+11:00",
      "alt": "KLF",
-     "scale": 1
+     "scale": 1,
+     "hasAudio": true
     },
     {
      "src": "crybaby.mp4",
      "thumb": "Content/Thumbnails/Crybaby.png",
      "created": "2025-11-20T19:30:00+11:00",
      "alt": "Crybaby",
-     "scale": 1
+     "scale": 1,
+     "hasAudio": true
     },
     {
      "src": "360.mp4",
      "thumb": "Content/Thumbnails/360.png",
      "created": "2025-11-20T19:30:00+11:00",
      "alt": "360",
-     "scale": 1
+     "scale": 1,
+     "hasAudio": true
     }
     
   ]
