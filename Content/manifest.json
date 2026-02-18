@@ -26,7 +26,7 @@
     },
     {
       "src": "promo2.mp4",
-      "thumb": "Content/Thumbnails/Promo2.png",
+      "thumb": "Content/Thumbnails/promo2.png",
       "created": "2025-11-20T19:30:00+11:00",
       "alt": "Promo2",
       "scale": 1,
@@ -42,7 +42,7 @@
     },
     {
       "src": "promo.mp4",
-      "thumb": "Content/Thumbnails/Promo.png",
+      "thumb": "Content/Thumbnails/promo.png",
       "created": "2025-11-20T19:30:00+11:00",
       "alt": "Promo",
       "scale": 1,
@@ -74,7 +74,7 @@
     },
     {
       "src": "klf.mp4",
-      "thumb": "Content/Thumbnails/KLF.png",
+      "thumb": "Content/Thumbnails/klf.png",
       "created": "2025-11-20T19:30:00+11:00",
       "alt": "KLF",
       "scale": 1,
@@ -82,7 +82,7 @@
     },
     {
       "src": "crybaby.mp4",
-      "thumb": "Content/Thumbnails/Crybaby.png",
+      "thumb": "Content/Thumbnails/crybaby.png",
       "created": "2025-11-20T19:30:00+11:00",
       "alt": "Crybaby",
       "scale": 1,
