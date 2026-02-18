@@ -4,18 +4,18 @@
   if (!grid || !slider) return;
 
   const knownFiles = [
-    "360.mp4",
     "Back Inside.mp4",
-    "CRTB.mp4",
-    "Creature.mp4",
-    "Dune.mp4",
-    "Jacy.mp4",
     "Magma.mp4",
     "Sunreactor.mp4",
-    "crybaby.mp4",
-    "klf.mp4",
-    "promo.mp4",
     "promo2.mp4",
+    "Creature.mp4",
+    "promo.mp4",
+    "CRTB.mp4",
+    "Dune.mp4",
+    "Jacy.mp4",
+    "klf.mp4",
+    "crybaby.mp4",
+    "360.mp4",
   ];
 
   function esc(text) {
@@ -68,34 +68,12 @@
     );
   }
 
-  function createdTime(item) {
-    const t = item.created ? Date.parse(item.created) : Number.NaN;
-    return Number.isNaN(t) ? -Infinity : t;
-  }
-
-  function sortByCreated(a, b) {
-    const ta = createdTime(a);
-    const tb = createdTime(b);
-    if (tb !== ta) return tb - ta;
-
+  function sortBySourceOrder(a, b) {
     const ao = Number.isFinite(a.sourceOrder) ? a.sourceOrder : Number.MAX_SAFE_INTEGER;
     const bo = Number.isFinite(b.sourceOrder) ? b.sourceOrder : Number.MAX_SAFE_INTEGER;
     if (ao !== bo) return ao - bo;
 
     return cleanTitle(a.alt || a.src).localeCompare(cleanTitle(b.alt || b.src));
-  }
-
-  function placeNextToEachOther(items, firstKey, secondKey) {
-    const out = [...items];
-    const firstIndex = out.findIndex((item) => item.key === firstKey);
-    const secondIndex = out.findIndex((item) => item.key === secondKey);
-    if (firstIndex === -1 || secondIndex === -1) return out;
-    if (secondIndex === firstIndex + 1) return out;
-
-    const [secondItem] = out.splice(secondIndex, 1);
-    const insertAfter = out.findIndex((item) => item.key === firstKey);
-    out.splice(insertAfter + 1, 0, secondItem);
-    return out;
   }
 
   let manifestItems = [];
@@ -145,8 +123,7 @@
     });
   });
 
-  const worksSorted = Array.from(workMap.values()).sort(sortByCreated);
-  const works = placeNextToEachOther(worksSorted, "jacy.mp4", "crtb.mp4");
+  const works = Array.from(workMap.values()).sort(sortBySourceOrder);
 
   grid.innerHTML = works
     .map((item) => {
