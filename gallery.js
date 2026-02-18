@@ -144,11 +144,13 @@
       const hasAudioAttr = item.hasAudio === false ? "0" : item.hasAudio === true ? "1" : "auto";
       const pairClass = item.key === "jacy.mp4" || item.key === "crtb.mp4" ? " pair-jc" : "";
       const eagerAttr = idx < eagerPreloadCount ? "1" : "0";
+      const thumbLoadingAttr = idx < eagerPreloadCount ? "eager" : "lazy";
+      const thumbPriorityAttr = idx < eagerPreloadCount ? "high" : "auto";
 
       return `
       <button type="button" class="g-tile${pairClass}" data-src="${src}" data-full-src="${fullSrc}" data-preview-src="${previewSrc}" data-eager="${eagerAttr}" data-has-audio="${hasAudioAttr}" aria-label="${label}">
         <div class="g-media">
-          <img class="g-thumb" src="${thumb}" data-fallback="${thumbFallback}" alt="${label}" loading="lazy" decoding="async" />
+          <img class="g-thumb" src="${thumb}" data-fallback="${thumbFallback}" alt="${label}" loading="${thumbLoadingAttr}" fetchpriority="${thumbPriorityAttr}" decoding="async" />
           <video class="g-vid" muted playsinline loop preload="none"></video>
           <span class="g-audio-hotspot" aria-hidden="true"></span>
           <span class="g-audio-icon is-muted" aria-hidden="true">
@@ -243,6 +245,19 @@
     let cornerPinned = false;
     let tileHovered = false;
     let activeSrc = "";
+    let thumbReady = thumb.complete && thumb.naturalWidth > 0;
+    let pendingStartWithSound = null;
+
+    function markThumbReady() {
+      if (!thumbReady) {
+        thumbReady = true;
+      }
+      if (pendingStartWithSound !== null) {
+        const withSound = pendingStartWithSound;
+        pendingStartWithSound = null;
+        startPreview(withSound);
+      }
+    }
 
     function loadVideoSource(source, { preload = "metadata" } = {}) {
       if (!source) return;
@@ -365,6 +380,7 @@
 
     thumb.addEventListener("load", () => {
       setGeometry(tile, thumb.naturalWidth, thumb.naturalHeight);
+      markThumbReady();
     });
 
     thumb.addEventListener("error", () => {
@@ -375,8 +391,13 @@
         tile.classList.add("no-thumb");
         tile.style.setProperty("--ratio", "1 / 1");
         tile.classList.add("is-square");
+        markThumbReady();
       }
     });
+
+    if (thumbReady) {
+      setGeometry(tile, thumb.naturalWidth, thumb.naturalHeight);
+    }
 
     video.addEventListener("loadedmetadata", () => {
       setGeometry(tile, video.videoWidth, video.videoHeight);
@@ -387,6 +408,12 @@
     video.addEventListener("timeupdate", syncAudioAvailability);
 
     function startPreview(withSound) {
+      if (!thumbReady && !tile.classList.contains("no-thumb")) {
+        pendingStartWithSound = Boolean(withSound);
+        primePreview();
+        return;
+      }
+      pendingStartWithSound = null;
       const shouldUseFullSource = withSound && hasAudio !== false && fullSrc && fullSrc !== previewSrc;
       if (shouldUseFullSource) {
         loadVideoSource(fullSrc, { preload: "auto" });
@@ -432,6 +459,7 @@
     tile.addEventListener("mouseleave", () => {
       tileHovered = false;
       cornerPinned = false;
+      pendingStartWithSound = null;
       stopPreview();
       if (hasAudio !== false) {
         hideSoundIcon(true);
