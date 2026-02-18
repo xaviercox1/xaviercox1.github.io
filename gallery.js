@@ -17,6 +17,7 @@
     "crybaby.mp4",
     "360.mp4",
   ];
+  const eagerPreloadCount = 2;
 
   function esc(text) {
     return String(text)
@@ -94,9 +95,13 @@
   manifestItems.forEach((item, idx) => {
     if (isExcludedWork(item)) return;
     const key = srcKey(item.src);
+    const fullSource = normalizeSrc(item.fullSrc || item.src);
+    const previewSource = normalizeSrc(item.previewSrc || fullSource);
     workMap.set(key, {
       key,
-      src: normalizeSrc(item.src),
+      src: fullSource,
+      fullSrc: fullSource,
+      previewSrc: previewSource,
       thumb: item.thumb || defaultThumb(item.src),
       thumbFallback: defaultThumbFallback(item.src),
       alt: item.alt || cleanTitle(item.src),
@@ -111,9 +116,12 @@
     if (isExcludedWork(temp)) return;
     const key = srcKey(file);
     if (workMap.has(key)) return;
+    const fullSource = normalizeSrc(file);
     workMap.set(key, {
       key,
-      src: normalizeSrc(file),
+      src: fullSource,
+      fullSrc: fullSource,
+      previewSrc: fullSource,
       thumb: defaultThumb(file),
       thumbFallback: defaultThumbFallback(file),
       alt: cleanTitle(file),
@@ -126,16 +134,19 @@
   const works = Array.from(workMap.values()).sort(sortBySourceOrder);
 
   grid.innerHTML = works
-    .map((item) => {
+    .map((item, idx) => {
       const src = encodeURI(item.src);
+      const fullSrc = encodeURI(item.fullSrc || item.src);
+      const previewSrc = encodeURI(item.previewSrc || item.src);
       const thumb = encodeURI(item.thumb);
       const thumbFallback = encodeURI(item.thumbFallback);
       const label = esc(item.alt);
       const hasAudioAttr = item.hasAudio === false ? "0" : item.hasAudio === true ? "1" : "auto";
       const pairClass = item.key === "jacy.mp4" || item.key === "crtb.mp4" ? " pair-jc" : "";
+      const eagerAttr = idx < eagerPreloadCount ? "1" : "0";
 
       return `
-      <button type="button" class="g-tile${pairClass}" data-src="${src}" data-has-audio="${hasAudioAttr}" aria-label="${label}">
+      <button type="button" class="g-tile${pairClass}" data-src="${src}" data-full-src="${fullSrc}" data-preview-src="${previewSrc}" data-eager="${eagerAttr}" data-has-audio="${hasAudioAttr}" aria-label="${label}">
         <div class="g-media">
           <img class="g-thumb" src="${thumb}" data-fallback="${thumbFallback}" alt="${label}" loading="lazy" decoding="async" />
           <video class="g-vid" muted playsinline loop preload="none"></video>
@@ -159,6 +170,7 @@
 
   const tiles = Array.from(grid.querySelectorAll(".g-tile"));
   const iconTimers = new WeakMap();
+  const previewPrimerMap = new WeakMap();
   const iconFadeMs = 1000;
   const cornerRevealPx = 92;
 
@@ -225,9 +237,39 @@
     const hotspot = tile.querySelector(".g-audio-hotspot");
     const icon = tile.querySelector(".g-audio-icon");
     if (!thumb || !video || !icon || !hotspot) return;
+    const previewSrc = tile.dataset.previewSrc || tile.dataset.src || "";
+    const fullSrc = tile.dataset.fullSrc || previewSrc;
     let hasAudio = tile.dataset.hasAudio === "1" ? true : tile.dataset.hasAudio === "0" ? false : null;
     let cornerPinned = false;
     let tileHovered = false;
+    let activeSrc = "";
+
+    function loadVideoSource(source, { preload = "metadata" } = {}) {
+      if (!source) return;
+      if (activeSrc === source && video.dataset.loaded === "1") {
+        video.preload = preload;
+        return;
+      }
+      const wasPlaying = !video.paused && !video.ended;
+      video.pause();
+      video.preload = preload;
+      video.src = source;
+      video.dataset.loaded = "1";
+      activeSrc = source;
+      if (wasPlaying) {
+        const playPromise = video.play();
+        if (playPromise && typeof playPromise.catch === "function") {
+          playPromise.catch(() => {});
+        }
+      } else {
+        video.load();
+      }
+    }
+
+    function primePreview() {
+      if (video.dataset.loaded === "1") return;
+      loadVideoSource(previewSrc, { preload: "metadata" });
+    }
 
     function inferHasAudioFromVideo() {
       if (typeof video.mozHasAudio === "boolean") {
@@ -345,9 +387,11 @@
     video.addEventListener("timeupdate", syncAudioAvailability);
 
     function startPreview(withSound) {
-      if (!video.dataset.loaded) {
-        video.src = tile.dataset.src || "";
-        video.dataset.loaded = "1";
+      const shouldUseFullSource = withSound && hasAudio !== false && fullSrc && fullSrc !== previewSrc;
+      if (shouldUseFullSource) {
+        loadVideoSource(fullSrc, { preload: "auto" });
+      } else {
+        primePreview();
       }
       video.muted = !(withSound && hasAudio !== false);
       if (hasAudio !== false) {
@@ -370,8 +414,14 @@
       video.currentTime = 0;
     }
 
+    previewPrimerMap.set(tile, primePreview);
+    if (tile.dataset.eager === "1") {
+      primePreview();
+    }
+
     tile.addEventListener("mouseenter", (event) => {
       tileHovered = true;
+      primePreview();
       startPreview(false);
       if (hasAudio !== false) {
         showSoundIcon();
@@ -445,4 +495,24 @@
       showSoundIcon({ persistent: cornerPinned });
     });
   });
+
+  if ("IntersectionObserver" in window) {
+    const preloadObserver = new IntersectionObserver(
+      (entries, observer) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          const tile = entry.target;
+          const primePreview = previewPrimerMap.get(tile);
+          if (primePreview) primePreview();
+          observer.unobserve(tile);
+        });
+      },
+      { rootMargin: "220px 0px" }
+    );
+
+    tiles.forEach((tile) => {
+      if (tile.dataset.eager === "1") return;
+      preloadObserver.observe(tile);
+    });
+  }
 })();
