@@ -227,6 +227,64 @@ if (cursorDot) {
   });
 })();
 
+// === Local file fallback for YouTube embeds ===
+(function () {
+  if (window.location.protocol !== "file:") return;
+
+  const youtubeFrames = Array.from(document.querySelectorAll(".video-hero iframe")).filter((frame) =>
+    /youtube(?:-nocookie)?\.com\/embed\//.test(frame.src)
+  );
+
+  youtubeFrames.forEach((frame) => {
+    let videoId = "";
+
+    try {
+      const url = new URL(frame.src);
+      const match = url.pathname.match(/\/embed\/([^/?]+)/);
+      videoId = match ? match[1] : "";
+    } catch (_error) {
+      videoId = "";
+    }
+
+    const fallback = document.createElement("div");
+    fallback.className = "video-embed-fallback";
+
+    const eyebrow = document.createElement("p");
+    eyebrow.className = "video-embed-fallback__eyebrow";
+    eyebrow.textContent = "Local preview";
+
+    const title = document.createElement("h2");
+    title.className = "video-embed-fallback__title";
+    title.textContent = frame.title || "Video";
+
+    const text = document.createElement("p");
+    text.className = "video-embed-fallback__text";
+    text.textContent = "YouTube blocks embedded playback when this page is opened directly as a local file.";
+
+    const actions = document.createElement("div");
+    actions.className = "video-embed-fallback__actions";
+
+    const openLink = document.createElement("a");
+    openLink.href = videoId ? `https://youtu.be/${videoId}` : "https://www.youtube.com/";
+    openLink.target = "_blank";
+    openLink.rel = "noreferrer";
+    openLink.textContent = "Open on YouTube";
+
+    const serverHint = document.createElement("p");
+    serverHint.className = "video-embed-fallback__hint";
+    serverHint.textContent = "To preview the embed here, serve the folder over localhost instead of opening the HTML file directly.";
+
+    actions.appendChild(openLink);
+    fallback.appendChild(eyebrow);
+    fallback.appendChild(title);
+    fallback.appendChild(text);
+    fallback.appendChild(actions);
+    fallback.appendChild(serverHint);
+
+    frame.replaceWith(fallback);
+  });
+})();
+
 // === Live VJ: 3D carousel + grid toggle (placeholders) ===
 // === Live VJ: Sphere carousel + FLIP grid toggle ===
 // === Live VJ: Click-to-expand grid with FLIP animation ===
