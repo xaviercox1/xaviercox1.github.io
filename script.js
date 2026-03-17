@@ -82,22 +82,30 @@ if (cursorDot) {
   if (!canvas) return;
 
   const ctx = canvas.getContext("2d", { willReadFrequently: true });
+  if (!ctx) return;
+  ctx.imageSmoothingEnabled = false;
 
   // >>> Adjust this to control speed <<<
   // Higher SPEED -> more grains and topples per frame -> faster, more intense sim
-  const SPEED =  40; // try values between 1 and ~10
+  const SPEED = 40; // try values between 1 and ~40
 
   // Logical grid size (rendered pixelated & scaled via CSS)
-  const N = 220;
+  const N = 300;
   const threshold = 4; // K = 4: classic Abelian sandpile
+  const GRAINS_PER_FRAME = SPEED;
+  const TOPPLES_PER_FRAME = 4000 * SPEED;
   canvas.width = N;
   canvas.height = N;
 
   const size = N * N;
-  const grid = new Uint16Array(size);
+  const grid = new Int32Array(size);
   const active = [];
+  const queued = new Uint8Array(size);
+  const centerX = (N / 2) | 0;
+  const centerY = (N / 2) | 0;
+  const centerIndex = centerY * N + centerX;
 
-  // Colour palette by local height (mod 8)
+  // Keep the existing palette, though the classic stable sandpile only uses heights 0-3.
   const palette = [
     [0, 0, 0],        // 0
     [60, 80, 200],    // 1
@@ -111,63 +119,76 @@ if (cursorDot) {
 
   const imageData = ctx.createImageData(N, N);
   const data = imageData.data;
+  let needsDraw = true;
 
   function idx(x, y) {
     return y * N + x;
   }
 
-  function addGrainAtCenter() {
-    const cx = (N / 2) | 0;
-    const cy = (N / 2) | 0;
-    const i = idx(cx, cy);
-    grid[i] += 1;
-    if (grid[i] >= threshold) {
+  function queueIfUnstable(i) {
+    if (grid[i] >= threshold && !queued[i]) {
+      queued[i] = 1;
       active.push(i);
     }
   }
 
-  // Topple up to maxTopples "units" this frame
-  function topple(maxTopples) {
-    let count = 0;
+  function addGrainAtCenter() {
+    grid[centerIndex] += 1;
+    queueIfUnstable(centerIndex);
+    needsDraw = true;
+  }
 
-    while (active.length > 0 && count < maxTopples) {
-      const i = active.pop();
-      let h = grid[i];
-      if (h < threshold) continue;
+  function toppleNext() {
+    if (!active.length) return 0;
 
-      const x = i % N;
-      const y = (i / N) | 0;
+    const i = active.pop();
+    queued[i] = 0;
 
-      // How many full topples we can do at once
-      const t = (h / threshold) | 0;
-      const grainsToDistribute = t * threshold;
-      grid[i] -= grainsToDistribute;
+    const h = grid[i];
+    if (h < threshold) return 0;
 
-      const dx = [1, -1, 0, 0];
-      const dy = [0, 0, 1, -1];
+    const t = (h / threshold) | 0;
+    const x = i % N;
+    const y = (i / N) | 0;
 
-      for (let n = 0; n < 4; n++) {
-        const nx = x + dx[n];
-        const ny = y + dy[n];
-        if (nx >= 0 && nx < N && ny >= 0 && ny < N) {
-          const ni = idx(nx, ny);
-          grid[ni] += t;
-          if (grid[ni] >= threshold) {
-            active.push(ni);
-          }
-        }
-      }
+    grid[i] -= t * threshold;
+    queueIfUnstable(i);
 
-      count += t;
+    if (x > 0) {
+      const left = i - 1;
+      grid[left] += t;
+      queueIfUnstable(left);
     }
+
+    if (x < N - 1) {
+      const right = i + 1;
+      grid[right] += t;
+      queueIfUnstable(right);
+    }
+
+    if (y > 0) {
+      const up = i - N;
+      grid[up] += t;
+      queueIfUnstable(up);
+    }
+
+    if (y < N - 1) {
+      const down = i + N;
+      grid[down] += t;
+      queueIfUnstable(down);
+    }
+
+    needsDraw = true;
+    return t;
   }
 
   function draw() {
     let p = 0;
     for (let y = 0; y < N; y++) {
       for (let x = 0; x < N; x++) {
-        const h = grid[idx(x, y)];
-        const c = palette[h % palette.length];
+        // Classical Abelian piles stabilize into heights 0-3.
+        const h = Math.min(grid[idx(x, y)], threshold - 1);
+        const c = palette[h];
         data[p++] = c[0]; // R
         data[p++] = c[1]; // G
         data[p++] = c[2]; // B
@@ -180,7 +201,9 @@ if (cursorDot) {
   // Reset simulation (used on click)
   function resetSandpile() {
     grid.fill(0);
+    queued.fill(0);
     active.length = 0;
+    needsDraw = true;
   }
 
   // Clicking ON the simulation resets it
@@ -190,16 +213,27 @@ if (cursorDot) {
   });
 
   function step() {
-    // Drop some grains per frame at the center (scaled by SPEED)
-    const GRAINS_PER_FRAME = 1;
-    const TOPPLES_PER_FRAME = 4000;
+    let grainsRemaining = GRAINS_PER_FRAME;
+    let topples = 0;
 
-    for (let i = 0; i < GRAINS_PER_FRAME * SPEED; i++) {
+    while (topples < TOPPLES_PER_FRAME) {
+      if (active.length > 0) {
+        topples += toppleNext();
+        continue;
+      }
+
+      if (grainsRemaining <= 0) {
+        break;
+      }
+
       addGrainAtCenter();
+      grainsRemaining -= 1;
     }
 
-    topple(TOPPLES_PER_FRAME * SPEED);
-    draw();
+    if (needsDraw) {
+      draw();
+      needsDraw = false;
+    }
 
     requestAnimationFrame(step);
   }
