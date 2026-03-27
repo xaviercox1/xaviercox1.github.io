@@ -1,4 +1,5 @@
 *.mp4
 !Content/*.mp4
+!Content/**/*.mp4
 
 .DS_Store
