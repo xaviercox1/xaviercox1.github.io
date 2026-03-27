@@ -7,10 +7,7 @@
     "Back Inside.mp4",
     "Magma.mp4",
     "Sunreactor.mp4",
-    "promo2.mp4",
     "Creature.mp4",
-    "promo.mp4",
-    "CRTB.mp4",
     "Dune.mp4",
     "Jacy.mp4",
     "klf.mp4",
@@ -142,7 +139,7 @@
       const thumbFallback = encodeURI(item.thumbFallback);
       const label = esc(item.alt);
       const hasAudioAttr = item.hasAudio === false ? "0" : item.hasAudio === true ? "1" : "auto";
-      const pairClass = item.key === "jacy.mp4" || item.key === "crtb.mp4" ? " pair-jc" : "";
+      const pairClass = item.key === "jacy.mp4" ? " pair-jc" : "";
       const eagerAttr = idx < eagerPreloadCount ? "1" : "0";
       const thumbLoadingAttr = idx < eagerPreloadCount ? "eager" : "lazy";
       const thumbPriorityAttr = idx < eagerPreloadCount ? "high" : "auto";

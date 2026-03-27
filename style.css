@@ -627,6 +627,110 @@ a:hover {
   opacity: 0;
 }
 
+/* === Intrinsik page === */
+
+.intrinsik-page {
+  justify-content: flex-start;
+  padding-top: 110px;
+  padding-bottom: 56px;
+}
+
+.intrinsik-meta {
+  margin-top: 18px;
+}
+
+.intrinsik-title-link {
+  border-bottom-color: rgba(245, 245, 245, 0.85);
+}
+
+.intrinsik-title-link:hover {
+  border-bottom-color: rgba(245, 245, 245, 1);
+}
+
+.intrinsik-portraits {
+  width: min(1100px, 100%);
+  margin-top: 28px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.intrinsik-portrait-card {
+  margin: 0;
+  overflow: hidden;
+  border-radius: 14px;
+  background: #050505;
+  box-shadow: 0 0 36px rgba(0, 0, 0, 0.72);
+  outline: 0;
+  transition:
+    transform 220ms ease,
+    box-shadow 220ms ease,
+    opacity 220ms ease;
+}
+
+.intrinsik-portrait-card:hover,
+.intrinsik-portrait-card:focus-visible,
+.intrinsik-portrait-card.is-playing {
+  transform: translateY(-3px);
+  box-shadow: 0 0 42px rgba(0, 0, 0, 0.88);
+}
+
+.intrinsik-portrait-media {
+  --ratio: 9 / 16;
+  background: #050505;
+}
+
+.intrinsik-portrait-card .g-thumb,
+.intrinsik-portrait-card .g-vid {
+  object-fit: cover;
+  background: #050505;
+}
+
+.intrinsik-copy {
+  width: min(860px, 100%);
+  margin-top: 24px;
+}
+
+.intrinsik-landscape {
+  width: min(1100px, 100%);
+  margin-top: 38px;
+}
+
+.intrinsik-landscape-shell {
+  position: relative;
+  width: 100%;
+}
+
+.intrinsik-landscape-controls {
+  margin-top: 10px;
+}
+
+.intrinsik-landscape-video {
+  opacity: 1;
+  transition:
+    opacity 450ms ease,
+    filter 450ms ease;
+}
+
+.intrinsik-landscape-video.is-screen-faded {
+  opacity: 0;
+  filter: blur(6px);
+}
+
+.intrinsik-copy--landscape {
+  margin-top: 20px;
+}
+
+.intrinsik-landscape-subhead {
+  width: min(860px, 100%);
+  margin: 18px 0 0;
+  font-size: 0.95rem;
+  font-style: italic;
+  color: #cccccc;
+  line-height: 1.4;
+  text-align: center;
+}
+
 /* === Gallery page === */
 
 .gallery-wrap {
@@ -812,6 +916,16 @@ a:hover {
 }
 
 @media (max-width: 760px) {
+  .intrinsik-portraits {
+    grid-template-columns: 1fr;
+    max-width: 420px;
+    gap: 14px;
+  }
+
+  .intrinsik-page {
+    padding-top: 96px;
+  }
+
   .gallery-head {
     flex-direction: column;
     align-items: flex-start;

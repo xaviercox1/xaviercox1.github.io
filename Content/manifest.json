@@ -25,36 +25,12 @@
       "hasAudio": false
     },
     {
-      "src": "promo2.mp4",
-      "thumb": "Content/Thumbnails/promo2.png",
-      "created": "2025-11-20T19:30:00+11:00",
-      "alt": "Promo2",
-      "scale": 1,
-      "hasAudio": true
-    },
-    {
       "src": "Creature.mp4",
       "thumb": "Content/Thumbnails/Creature.png",
       "type": "video",
       "created": "2025-11-20T19:30:00+11:00",
       "alt": "Creature",
       "hasAudio": false
-    },
-    {
-      "src": "promo.mp4",
-      "thumb": "Content/Thumbnails/promo.png",
-      "created": "2025-11-20T19:30:00+11:00",
-      "alt": "Promo",
-      "scale": 1,
-      "hasAudio": true
-    },
-    {
-      "src": "CRTB.mp4",
-      "thumb": "Content/Thumbnails/CRTB.png",
-      "created": "2025-11-20T19:30:00+11:00",
-      "alt": "CRTB",
-      "scale": 1,
-      "hasAudio": true
     },
     {
       "src": "Dune.mp4",
