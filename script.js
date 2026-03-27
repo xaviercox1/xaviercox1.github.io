@@ -8,6 +8,7 @@
 // === Custom cursor + blur lens ===
 const cursorDot = document.querySelector(".cursor-dot");
 const cursorBlur = document.querySelector(".cursor-blur");
+const cursorModeQuery = window.matchMedia("(any-hover: hover) and (any-pointer: fine)");
 
 if (cursorDot) {
   let mouseX = window.innerWidth / 2;
@@ -16,8 +17,41 @@ if (cursorDot) {
   let dotY = mouseY;
   const followSpeed = 0.2;
   let overEmbeddedFrame = false;
+  let customCursorEnabled = cursorModeQuery.matches;
+
+  function setCustomCursorEnabled(enabled) {
+    customCursorEnabled = enabled;
+    document.documentElement.classList.toggle("has-custom-cursor", enabled);
+
+    if (!enabled) {
+      overEmbeddedFrame = false;
+      cursorDot.classList.remove("is-visible");
+      cursorDot.classList.remove("cursor-dot--link");
+      if (cursorBlur) {
+        cursorBlur.style.opacity = "0";
+      }
+      return;
+    }
+
+    if (cursorBlur) {
+      cursorBlur.style.opacity = "";
+    }
+  }
+
+  function handleCursorModeChange(event) {
+    setCustomCursorEnabled(event.matches);
+  }
+
+  if (typeof cursorModeQuery.addEventListener === "function") {
+    cursorModeQuery.addEventListener("change", handleCursorModeChange);
+  } else if (typeof cursorModeQuery.addListener === "function") {
+    cursorModeQuery.addListener(handleCursorModeChange);
+  }
+
+  setCustomCursorEnabled(customCursorEnabled);
 
   window.addEventListener("mousemove", (event) => {
+    if (!customCursorEnabled) return;
     mouseX = event.clientX;
     mouseY = event.clientY;
     if (!overEmbeddedFrame) {
@@ -26,22 +60,26 @@ if (cursorDot) {
   });
 
   document.addEventListener("mouseleave", () => {
+    if (!customCursorEnabled) return;
     cursorDot.classList.remove("is-visible");
   });
 
   document.addEventListener("mousedown", (event) => {
+    if (!customCursorEnabled) return;
     if (event.button === 0) {
       cursorDot.classList.add("cursor-dot--link");
     }
   });
 
   document.addEventListener("mouseup", () => {
+    if (!customCursorEnabled) return;
     cursorDot.classList.remove("cursor-dot--link");
   });
 
   const embeddedFrames = document.querySelectorAll(".video-hero iframe");
   embeddedFrames.forEach((frame) => {
     frame.addEventListener("mouseenter", () => {
+      if (!customCursorEnabled) return;
       overEmbeddedFrame = true;
       cursorDot.classList.remove("is-visible");
       cursorDot.classList.remove("cursor-dot--link");
@@ -51,6 +89,7 @@ if (cursorDot) {
     });
 
     frame.addEventListener("mouseleave", () => {
+      if (!customCursorEnabled) return;
       overEmbeddedFrame = false;
       if (cursorBlur) {
         cursorBlur.style.opacity = "";
@@ -59,6 +98,11 @@ if (cursorDot) {
   });
 
   function animateCursor() {
+    if (!customCursorEnabled) {
+      requestAnimationFrame(animateCursor);
+      return;
+    }
+
     dotX += (mouseX - dotX) * followSpeed;
     dotY += (mouseY - dotY) * followSpeed;
 

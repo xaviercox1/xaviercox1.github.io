@@ -20,14 +20,19 @@ body {
     "SF Pro Text", "Segoe UI", sans-serif;
   font-size: 15px;
   line-height: 1.4;
+}
+
+html.has-custom-cursor body,
+html.has-custom-cursor a,
+html.has-custom-cursor button,
+html.has-custom-cursor input,
+html.has-custom-cursor textarea {
   cursor: none;
 }
 
-a,
-button,
-input,
-textarea {
-  cursor: none;
+html:not(.has-custom-cursor) .cursor-dot,
+html:not(.has-custom-cursor) .cursor-blur {
+  display: none !important;
 }
 
 /* === Left‑locked text column === */
@@ -408,7 +413,6 @@ a:hover {
   color: #f5f5f5;
   font: inherit;
   font-size: 1rem;
-  cursor: none;
   padding: 2px 6px;
 
   font-weight: 400;
@@ -434,7 +438,6 @@ a:hover {
   font-size: 0.85rem;
   font-style: italic;
   padding: 2px 6px;
-  cursor: none;
 
   transition:
     font-weight 200ms ease,
@@ -492,7 +495,6 @@ a:hover {
   color: inherit;
   font: inherit;
   line-height: inherit;
-  cursor: none;
   border-bottom: 1px solid transparent;
   transition:
     border-color 180ms ease,
@@ -523,7 +525,6 @@ a:hover {
   margin: 0;
   background: rgba(0, 0, 0, 0.18);
   color: rgba(245, 245, 245, 0.85);
-  cursor: none;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -601,7 +602,6 @@ a:hover {
   font: inherit;
   font-size: 0.78rem;
   letter-spacing: 0.06em;
-  cursor: none;
   transition:
     color 180ms ease,
     opacity 180ms ease,
@@ -766,7 +766,6 @@ a:hover {
   appearance: none;
   -webkit-appearance: none;
   outline: none;
-  cursor: none;
 }
 
 .gallery-slider::-webkit-slider-runnable-track {
@@ -816,7 +815,6 @@ a:hover {
   margin: 0;
   overflow: hidden;
   text-align: left;
-  cursor: none;
   grid-column: span 1;
 }
 
