@@ -9,15 +9,191 @@
 const cursorDot = document.querySelector(".cursor-dot");
 const cursorBlur = document.querySelector(".cursor-blur");
 const cursorModeQuery = window.matchMedia("(any-hover: hover) and (any-pointer: fine)");
+const CURSOR_RENDER_OFFSET_X = 0;
+const CURSOR_RENDER_OFFSET_Y = 0;
 
 if (cursorDot) {
+  const homeOrbitPanel = null;
   let mouseX = window.innerWidth / 2;
   let mouseY = window.innerHeight / 2;
-  let dotX = mouseX;
-  let dotY = mouseY;
-  const followSpeed = 0.2;
+  const idleDelayDuration = 500;
+  const idleFadeDuration = 2000;
+  const idleMovementThreshold = 1.5;
+  const baseScaleSmoothing = 13;
+  const cursorProjectionSmoothing = 10;
   let overEmbeddedFrame = false;
   let customCursorEnabled = cursorModeQuery.matches;
+  let lastActivityX = mouseX;
+  let lastActivityY = mouseY;
+  let lastActivityTime = performance.now();
+  let pointerIsDown = false;
+  let currentBaseScale = 1;
+  let lastFrameTime = performance.now();
+  let cursorProjectionX = 0;
+  let cursorProjectionY = 0;
+  let cursorProjectionBaseX = 0;
+  let cursorProjectionBaseY = 0;
+  let cursorProjectionTargetX = 0;
+  let cursorProjectionTargetY = 0;
+  let homePanelProximity = 0;
+  let homePanelHovering = false;
+
+  function resetCursorIdleState() {
+    lastActivityTime = performance.now();
+    pointerIsDown = false;
+  }
+
+  function getTargetBaseScale() {
+    return cursorDot.classList.contains("cursor-dot--link") ? 1.6 : 1;
+  }
+
+  function getIdleVisualState(now, options = {}) {
+    const { includePressedState = true } = options;
+
+    if (
+      (includePressedState && pointerIsDown) ||
+      overEmbeddedFrame ||
+      !customCursorEnabled ||
+      !cursorDot.classList.contains("is-visible")
+    ) {
+      return { scaleFactor: 1, opacity: 1 };
+    }
+
+    const idleElapsed = now - lastActivityTime;
+    if (idleElapsed <= idleDelayDuration) {
+      return { scaleFactor: 1, opacity: 1 };
+    }
+
+    const idleProgress = Math.min((idleElapsed - idleDelayDuration) / idleFadeDuration, 1);
+    if (idleProgress >= 1) {
+      return { scaleFactor: 0, opacity: 0 };
+    }
+
+    const acceleratedProgress = Math.pow(idleProgress, 2.35);
+    const scaleFactor = 1 - acceleratedProgress;
+    const opacity = 1 - Math.pow(idleProgress, 1.1);
+    return { scaleFactor, opacity };
+  }
+
+  function lerp(start, end, amount) {
+    return start + (end - start) * amount;
+  }
+
+  function noteCursorActivity() {
+    lastActivityTime = performance.now();
+  }
+
+  function resetCursorProjection() {
+    cursorProjectionX = 0;
+    cursorProjectionY = 0;
+    cursorProjectionBaseX = 0;
+    cursorProjectionBaseY = 0;
+    cursorProjectionTargetX = 0;
+    cursorProjectionTargetY = 0;
+  }
+
+  function resetHomeOrbitPanelMotion() {
+    homePanelProximity = 0;
+    homePanelHovering = false;
+    if (!homeOrbitPanel) return;
+    homeOrbitPanel.style.setProperty("--home-page-float-x", "0px");
+    homeOrbitPanel.style.setProperty("--home-page-float-y", "0px");
+    homeOrbitPanel.style.setProperty("--home-page-float-z", "0px");
+    homeOrbitPanel.style.setProperty("--home-page-dynamic-rotate-y", "0deg");
+    homeOrbitPanel.style.setProperty("--home-page-dynamic-rotate-x", "0deg");
+    homeOrbitPanel.style.setProperty("--home-page-dynamic-rotate-z", "0deg");
+  }
+
+  function updateCursorProjectionTarget(pointerX, pointerY, eventTarget) {
+    cursorProjectionBaseX = 0;
+    cursorProjectionBaseY = 0;
+    homePanelHovering = false;
+
+    if (!homeOrbitPanel || window.innerWidth <= 600) {
+      return;
+    }
+
+    if (!(eventTarget instanceof Element)) {
+      return;
+    }
+
+    homePanelHovering = Boolean(eventTarget.closest(".home-page .page"));
+  }
+
+  function updateHomeOrbitPanelMotion(frameNow, deltaSeconds) {
+    if (!homeOrbitPanel || window.innerWidth <= 600) {
+      resetHomeOrbitPanelMotion();
+      return;
+    }
+
+    const rect = homeOrbitPanel.getBoundingClientRect();
+    if (!rect.width || !rect.height) {
+      resetHomeOrbitPanelMotion();
+      return;
+    }
+
+    let proximityTarget = 0;
+    if (
+      customCursorEnabled &&
+      !overEmbeddedFrame &&
+      cursorDot.classList.contains("is-visible")
+    ) {
+      if (homePanelHovering) {
+        proximityTarget = 1;
+      } else {
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        const distance = Math.hypot(mouseX - centerX, mouseY - centerY);
+        const flatRadius = Math.max(rect.width * 1.2, 420);
+        const releaseRadius = flatRadius + Math.max(rect.width * 0.65, 180);
+
+        if (distance <= flatRadius) {
+          proximityTarget = 1;
+        } else {
+          const releaseProgress = Math.min(
+            Math.max((distance - flatRadius) / (releaseRadius - flatRadius), 0),
+            1
+          );
+          const easedRelease =
+            releaseProgress * releaseProgress * (3 - 2 * releaseProgress);
+          proximityTarget = 1 - easedRelease;
+        }
+      }
+    }
+
+    const proximityBlend = 1 - Math.exp(-4.2 * deltaSeconds);
+    homePanelProximity = lerp(homePanelProximity, proximityTarget, proximityBlend);
+
+    const time = frameNow * 0.001;
+    const wiggleStrength = 1 - homePanelProximity * 0.92;
+    const orbitX = (Math.cos(time * 0.56) * 5.2 + Math.sin(time * 0.31) * 1.9) * wiggleStrength;
+    const orbitY = Math.sin(time * 0.44) * 3.4 * wiggleStrength;
+    const orbitZ =
+      (Math.sin(time * 0.36) * 3.8 + Math.cos(time * 0.21) * 1.4) * wiggleStrength +
+      homePanelProximity * 8;
+    const dynamicRotateY =
+      Math.sin(time * 0.42) * 2.1 * wiggleStrength + homePanelProximity * 11;
+    const dynamicRotateX =
+      Math.cos(time * 0.34) * 1.15 * wiggleStrength - homePanelProximity * 4;
+    const dynamicRotateZ =
+      Math.sin(time * 0.29) * 0.95 * wiggleStrength - homePanelProximity * 2;
+
+    homeOrbitPanel.style.setProperty("--home-page-float-x", orbitX.toFixed(2) + "px");
+    homeOrbitPanel.style.setProperty("--home-page-float-y", orbitY.toFixed(2) + "px");
+    homeOrbitPanel.style.setProperty("--home-page-float-z", orbitZ.toFixed(2) + "px");
+    homeOrbitPanel.style.setProperty(
+      "--home-page-dynamic-rotate-y",
+      dynamicRotateY.toFixed(2) + "deg"
+    );
+    homeOrbitPanel.style.setProperty(
+      "--home-page-dynamic-rotate-x",
+      dynamicRotateX.toFixed(2) + "deg"
+    );
+    homeOrbitPanel.style.setProperty(
+      "--home-page-dynamic-rotate-z",
+      dynamicRotateZ.toFixed(2) + "deg"
+    );
+  }
 
   function setCustomCursorEnabled(enabled) {
     customCursorEnabled = enabled;
@@ -27,6 +203,10 @@ if (cursorDot) {
       overEmbeddedFrame = false;
       cursorDot.classList.remove("is-visible");
       cursorDot.classList.remove("cursor-dot--link");
+      resetCursorIdleState();
+      currentBaseScale = 1;
+      resetCursorProjection();
+      resetHomeOrbitPanelMotion();
       if (cursorBlur) {
         cursorBlur.style.opacity = "0";
       }
@@ -36,6 +216,39 @@ if (cursorDot) {
     if (cursorBlur) {
       cursorBlur.style.opacity = "";
     }
+  }
+
+  function hideCustomCursor() {
+    cursorDot.classList.remove("is-visible");
+    cursorDot.classList.remove("cursor-dot--link");
+    resetCursorIdleState();
+    currentBaseScale = 1;
+    resetCursorProjection();
+    if (cursorBlur) {
+      cursorBlur.style.opacity = "0";
+    }
+  }
+
+  function restoreCustomCursorEffects() {
+    if (cursorBlur && !overEmbeddedFrame) {
+      cursorBlur.style.opacity = "";
+    }
+  }
+
+  function applyCursorRenderPosition(renderX, renderY) {
+    cursorDot.style.left = renderX + "px";
+    cursorDot.style.top = renderY + "px";
+
+    if (cursorBlur) {
+      cursorBlur.style.left = renderX + "px";
+      cursorBlur.style.top = renderY + "px";
+    }
+  }
+
+  function renderCursorAtCurrentPointer() {
+    const renderX = mouseX + cursorProjectionX + CURSOR_RENDER_OFFSET_X;
+    const renderY = mouseY + cursorProjectionY + CURSOR_RENDER_OFFSET_Y;
+    applyCursorRenderPosition(renderX, renderY);
   }
 
   function handleCursorModeChange(event) {
@@ -50,30 +263,86 @@ if (cursorDot) {
 
   setCustomCursorEnabled(customCursorEnabled);
 
-  window.addEventListener("mousemove", (event) => {
+  window.addEventListener("pointermove", (event) => {
     if (!customCursorEnabled) return;
     mouseX = event.clientX;
     mouseY = event.clientY;
+    updateCursorProjectionTarget(mouseX, mouseY, event.target);
+    renderCursorAtCurrentPointer();
     if (!overEmbeddedFrame) {
+      const movementDistance = Math.hypot(mouseX - lastActivityX, mouseY - lastActivityY);
+      const movedEnough =
+        !cursorDot.classList.contains("is-visible") ||
+        movementDistance >= idleMovementThreshold;
+
+      restoreCustomCursorEffects();
       cursorDot.classList.add("is-visible");
+      if (movedEnough) {
+        lastActivityX = mouseX;
+        lastActivityY = mouseY;
+        noteCursorActivity();
+      }
     }
   });
 
   document.addEventListener("mouseleave", () => {
     if (!customCursorEnabled) return;
-    cursorDot.classList.remove("is-visible");
+    hideCustomCursor();
+  });
+
+  document.addEventListener("mouseout", (event) => {
+    if (!customCursorEnabled) return;
+    if (event.relatedTarget || event.toElement) return;
+    hideCustomCursor();
+  });
+
+  window.addEventListener("blur", () => {
+    if (!customCursorEnabled) return;
+    hideCustomCursor();
+  });
+
+  document.addEventListener("visibilitychange", () => {
+    if (!customCursorEnabled) return;
+    if (document.visibilityState !== "visible") {
+      hideCustomCursor();
+    }
   });
 
   document.addEventListener("mousedown", (event) => {
     if (!customCursorEnabled) return;
+    pointerIsDown = true;
     if (event.button === 0) {
       cursorDot.classList.add("cursor-dot--link");
     }
+
+    if (!overEmbeddedFrame) {
+      mouseX = event.clientX;
+      mouseY = event.clientY;
+      updateCursorProjectionTarget(mouseX, mouseY, event.target);
+      renderCursorAtCurrentPointer();
+      lastActivityX = mouseX;
+      lastActivityY = mouseY;
+      restoreCustomCursorEffects();
+      cursorDot.classList.add("is-visible");
+      noteCursorActivity();
+    }
   });
 
-  document.addEventListener("mouseup", () => {
+  document.addEventListener("mouseup", (event) => {
     if (!customCursorEnabled) return;
+    pointerIsDown = false;
     cursorDot.classList.remove("cursor-dot--link");
+    if (!overEmbeddedFrame) {
+      mouseX = event.clientX;
+      mouseY = event.clientY;
+      updateCursorProjectionTarget(mouseX, mouseY, event.target);
+      renderCursorAtCurrentPointer();
+      lastActivityX = mouseX;
+      lastActivityY = mouseY;
+      restoreCustomCursorEffects();
+      cursorDot.classList.add("is-visible");
+      noteCursorActivity();
+    }
   });
 
   const embeddedFrames = document.querySelectorAll(".video-hero iframe");
@@ -81,11 +350,7 @@ if (cursorDot) {
     frame.addEventListener("mouseenter", () => {
       if (!customCursorEnabled) return;
       overEmbeddedFrame = true;
-      cursorDot.classList.remove("is-visible");
-      cursorDot.classList.remove("cursor-dot--link");
-      if (cursorBlur) {
-        cursorBlur.style.opacity = "0";
-      }
+      hideCustomCursor();
     });
 
     frame.addEventListener("mouseleave", () => {
@@ -97,28 +362,463 @@ if (cursorDot) {
     });
   });
 
-  function animateCursor() {
+  function animateCursor(now) {
+    const frameNow = typeof now === "number" ? now : performance.now();
+    const deltaSeconds = Math.min((frameNow - lastFrameTime) / 1000, 0.05);
+    lastFrameTime = frameNow;
+
     if (!customCursorEnabled) {
       requestAnimationFrame(animateCursor);
       return;
     }
 
-    dotX += (mouseX - dotX) * followSpeed;
-    dotY += (mouseY - dotY) * followSpeed;
+    updateHomeOrbitPanelMotion(frameNow, deltaSeconds);
+    const projectionFalloff = 1 - homePanelProximity;
+    cursorProjectionTargetX = cursorProjectionBaseX * projectionFalloff;
+    cursorProjectionTargetY = cursorProjectionBaseY * projectionFalloff;
+    const projectionBlend = 1 - Math.exp(-cursorProjectionSmoothing * deltaSeconds);
+    cursorProjectionX = lerp(cursorProjectionX, cursorProjectionTargetX, projectionBlend);
+    cursorProjectionY = lerp(cursorProjectionY, cursorProjectionTargetY, projectionBlend);
 
-    cursorDot.style.left = dotX + "px";
-    cursorDot.style.top = dotY + "px";
+    const renderX = mouseX + cursorProjectionX + CURSOR_RENDER_OFFSET_X;
+    const renderY = mouseY + cursorProjectionY + CURSOR_RENDER_OFFSET_Y;
 
-    if (cursorBlur) {
-      cursorBlur.style.left = dotX + "px";
-      cursorBlur.style.top = dotY + "px";
-    }
+    applyCursorRenderPosition(renderX, renderY);
+
+    const cursorVisible = cursorDot.classList.contains("is-visible");
+    const idleState = getIdleVisualState(frameNow);
+    const targetBaseScale = getTargetBaseScale();
+    const baseScaleBlend = 1 - Math.exp(-baseScaleSmoothing * deltaSeconds);
+    currentBaseScale = lerp(currentBaseScale, targetBaseScale, baseScaleBlend);
+
+    const renderScale = cursorVisible ? currentBaseScale * idleState.scaleFactor : currentBaseScale;
+    const renderOpacity = cursorVisible ? idleState.opacity : 0;
+
+    cursorDot.style.setProperty("--cursor-scale", renderScale.toFixed(4));
+    cursorDot.style.opacity = renderOpacity.toFixed(4);
 
     requestAnimationFrame(animateCursor);
   }
 
   animateCursor();
 }
+
+// === Center eye art ===
+(function () {
+  const eyeArt = document.querySelector(".eye-art");
+  const eyePlane = eyeArt?.querySelector(".eye-plane");
+  const eyeBackdrop = eyeArt?.querySelector(".eye-backdrop");
+  const eyeField = eyeArt?.querySelector(".eye-field");
+  if (!eyeArt || !eyePlane || !eyeBackdrop || !eyeField) return;
+
+  const frameBasePath = "WebArt/Eye/eyeball_png_sequence/";
+  const eyeFrames = [
+    { filename: "centre.png", lookX: 0, lookY: 0, idleWeight: 4.2 },
+    { filename: "left.png", lookX: -1, lookY: 0, idleWeight: 0.6 },
+    { filename: "right.png", lookX: 1, lookY: 0, idleWeight: 0.6 },
+    { filename: "up.png", lookX: 0, lookY: -1, idleWeight: 0.45 },
+    { filename: "down.png", lookX: 0, lookY: 1, idleWeight: 0.45 },
+    { filename: "leftup.png", lookX: -1, lookY: -1, idleWeight: 0.28 },
+    { filename: "rightup.png", lookX: 1, lookY: -1, idleWeight: 0.28 },
+    { filename: "leftdown.png", lookX: -1, lookY: 1, idleWeight: 0.28 },
+    { filename: "rightdown.png", lookX: 1, lookY: 1, idleWeight: 0.28 },
+    { filename: "slightleftup.png", lookX: -0.56, lookY: -0.52, idleWeight: 1.1 },
+    { filename: "slightrightup.png", lookX: 0.56, lookY: -0.52, idleWeight: 1.1 },
+    { filename: "slightleftdown.png", lookX: -0.56, lookY: 0.52, idleWeight: 1.1 },
+    { filename: "slightrightdown.png", lookX: 0.56, lookY: 0.52, idleWeight: 1.1 },
+  ].map((frame) => ({
+    ...frame,
+    src: frameBasePath + frame.filename,
+  }));
+  const trackingCenterXRatio = 0.5;
+  const trackingCenterYRatio = 0.347;
+  const idleLookDelay = 1200;
+  const activeWiggleBlend = 0.14;
+  const backdropBaseZ = -136;
+  const backdropPositionFollowSpeed = 1.55;
+  const backdropRotationFollowSpeed = 0.8;
+  const eyeLayout = [
+    { x: 14.3, y: 13.5, scale: 0.98 },
+    { x: 50, y: 12.5, scale: 1.03 },
+    { x: 85.7, y: 13.5, scale: 0.98 },
+    { x: 31.2, y: 31.5, scale: 1 },
+    { x: 68.8, y: 31.5, scale: 1 },
+    { x: 14.3, y: 49.5, scale: 0.99 },
+    { x: 50, y: 48.5, scale: 1.04 },
+    { x: 85.7, y: 49.5, scale: 0.99 },
+    { x: 31.2, y: 67.5, scale: 1 },
+    { x: 68.8, y: 67.5, scale: 1 },
+    { x: 14.3, y: 85.5, scale: 0.98 },
+    { x: 50, y: 84.5, scale: 1.03 },
+    { x: 85.7, y: 85.5, scale: 0.98 },
+  ];
+  let pointerX = window.innerWidth / 2;
+  let pointerY = window.innerHeight / 2;
+  let pointerIsActive = false;
+  let lastPointerMoveTime = performance.now();
+  const neutralFrame = eyeFrames.find((frame) => frame.filename === "centre.png") || eyeFrames[0];
+  const idleLookFrames = eyeFrames.filter((frame) => frame.filename !== "centre.png");
+  let idleLookTargetX = neutralFrame.lookX;
+  let idleLookTargetY = neutralFrame.lookY;
+  let idleLookNextShiftTime = performance.now() + randomBetween(300, 1100);
+  const idleSwaySpeedX = randomBetween(0.11, 0.16);
+  const idleSwaySpeedY = randomBetween(0.09, 0.13);
+  const idleSwayAmplitudeX = 0.055;
+  const idleSwayAmplitudeY = 0.04;
+  const idlePhaseX = randomBetween(0, Math.PI * 2);
+  const idlePhaseY = randomBetween(0, Math.PI * 2);
+  let lastBackdropFrameTime = performance.now();
+  let currentBackdropX = 0;
+  let currentBackdropY = 0;
+  let currentBackdropZ = backdropBaseZ;
+  let currentBackdropRotateX = 0;
+  let currentBackdropRotateY = 0;
+  let currentBackdropRotateZ = 0;
+  let eyeReady = false;
+  const eyeStates = eyeLayout.map((layout) => {
+    const stack = document.createElement("div");
+    stack.className = "eye-stack";
+    stack.style.setProperty("--eye-x", layout.x + "%");
+    stack.style.setProperty("--eye-y", layout.y + "%");
+    stack.style.setProperty("--eye-scale", layout.scale.toFixed(3));
+
+    const shadow = document.createElement("div");
+    shadow.className = "eye-stack__shadow";
+
+    const underlay = document.createElement("div");
+    underlay.className = "eye-stack__underlay";
+
+    const image = document.createElement("img");
+    image.className = "eye-stack__image";
+    image.src = neutralFrame.src;
+    image.alt = "";
+    image.draggable = false;
+
+    stack.append(shadow, underlay, image);
+    eyeField.appendChild(stack);
+
+    return {
+      root: stack,
+      image,
+      activeFrameSrc: neutralFrame.src,
+      currentLookX: neutralFrame.lookX,
+      currentLookY: neutralFrame.lookY,
+      targetLookX: neutralFrame.lookX,
+      targetLookY: neutralFrame.lookY,
+      followBlend: randomBetween(0.055, 0.095),
+      lookRange: randomBetween(0.78, 1),
+      floatAmplitudeX: randomBetween(0.6, 1.7),
+      floatAmplitudeY: randomBetween(0.5, 1.5),
+      floatSpeedX: randomBetween(0.2, 0.38),
+      floatSpeedY: randomBetween(0.18, 0.34),
+      rotateAmplitude: randomBetween(0.35, 0.95),
+      rotateSpeed: randomBetween(0.15, 0.28),
+      floatPhaseX: randomBetween(0, Math.PI * 2),
+      floatPhaseY: randomBetween(0, Math.PI * 2),
+      rotatePhase: randomBetween(0, Math.PI * 2),
+    };
+  });
+
+  function clamp(value, min, max) {
+    return Math.min(Math.max(value, min), max);
+  }
+
+  function randomBetween(min, max) {
+    return min + Math.random() * (max - min);
+  }
+
+  function lerp(start, end, amount) {
+    return start + (end - start) * amount;
+  }
+
+  function isEyeIdling(frameNow) {
+    return !pointerIsActive || frameNow - lastPointerMoveTime >= idleLookDelay;
+  }
+
+  function preloadFrames(frameList) {
+    return Promise.all(
+      frameList.map(
+        (frame) =>
+          new Promise((resolve) => {
+            const image = new Image();
+            image.decoding = "async";
+            image.src = frame.src;
+            if (image.complete) {
+              resolve();
+              return;
+            }
+            image.addEventListener("load", () => resolve(), { once: true });
+            image.addEventListener("error", () => resolve(), { once: true });
+          })
+      )
+    );
+  }
+
+  function chooseWeightedFrame(frameList) {
+    let totalWeight = 0;
+    for (const frame of frameList) {
+      totalWeight += frame.idleWeight || 1;
+    }
+
+    let remainingWeight = Math.random() * totalWeight;
+    for (const frame of frameList) {
+      remainingWeight -= frame.idleWeight || 1;
+      if (remainingWeight <= 0) {
+        return frame;
+      }
+    }
+
+    return frameList[frameList.length - 1];
+  }
+
+  function updateIdleLookTarget(frameNow) {
+    if (!neutralFrame) return;
+    if (frameNow < idleLookNextShiftTime) return;
+
+    if (!idleLookFrames.length || Math.random() < 0.3) {
+      idleLookTargetX = randomBetween(-0.18, 0.18);
+      idleLookTargetY = randomBetween(-0.1, 0.16);
+      idleLookNextShiftTime = frameNow + randomBetween(1400, 2600);
+      return;
+    }
+
+    const sampledFrame = chooseWeightedFrame(idleLookFrames);
+    idleLookTargetX = sampledFrame.lookX;
+    idleLookTargetY = sampledFrame.lookY;
+    idleLookNextShiftTime = frameNow + randomBetween(1700, 3200);
+  }
+
+  function updatePointerTarget(eyeState, frameNow) {
+    if (!eyeFrames.length || !neutralFrame) return;
+
+    if (isEyeIdling(frameNow)) {
+      updateIdleLookTarget(frameNow);
+      const sharedIdleLookX = clamp(
+        idleLookTargetX +
+          Math.sin(frameNow * 0.001 * idleSwaySpeedX + idlePhaseX) * idleSwayAmplitudeX,
+        -1,
+        1
+      );
+      const sharedIdleLookY = clamp(
+        idleLookTargetY +
+          Math.sin(frameNow * 0.001 * idleSwaySpeedY + idlePhaseY) * idleSwayAmplitudeY,
+        -1,
+        1
+      );
+      eyeState.targetLookX = sharedIdleLookX * eyeState.lookRange;
+      eyeState.targetLookY = sharedIdleLookY * eyeState.lookRange;
+      return;
+    }
+
+    const rect = eyeState.image.getBoundingClientRect();
+    if (!rect.width || !rect.height) {
+      eyeState.targetLookX = neutralFrame.lookX;
+      eyeState.targetLookY = neutralFrame.lookY;
+      return;
+    }
+
+    const centerX = rect.left + rect.width * trackingCenterXRatio;
+    const centerY = rect.top + rect.height * trackingCenterYRatio;
+    const normalizedX = clamp((pointerX - centerX) / (rect.width * 0.38), -1, 1);
+    const normalizedY = clamp((pointerY - centerY) / (rect.height * 0.4), -1, 1);
+
+    eyeState.targetLookX = normalizedX * eyeState.lookRange;
+    eyeState.targetLookY = normalizedY * 0.94 * eyeState.lookRange;
+  }
+
+  function getNearestFrame(lookX, lookY) {
+    const horizontalDominance =
+      Math.abs(lookX) / Math.max(Math.abs(lookX) + Math.abs(lookY), 0.001);
+    const verticalWeight = 1 - horizontalDominance * 0.62;
+    let nearestFrame = eyeFrames[0];
+    let nearestDistance = Infinity;
+
+    for (const frame of eyeFrames) {
+      const distance =
+        (frame.lookX - lookX) ** 2 + (frame.lookY - lookY) ** 2 * verticalWeight;
+      if (distance < nearestDistance) {
+        nearestDistance = distance;
+        nearestFrame = frame;
+      }
+    }
+
+    return nearestFrame;
+  }
+
+  function applyBackdropStep(stepX, stepY, stepZ, rotateX, rotateY, rotateZ) {
+    currentBackdropX = stepX;
+    currentBackdropY = stepY;
+    currentBackdropZ = stepZ;
+    currentBackdropRotateX = rotateX;
+    currentBackdropRotateY = rotateY;
+    currentBackdropRotateZ = rotateZ;
+
+    eyeArt.style.setProperty("--eye-backdrop-x", currentBackdropX.toFixed(2) + "px");
+    eyeArt.style.setProperty("--eye-backdrop-y", currentBackdropY.toFixed(2) + "px");
+    eyeArt.style.setProperty("--eye-backdrop-z", currentBackdropZ.toFixed(2) + "px");
+    eyeArt.style.setProperty(
+      "--eye-backdrop-rotate-x",
+      currentBackdropRotateX.toFixed(2) + "deg"
+    );
+    eyeArt.style.setProperty(
+      "--eye-backdrop-rotate-y",
+      currentBackdropRotateY.toFixed(2) + "deg"
+    );
+    eyeArt.style.setProperty(
+      "--eye-backdrop-rotate-z",
+      currentBackdropRotateZ.toFixed(2) + "deg"
+    );
+
+  }
+
+  function updateEyeBackdropMotion(frameNow) {
+    if (!eyeArt || !eyeBackdrop) return;
+
+    const deltaSeconds = Math.min((frameNow - lastBackdropFrameTime) / 1000, 0.05);
+    lastBackdropFrameTime = frameNow;
+    const rect = eyeArt.getBoundingClientRect();
+    let normalizedX = 0;
+    let normalizedY = 0;
+
+    if (pointerIsActive && rect.width && rect.height) {
+      const centerX = rect.left + rect.width * 0.5;
+      const centerY = rect.top + rect.height * trackingCenterYRatio;
+      normalizedX = clamp((pointerX - centerX) / (rect.width * 0.85), -1, 1);
+      normalizedY = clamp((pointerY - centerY) / (rect.height * 0.85), -1, 1);
+    }
+
+    const time = (typeof frameNow === "number" ? frameNow : performance.now()) * 0.001;
+    const orbitX = Math.cos(time * 0.54) * 7.2 + Math.sin(time * 0.29) * 2.6;
+    const orbitY = Math.sin(time * 0.46) * 5.4 + Math.cos(time * 0.21) * 1.8;
+    const orbitZ = Math.sin(time * 0.35) * 10;
+    const orbitRotateX = Math.cos(time * 0.41) * 3.2;
+    const orbitRotateY = Math.sin(time * 0.38) * 4.1;
+    const orbitRotateZ = Math.sin(time * 0.25) * 4.8;
+    const targetX = orbitX + normalizedX * 8;
+    const targetY = orbitY + normalizedY * 7;
+    const targetZ = backdropBaseZ + orbitZ + Math.abs(normalizedX) * 3;
+    const targetRotateX = orbitRotateX - normalizedY * 16;
+    const targetRotateY = orbitRotateY + normalizedX * 19;
+    const targetRotateZ = orbitRotateZ + normalizedX * -4.2 + normalizedY * 2.6;
+    const positionBlend = 1 - Math.exp(-backdropPositionFollowSpeed * deltaSeconds);
+    const rotationBlend = 1 - Math.exp(-backdropRotationFollowSpeed * deltaSeconds);
+
+    currentBackdropX = lerp(currentBackdropX, targetX, positionBlend);
+    currentBackdropY = lerp(currentBackdropY, targetY, positionBlend);
+    currentBackdropZ = lerp(currentBackdropZ, targetZ, positionBlend);
+    currentBackdropRotateX = lerp(currentBackdropRotateX, targetRotateX, rotationBlend);
+    currentBackdropRotateY = lerp(currentBackdropRotateY, targetRotateY, rotationBlend);
+    currentBackdropRotateZ = lerp(currentBackdropRotateZ, targetRotateZ, rotationBlend);
+
+    applyBackdropStep(
+      currentBackdropX,
+      currentBackdropY,
+      currentBackdropZ,
+      currentBackdropRotateX,
+      currentBackdropRotateY,
+      currentBackdropRotateZ
+    );
+  }
+
+  function setActiveFrame(eyeState, frame) {
+    if (!frame) return;
+    if (frame.src === eyeState.activeFrameSrc) return;
+    eyeState.activeFrameSrc = frame.src;
+    eyeState.image.src = frame.src;
+  }
+
+  function updateEyeWiggle(frameNow) {
+    if (!eyeArt) return;
+
+    const time = frameNow * 0.001;
+    const activityBlend = isEyeIdling(frameNow) ? 1 : activeWiggleBlend;
+    const floatX = (Math.cos(time * 0.36) * 6.2 + Math.sin(time * 0.18) * 2.1) * activityBlend;
+    const floatY = (Math.sin(time * 0.31) * 6.9 + Math.cos(time * 0.17) * 1.35) * activityBlend;
+    const rotateZ = Math.sin(time * 0.22) * 1.45 * activityBlend;
+
+    eyeArt.style.setProperty("--eye-float-x", floatX.toFixed(2) + "px");
+    eyeArt.style.setProperty("--eye-float-y", floatY.toFixed(2) + "px");
+    eyeArt.style.setProperty("--eye-rotate-z", rotateZ.toFixed(2) + "deg");
+  }
+
+  function updateEyeStackDrift(eyeState, frameNow) {
+    const time = frameNow * 0.001;
+    const activityBlend = isEyeIdling(frameNow) ? 1 : activeWiggleBlend;
+    const floatX =
+      Math.cos(time * eyeState.floatSpeedX + eyeState.floatPhaseX) *
+      eyeState.floatAmplitudeX *
+      activityBlend;
+    const floatY =
+      Math.sin(time * eyeState.floatSpeedY + eyeState.floatPhaseY) *
+      eyeState.floatAmplitudeY *
+      activityBlend;
+    const rotateZ =
+      Math.sin(time * eyeState.rotateSpeed + eyeState.rotatePhase) *
+      eyeState.rotateAmplitude *
+      activityBlend;
+
+    eyeState.root.style.setProperty("--eye-stack-float-x", floatX.toFixed(2) + "px");
+    eyeState.root.style.setProperty("--eye-stack-float-y", floatY.toFixed(2) + "px");
+    eyeState.root.style.setProperty("--eye-stack-rotate-z", rotateZ.toFixed(2) + "deg");
+  }
+
+  window.addEventListener("pointermove", (event) => {
+    pointerX = event.clientX;
+    pointerY = event.clientY;
+    pointerIsActive = true;
+    lastPointerMoveTime = performance.now();
+  });
+
+  document.addEventListener("mouseleave", () => {
+    pointerIsActive = false;
+  });
+
+  window.addEventListener("blur", () => {
+    pointerIsActive = false;
+  });
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState !== "visible") {
+      pointerIsActive = false;
+    }
+  });
+
+  preloadFrames(eyeFrames)
+    .then(() => {
+      updateEyeBackdropMotion(performance.now());
+      eyeStates.forEach((eyeState) => {
+        setActiveFrame(eyeState, neutralFrame);
+      });
+      eyeReady = true;
+    })
+    .catch(() => {
+      eyeReady = true;
+    });
+
+  function animateEye(now) {
+    const frameNow = typeof now === "number" ? now : performance.now();
+    updateEyeBackdropMotion(frameNow);
+    updateEyeWiggle(frameNow);
+    eyeStates.forEach((eyeState) => {
+      updateEyeStackDrift(eyeState, frameNow);
+    });
+
+    if (eyeReady && eyeFrames.length) {
+      eyeStates.forEach((eyeState) => {
+        updatePointerTarget(eyeState, frameNow);
+        eyeState.currentLookX +=
+          (eyeState.targetLookX - eyeState.currentLookX) * eyeState.followBlend;
+        eyeState.currentLookY +=
+          (eyeState.targetLookY - eyeState.currentLookY) * eyeState.followBlend;
+        setActiveFrame(eyeState, getNearestFrame(eyeState.currentLookX, eyeState.currentLookY));
+      });
+    }
+
+    requestAnimationFrame(animateEye);
+  }
+
+  animateEye();
+})();
 
 // === Sandpile simulation ===
 (function () {
@@ -250,10 +950,23 @@ if (cursorDot) {
     needsDraw = true;
   }
 
-  // Clicking ON the simulation resets it
-  canvas.addEventListener("click", (event) => {
-    event.stopPropagation();
-    resetSandpile();
+  // Keep the background non-selectable/non-draggable while still allowing
+  // clicks in the canvas region to reset the simulation.
+  document.addEventListener("click", (event) => {
+    if (!(event.target instanceof Element)) return;
+    if (window.getSelection()?.type === "Range") return;
+    if (event.target.closest(".page, a, button, input, textarea, label")) return;
+
+    const rect = canvas.getBoundingClientRect();
+    const clickedInsideCanvas =
+      event.clientX >= rect.left &&
+      event.clientX <= rect.right &&
+      event.clientY >= rect.top &&
+      event.clientY <= rect.bottom;
+
+    if (clickedInsideCanvas) {
+      resetSandpile();
+    }
   });
 
   function step() {

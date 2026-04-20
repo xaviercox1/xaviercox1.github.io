@@ -22,6 +22,21 @@ body {
   line-height: 1.4;
 }
 
+body.home-page {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.home-scene {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  perspective: 1800px;
+  perspective-origin: 58% 48%;
+  transform-style: preserve-3d;
+}
+
 html.has-custom-cursor body,
 html.has-custom-cursor a,
 html.has-custom-cursor button,
@@ -46,11 +61,47 @@ html:not(.has-custom-cursor) .cursor-blur {
   z-index: 1; /* keep text above background/sim but below cursor */
 }
 
+.home-page .page {
+  transform: none;
+}
+
+.home-page .page > *,
+.home-page .intro-line,
+.home-page .quote-line,
+.home-page .line,
+.home-page .line-gallery,
+.home-page .page a {
+  transform: none;
+}
+
+.home-page .page a {
+  display: inline;
+}
+
+@media (max-width: 900px) {
+  .home-page .page {
+    transform: none;
+  }
+}
+
 @media (max-width: 600px) {
   .page {
     margin-top: 24px;
     margin-left: 24px;
     max-width: calc(100% - 48px);
+  }
+
+  .home-scene {
+    perspective: none;
+  }
+
+  .home-page .page,
+  .home-page .intro-line,
+  .home-page .quote-line,
+  .home-page .line,
+  .home-page .line-gallery,
+  .home-page .page a {
+    transform: none;
   }
 }
 
@@ -87,27 +138,32 @@ a:hover {
 
 /* === Cursor blur lens (blurs everything under it) === */
 
-/* .cursor-blur {
+.cursor-blur {
   position: fixed;
   top: 0;
   left: 0;
-  width: 48px;
-  height: 48px;
+  width: 72px;
+  height: 72px;
   border-radius: 999px;
   pointer-events: none;
   transform: translate(-50%, -50%);
   z-index: 19;
+  opacity: 0;
+  transition: opacity 0.2s ease-out;
 
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(5px) brightness(1.18);
+  -webkit-backdrop-filter: blur(5px) brightness(1.18);
 
-  /* important: no background color */
-  /*background: transparent;
-} */
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.02) 62%, transparent 75%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 0 28px rgba(255, 255, 255, 0.06);
+  will-change: transform, opacity;
+}
 
 /* === Custom cursor dot === */
 
 .cursor-dot {
+  --cursor-scale: 1;
   position: fixed;
   top: 0;
   left: 0;
@@ -117,30 +173,24 @@ a:hover {
   border: 1px solid #f5f5f5;
   background: transparent;
   pointer-events: none;
-  transform: translate(-50%, -50%) scale(1);
+  transform: translate(-50%, -50%) scale(var(--cursor-scale));
   opacity: 0;
   transition:
-    opacity 0.2s ease-out,
     background 0.2s ease-out,
-    border-color 0.2s ease-out,
-    transform 0.2s ease-out;
+    border-color 0.2s ease-out;
+  will-change: transform, opacity;
   z-index: 20;  /* ALWAYS above the simulation */
-}
-
-.cursor-dot.is-visible {
-  opacity: 1;
 }
 
 .cursor-dot--link {
   background: #f5f5f5;
   border-color: #f5f5f5;
-  transform: translate(-50%, -50%) scale(1.6);
 }
 
-/* === Centered sandpile simulation === */
+/* === Centered Eye Art === */
 
 .sim-wrapper {
-  position: fixed;
+  position: absolute;
   top: 50%;
   left: 50%;
   width: min(60vmin, 480px);
@@ -149,18 +199,154 @@ a:hover {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 0; /* behind everything except background */
+  z-index: 1; /* behind text */
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-user-drag: none;
+  perspective: 1400px;
+  transform-style: preserve-3d;
 }
 
-#sandpile {
+.eye-art {
+  --eye-float-x: 0px;
+  --eye-float-y: 0px;
+  --eye-rotate-z: 0deg;
+  --eye-backdrop-x: 0px;
+  --eye-backdrop-y: 0px;
+  --eye-backdrop-z: -136px;
+  --eye-backdrop-rotate-x: 0deg;
+  --eye-backdrop-rotate-y: 0deg;
+  --eye-backdrop-rotate-z: 0deg;
+  width: 73%;
+  height: 73%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-user-drag: none;
+  overflow: visible;
+  transform:
+    translate3d(var(--eye-float-x), var(--eye-float-y), 0)
+    rotateZ(var(--eye-rotate-z));
+  transform-origin: 50% 52%;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.eye-plane {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 126%;
+  height: 126%;
+  transform:
+    translate3d(
+      var(--eye-backdrop-x),
+      var(--eye-backdrop-y),
+      var(--eye-backdrop-z)
+    )
+    rotateX(var(--eye-backdrop-rotate-x))
+    rotateY(var(--eye-backdrop-rotate-y))
+    rotateZ(var(--eye-backdrop-rotate-z));
+  transform-origin: 50% 50%;
+  transform-style: preserve-3d;
+  will-change: transform;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-user-drag: none;
+}
+
+.eye-backdrop {
+  position: absolute;
+  inset: 0;
+  border-radius: 7%;
+  background-color: #cf0a02;
+  background-image: url("WebArt/Backdrops/red-bg-brighter.png");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+  z-index: 0;
+}
+
+.eye-field {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.eye-stack {
+  --eye-x: 50%;
+  --eye-y: 50%;
+  --eye-size: 23.6%;
+  --eye-scale: 1;
+  --eye-stack-float-x: 0px;
+  --eye-stack-float-y: 0px;
+  --eye-stack-rotate-z: 0deg;
+  position: absolute;
+  left: var(--eye-x);
+  top: var(--eye-y);
+  width: var(--eye-size);
+  aspect-ratio: 1 / 1;
+  transform:
+    translate(-50%, -50%)
+    translate3d(var(--eye-stack-float-x), var(--eye-stack-float-y), 0)
+    rotateZ(var(--eye-stack-rotate-z))
+    scale(var(--eye-scale));
+  transform-style: preserve-3d;
+  will-change: transform;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-user-drag: none;
+}
+
+.eye-stack__shadow {
+  display: none;
+}
+
+.eye-stack__underlay {
+  position: absolute;
+  width: 68%;
+  height: 68%;
+  left: 50%;
+  top: 50%;
+  border-radius: 999px;
+  background: #e8dac3;
+  transform: translate(-50%, -50%);
+  transform-origin: 50% 50%;
+  will-change: transform;
+  z-index: 2;
+}
+
+.eye-stack__image {
+  position: relative;
   width: 100%;
   height: 100%;
-  image-rendering: pixelated;  /* keep it crisp blocky */
-  border-radius: 8px;
-  box-shadow: 0 0 24px rgba(0, 0, 0, 0.7);
-  border: none;               /* remove faint border */
-  outline: none;
+  pointer-events: none;
+  object-fit: contain;
+  filter: none;
+  transform: none;
   display: block;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-user-drag: none;
+  z-index: 3;
+}
+
+.cursor-dot,
+.cursor-blur {
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-user-drag: none;
 }
 
 /* === Project page (video-focused) === */
