@@ -261,6 +261,23 @@ a:hover {
   -webkit-user-drag: none;
 }
 
+.eye-plane::after {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  background: #000;
+  border-radius: calc(7% + 3px);
+  opacity: 1;
+  pointer-events: none;
+  z-index: 4;
+  backface-visibility: hidden;
+  transition: opacity 500ms ease;
+}
+
+.eye-art.is-revealed .eye-plane::after {
+  opacity: 0;
+}
+
 .eye-backdrop {
   position: absolute;
   inset: 0;

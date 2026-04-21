@@ -432,6 +432,7 @@ if (cursorDot) {
   }));
   const trackingCenterXRatio = 0.5;
   const trackingCenterYRatio = 0.347;
+  const eyeRevealDelay = 2000;
   const idleLookDelay = 1200;
   const activeWiggleBlend = 0.14;
   const backdropBaseZ = -136;
@@ -475,6 +476,9 @@ if (cursorDot) {
   let currentBackdropRotateY = 0;
   let currentBackdropRotateZ = 0;
   let eyeReady = false;
+  let eyeAssetsReady = false;
+  let eyeRevealScheduled = false;
+  const eyeRevealReadyTime = performance.now() + eyeRevealDelay;
   const eyeStates = eyeLayout.map((layout) => {
     const stack = document.createElement("div");
     stack.className = "eye-stack";
@@ -529,6 +533,15 @@ if (cursorDot) {
 
   function lerp(start, end, amount) {
     return start + (end - start) * amount;
+  }
+
+  function revealEyeArt() {
+    if (eyeRevealScheduled || !eyeAssetsReady) return;
+    eyeRevealScheduled = true;
+    const remainingDelay = Math.max(eyeRevealReadyTime - performance.now(), 0);
+    window.setTimeout(() => {
+      eyeArt.classList.add("is-revealed");
+    }, remainingDelay);
   }
 
   function isEyeIdling(frameNow) {
@@ -790,9 +803,13 @@ if (cursorDot) {
         setActiveFrame(eyeState, neutralFrame);
       });
       eyeReady = true;
+      eyeAssetsReady = true;
+      revealEyeArt();
     })
     .catch(() => {
       eyeReady = true;
+      eyeAssetsReady = true;
+      revealEyeArt();
     });
 
   function animateEye(now) {
