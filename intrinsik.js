@@ -507,6 +507,14 @@
     toggleSound();
   });
 
+  document.addEventListener("click", (event) => {
+    const target = event.target;
+    if (!(target instanceof Element)) return;
+    if (target.closest("a, button, input, textarea, select, label, .intrinsik-portrait-card")) return;
+    if (videoShell && videoShell.contains(target)) return;
+    toggleSound();
+  });
+
   hotspot?.addEventListener("mouseenter", () => {
     if (hasAudio === false) return;
     cornerPinned = true;

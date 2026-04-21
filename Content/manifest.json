@@ -71,6 +71,30 @@
       "alt": "360",
       "scale": 1,
       "hasAudio": true
+    },
+    {
+      "src": "joke king.mp4",
+      "thumb": "Content/Thumbnails/joe king.png",
+      "type": "video",
+      "created": "2020-06-27T13:51:10+10:00",
+      "alt": "Joe King",
+      "hasAudio": true
+    },
+    {
+      "src": "Everything I Am.m4v",
+      "thumb": "Content/Thumbnails/everything i am.png",
+      "type": "video",
+      "created": "2022-04-18T19:32:32+10:00",
+      "alt": "Everything I Am",
+      "hasAudio": true
+    },
+    {
+      "src": "midnight gospel.mp4",
+      "thumb": "Content/Thumbnails/midnight gospel.png",
+      "type": "video",
+      "created": "2021-07-20T15:39:54+10:00",
+      "alt": "Midnight Gospel",
+      "hasAudio": true
     }
   ]
 }

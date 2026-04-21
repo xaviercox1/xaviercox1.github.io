@@ -1,28 +1,87 @@
 (async function () {
-  const grid = document.getElementById("galleryGrid");
-  const slider = document.getElementById("sizeSlider");
-  if (!grid || !slider) return;
+  const index = document.getElementById("galleryIndex");
+  const stage = document.getElementById("galleryStage");
+  const stageThumb = document.getElementById("galleryStageThumb");
+  const stageVideo = document.getElementById("galleryStageVideo");
+  const stageYear = document.getElementById("galleryStageYear");
+  const audioBtn = document.getElementById("galleryAudio");
 
-  const knownFiles = [
-    "Back Inside.mp4",
-    "Magma.mp4",
-    "Sunreactor.mp4",
-    "Creature.mp4",
-    "Dune.mp4",
-    "Jacy.mp4",
-    "klf.mp4",
-    "crybaby.mp4",
-    "360.mp4",
+  if (!index || !stage || !stageThumb || !stageVideo || !stageYear || !audioBtn) return;
+
+  const knownWorks = [
+    {
+      src: "Back Inside.mp4",
+      thumb: "Content/Thumbnails/Back Inside.png",
+      alt: "Back Inside",
+      hasAudio: true,
+    },
+    {
+      src: "Magma.mp4",
+      thumb: "Content/Thumbnails/Magma.png",
+      alt: "Magma",
+      hasAudio: false,
+    },
+    {
+      src: "Sunreactor.mp4",
+      thumb: "Content/Thumbnails/Sunreactor.png",
+      alt: "Sunreactor",
+      hasAudio: false,
+    },
+    {
+      src: "Creature.mp4",
+      thumb: "Content/Thumbnails/Creature.png",
+      alt: "Creature",
+      hasAudio: false,
+    },
+    {
+      src: "Dune.mp4",
+      thumb: "Content/Thumbnails/Dune.png",
+      alt: "Dune",
+      hasAudio: false,
+    },
+    {
+      src: "Jacy.mp4",
+      thumb: "Content/Thumbnails/Jacy.png",
+      alt: "Jacy",
+      hasAudio: true,
+    },
+    {
+      src: "klf.mp4",
+      thumb: "Content/Thumbnails/klf.png",
+      alt: "KLF",
+      hasAudio: true,
+    },
+    {
+      src: "crybaby.mp4",
+      thumb: "Content/Thumbnails/crybaby.png",
+      alt: "Crybaby",
+      hasAudio: true,
+    },
+    {
+      src: "360.mp4",
+      thumb: "Content/Thumbnails/360.png",
+      alt: "360",
+      hasAudio: true,
+    },
+    {
+      src: "joke king.mp4",
+      thumb: "Content/Thumbnails/joe king.png",
+      alt: "Joe King",
+      hasAudio: true,
+    },
+    {
+      src: "Everything I Am.m4v",
+      thumb: "Content/Thumbnails/everything i am.png",
+      alt: "Everything I Am",
+      hasAudio: true,
+    },
+    {
+      src: "midnight gospel.mp4",
+      thumb: "Content/Thumbnails/midnight gospel.png",
+      alt: "Midnight Gospel",
+      hasAudio: true,
+    },
   ];
-  const eagerPreloadCount = 2;
-
-  function esc(text) {
-    return String(text)
-      .replaceAll("&", "&amp;")
-      .replaceAll("<", "&lt;")
-      .replaceAll(">", "&gt;")
-      .replaceAll('"', "&quot;");
-  }
 
   function srcKey(src) {
     const clean = String(src || "").split("/").pop() || "";
@@ -55,6 +114,16 @@
       .trim();
   }
 
+  function slugify(value) {
+    return String(value || "")
+      .toLowerCase()
+      .normalize("NFKD")
+      .replace(/[^\w\s-]/g, "")
+      .trim()
+      .replace(/[\s_-]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+  }
+
   function isExcludedWork(item) {
     const source = srcKey(item.src || "");
     const alt = String(item.alt || "").toLowerCase();
@@ -70,8 +139,55 @@
     const ao = Number.isFinite(a.sourceOrder) ? a.sourceOrder : Number.MAX_SAFE_INTEGER;
     const bo = Number.isFinite(b.sourceOrder) ? b.sourceOrder : Number.MAX_SAFE_INTEGER;
     if (ao !== bo) return ao - bo;
-
     return cleanTitle(a.alt || a.src).localeCompare(cleanTitle(b.alt || b.src));
+  }
+
+  function hashString(value) {
+    let hash = 2166136261;
+    const text = String(value || "");
+    for (let i = 0; i < text.length; i += 1) {
+      hash ^= text.charCodeAt(i);
+      hash = Math.imul(hash, 16777619);
+    }
+    return hash >>> 0;
+  }
+
+  function sortByMixedOrder(a, b) {
+    const ah = hashString(`${a.alt}|${a.src}`);
+    const bh = hashString(`${b.alt}|${b.src}`);
+    if (ah !== bh) return ah - bh;
+    return sortBySourceOrder(a, b);
+  }
+
+  function setRatio(width, height) {
+    if (!width || !height) return;
+    stage.style.setProperty("--stage-ratio", `${width} / ${height}`);
+  }
+
+  function formatYear(created) {
+    if (!created) return "";
+    const date = new Date(created);
+    if (Number.isNaN(date.getTime())) return "";
+    return String(date.getFullYear());
+  }
+
+  function setAudioButtonState(isMuted) {
+    audioBtn.classList.toggle("is-muted", isMuted);
+    audioBtn.classList.toggle("is-unmuted", !isMuted);
+    audioBtn.setAttribute("aria-label", isMuted ? "Unmute video" : "Mute video");
+  }
+
+  function setAudioAvailability(hasAudio) {
+    audioBtn.hidden = !hasAudio;
+    audioBtn.disabled = !hasAudio;
+  }
+
+  function toggleStageSound() {
+    if (!currentWork || currentWork.hasAudio === false) return;
+    const nextMuted = !stageVideo.muted;
+    stageVideo.muted = nextMuted;
+    setAudioButtonState(nextMuted);
+    playStageVideo();
   }
 
   let manifestItems = [];
@@ -94,450 +210,180 @@
     const key = srcKey(item.src);
     const fullSource = normalizeSrc(item.fullSrc || item.src);
     const previewSource = normalizeSrc(item.previewSrc || fullSource);
+    const title = item.alt || cleanTitle(item.src);
     workMap.set(key, {
       key,
+      slug: slugify(title || item.src),
       src: fullSource,
       fullSrc: fullSource,
       previewSrc: previewSource,
       thumb: item.thumb || defaultThumb(item.src),
       thumbFallback: defaultThumbFallback(item.src),
-      alt: item.alt || cleanTitle(item.src),
+      alt: title,
       created: item.created || "",
       hasAudio: typeof item.hasAudio === "boolean" ? item.hasAudio : null,
       sourceOrder: idx,
     });
   });
 
-  knownFiles.forEach((file, idx) => {
-    const temp = { src: file, alt: cleanTitle(file) };
+  knownWorks.forEach((item, idx) => {
+    const temp = { src: item.src, alt: item.alt || cleanTitle(item.src) };
     if (isExcludedWork(temp)) return;
-    const key = srcKey(file);
+    const key = srcKey(item.src);
     if (workMap.has(key)) return;
-    const fullSource = normalizeSrc(file);
+    const fullSource = normalizeSrc(item.src);
+    const title = item.alt || cleanTitle(item.src);
     workMap.set(key, {
       key,
+      slug: slugify(title || item.src),
       src: fullSource,
       fullSrc: fullSource,
       previewSrc: fullSource,
-      thumb: defaultThumb(file),
-      thumbFallback: defaultThumbFallback(file),
-      alt: cleanTitle(file),
-      created: "",
-      hasAudio: null,
+      thumb: item.thumb || defaultThumb(item.src),
+      thumbFallback: item.thumb || defaultThumbFallback(item.src),
+      alt: title,
+      created: item.created || "",
+      hasAudio: typeof item.hasAudio === "boolean" ? item.hasAudio : null,
       sourceOrder: 1000 + idx,
     });
   });
 
-  const works = Array.from(workMap.values()).sort(sortBySourceOrder);
+  const works = Array.from(workMap.values()).sort(sortByMixedOrder);
+  if (!works.length) return;
 
-  grid.innerHTML = works
-    .map((item, idx) => {
-      const src = encodeURI(item.src);
-      const fullSrc = encodeURI(item.fullSrc || item.src);
-      const previewSrc = encodeURI(item.previewSrc || item.src);
+  index.innerHTML = works
+    .map((item) => {
       const thumb = encodeURI(item.thumb);
       const thumbFallback = encodeURI(item.thumbFallback);
-      const label = esc(item.alt);
-      const hasAudioAttr = item.hasAudio === false ? "0" : item.hasAudio === true ? "1" : "auto";
-      const pairClass = item.key === "jacy.mp4" ? " pair-jc" : "";
-      const eagerAttr = idx < eagerPreloadCount ? "1" : "0";
-      const thumbLoadingAttr = idx < eagerPreloadCount ? "eager" : "lazy";
-      const thumbPriorityAttr = idx < eagerPreloadCount ? "high" : "auto";
-
       return `
-      <button type="button" class="g-tile${pairClass}" data-src="${src}" data-full-src="${fullSrc}" data-preview-src="${previewSrc}" data-eager="${eagerAttr}" data-has-audio="${hasAudioAttr}" aria-label="${label}">
-        <div class="g-media">
-          <img class="g-thumb" src="${thumb}" data-fallback="${thumbFallback}" alt="${label}" loading="${thumbLoadingAttr}" fetchpriority="${thumbPriorityAttr}" decoding="async" />
-          <video class="g-vid" muted playsinline loop preload="none"></video>
-          <span class="g-audio-hotspot" aria-hidden="true"></span>
-          <span class="g-audio-icon is-muted" aria-hidden="true">
-            <svg class="g-audio-icon-muted" viewBox="0 0 24 24">
-              <path class="g-audio-body" d="M11 6L7.4 9H4v6h3.4L11 18V6z"></path>
-              <line x1="16" y1="9" x2="21" y2="14"></line>
-              <line x1="21" y1="9" x2="16" y2="14"></line>
-            </svg>
-            <svg class="g-audio-icon-unmuted" viewBox="0 0 24 24">
-              <path class="g-audio-body" d="M11 6L7.4 9H4v6h3.4L11 18V6z"></path>
-              <path d="M15.5 9.5a4 4 0 0 1 0 5"></path>
-              <path d="M18.2 7.6a7 7 0 0 1 0 8.8"></path>
-            </svg>
-          </span>
-        </div>
-      </button>`;
+        <button type="button" class="gallery-index-item" data-work="${item.slug}" aria-label="${item.alt}">
+          <img class="gallery-index-thumb" src="${thumb}" data-fallback="${thumbFallback}" alt="" loading="lazy" decoding="async" />
+        </button>
+      `;
     })
     .join("");
 
-  const tiles = Array.from(grid.querySelectorAll(".g-tile"));
-  const iconTimers = new WeakMap();
-  const previewPrimerMap = new WeakMap();
-  const iconFadeMs = 1000;
-  const cornerRevealPx = 92;
-
-  function setGeometry(tile, w, h) {
-    if (!w || !h) return;
-    if (tile.classList.contains("pair-jc")) {
-      tile.style.setProperty("--ratio", "1 / 1");
-      tile.classList.remove("is-landscape", "is-portrait", "is-square");
-      tile.classList.add("is-square");
-      return;
-    }
-    tile.style.setProperty("--ratio", `${w} / ${h}`);
-    const ratio = w / h;
-    tile.classList.remove("is-landscape", "is-portrait", "is-square");
-    if (ratio >= 1.25) {
-      tile.classList.add("is-landscape");
-    } else if (ratio <= 0.8) {
-      tile.classList.add("is-portrait");
-    } else {
-      tile.classList.add("is-square");
-    }
-  }
-
-  function applySize(value) {
-    const ratio = Number(value);
-    const unit = 130 + ratio * 230;
-    grid.style.setProperty("--gallery-unit", `${unit}px`);
-  }
-
-  let targetRatio = Number(slider.value);
-  let displayRatio = targetRatio;
-  let sizeRaf = 0;
-  const followSpeed = 0.2; // match cursor follow speed
-
-  function animateSize() {
-    displayRatio += (targetRatio - displayRatio) * followSpeed;
-    if (Math.abs(targetRatio - displayRatio) < 0.001) {
-      displayRatio = targetRatio;
-    }
-
-    slider.value = String(displayRatio);
-    applySize(displayRatio);
-
-    if (displayRatio !== targetRatio) {
-      sizeRaf = requestAnimationFrame(animateSize);
-    } else {
-      sizeRaf = 0;
-    }
-  }
-
-  function queueSizeAnimation() {
-    if (!sizeRaf) sizeRaf = requestAnimationFrame(animateSize);
-  }
-
-  applySize(displayRatio);
-  slider.addEventListener("input", () => {
-    targetRatio = Number(slider.value);
-    queueSizeAnimation();
-  });
-
-  tiles.forEach((tile) => {
-    const thumb = tile.querySelector(".g-thumb");
-    const video = tile.querySelector(".g-vid");
-    const hotspot = tile.querySelector(".g-audio-hotspot");
-    const icon = tile.querySelector(".g-audio-icon");
-    if (!thumb || !video || !icon || !hotspot) return;
-    const previewSrc = tile.dataset.previewSrc || tile.dataset.src || "";
-    const fullSrc = tile.dataset.fullSrc || previewSrc;
-    let hasAudio = tile.dataset.hasAudio === "1" ? true : tile.dataset.hasAudio === "0" ? false : null;
-    let cornerPinned = false;
-    let tileHovered = false;
-    let activeSrc = "";
-    let thumbReady = thumb.complete && thumb.naturalWidth > 0;
-    let pendingStartWithSound = null;
-
-    function markThumbReady() {
-      if (!thumbReady) {
-        thumbReady = true;
+  index.querySelectorAll(".gallery-index-thumb").forEach((img) => {
+    img.addEventListener("error", () => {
+      const fallback = img.dataset.fallback || "";
+      if (fallback && img.getAttribute("src") !== fallback) {
+        img.setAttribute("src", fallback);
       }
-      if (pendingStartWithSound !== null) {
-        const withSound = pendingStartWithSound;
-        pendingStartWithSound = null;
-        startPreview(withSound);
-      }
-    }
-
-    function loadVideoSource(source, { preload = "metadata" } = {}) {
-      if (!source) return;
-      if (activeSrc === source && video.dataset.loaded === "1") {
-        video.preload = preload;
-        return;
-      }
-      const wasPlaying = !video.paused && !video.ended;
-      video.pause();
-      video.preload = preload;
-      video.src = source;
-      video.dataset.loaded = "1";
-      activeSrc = source;
-      if (wasPlaying) {
-        const playPromise = video.play();
-        if (playPromise && typeof playPromise.catch === "function") {
-          playPromise.catch(() => {});
-        }
-      } else {
-        video.load();
-      }
-    }
-
-    function primePreview() {
-      if (video.dataset.loaded === "1") return;
-      loadVideoSource(previewSrc, { preload: "metadata" });
-    }
-
-    function inferHasAudioFromVideo() {
-      if (typeof video.mozHasAudio === "boolean") {
-        return video.mozHasAudio;
-      }
-      if (video.audioTracks && typeof video.audioTracks.length === "number") {
-        return video.audioTracks.length > 0;
-      }
-      if (typeof video.webkitAudioDecodedByteCount === "number" && video.webkitAudioDecodedByteCount > 0) {
-        return true;
-      }
-      return null;
-    }
-
-    function syncAudioAvailability() {
-      if (hasAudio !== null) return;
-      const inferred = inferHasAudioFromVideo();
-      if (typeof inferred !== "boolean") return;
-      hasAudio = inferred;
-      tile.dataset.hasAudio = inferred ? "1" : "0";
-      applyAudioAvailability();
-    }
-
-    function applyAudioAvailability() {
-      const hideAudioUI = hasAudio === false;
-      icon.hidden = hideAudioUI;
-      hotspot.hidden = hideAudioUI;
-      if (hideAudioUI) {
-        cornerPinned = false;
-        hideSoundIcon(true);
-      }
-    }
-
-    function setSoundIcon(muted) {
-      if (hasAudio === false) return;
-      icon.classList.toggle("is-muted", muted);
-      icon.classList.toggle("is-unmuted", !muted);
-    }
-
-    function showSoundIcon({ persistent = false } = {}) {
-      if (hasAudio === false) return;
-      const prevTimer = iconTimers.get(icon);
-      if (prevTimer) clearTimeout(prevTimer);
-
-      icon.classList.add("is-visible");
-      if (persistent || cornerPinned) {
-        iconTimers.delete(icon);
-        return;
-      }
-
-      const timer = setTimeout(() => {
-        if (!cornerPinned) {
-          icon.classList.remove("is-visible");
-          iconTimers.delete(icon);
-        }
-      }, iconFadeMs);
-      iconTimers.set(icon, timer);
-    }
-
-    function hideSoundIcon(force = false) {
-      if (hasAudio === false) return;
-      if (!force && cornerPinned) return;
-      const prevTimer = iconTimers.get(icon);
-      if (prevTimer) clearTimeout(prevTimer);
-      icon.classList.remove("is-visible");
-      iconTimers.delete(icon);
-    }
-
-    function syncCornerState(event) {
-      if (hasAudio === false) return;
-      const rect = tile.getBoundingClientRect();
-      const x = event.clientX - rect.left;
-      const y = event.clientY - rect.top;
-      const inCorner = x >= 0 && y >= 0 && x <= cornerRevealPx && y >= rect.height - cornerRevealPx;
-      if (inCorner && !cornerPinned) {
-        cornerPinned = true;
-        showSoundIcon({ persistent: true });
-      } else if (!inCorner && cornerPinned) {
-        cornerPinned = false;
-        if (tileHovered) {
-          showSoundIcon();
-        } else {
-          hideSoundIcon(true);
-        }
-      }
-    }
-
-    applyAudioAvailability();
-    if (hasAudio !== false) {
-      setSoundIcon(true);
-      hideSoundIcon();
-    }
-
-    thumb.addEventListener("load", () => {
-      setGeometry(tile, thumb.naturalWidth, thumb.naturalHeight);
-      markThumbReady();
-    });
-
-    thumb.addEventListener("error", () => {
-      const fallback = thumb.dataset.fallback || "";
-      if (fallback && thumb.getAttribute("src") !== fallback) {
-        thumb.setAttribute("src", fallback);
-      } else {
-        tile.classList.add("no-thumb");
-        tile.style.setProperty("--ratio", "1 / 1");
-        tile.classList.add("is-square");
-        markThumbReady();
-      }
-    });
-
-    if (thumbReady) {
-      setGeometry(tile, thumb.naturalWidth, thumb.naturalHeight);
-    }
-
-    video.addEventListener("loadedmetadata", () => {
-      setGeometry(tile, video.videoWidth, video.videoHeight);
-      syncAudioAvailability();
-    });
-    video.addEventListener("loadeddata", syncAudioAvailability);
-    video.addEventListener("canplay", syncAudioAvailability);
-    video.addEventListener("timeupdate", syncAudioAvailability);
-
-    function startPreview(withSound) {
-      if (!thumbReady && !tile.classList.contains("no-thumb")) {
-        pendingStartWithSound = Boolean(withSound);
-        primePreview();
-        return;
-      }
-      pendingStartWithSound = null;
-      const shouldUseFullSource = withSound && hasAudio !== false && fullSrc && fullSrc !== previewSrc;
-      if (shouldUseFullSource) {
-        loadVideoSource(fullSrc, { preload: "auto" });
-      } else {
-        primePreview();
-      }
-      video.muted = !(withSound && hasAudio !== false);
-      if (hasAudio !== false) {
-        setSoundIcon(video.muted);
-      }
-      tile.classList.add("is-playing");
-      const playPromise = video.play();
-      if (playPromise && typeof playPromise.catch === "function") {
-        playPromise.catch(() => {});
-      }
-    }
-
-    function stopPreview() {
-      tile.classList.remove("is-playing");
-      video.muted = true;
-      if (hasAudio !== false) {
-        setSoundIcon(true);
-      }
-      video.pause();
-      video.currentTime = 0;
-    }
-
-    previewPrimerMap.set(tile, primePreview);
-    if (tile.dataset.eager === "1") {
-      primePreview();
-    }
-
-    tile.addEventListener("mouseenter", (event) => {
-      tileHovered = true;
-      primePreview();
-      startPreview(false);
-      if (hasAudio !== false) {
-        showSoundIcon();
-        syncCornerState(event);
-      }
-    });
-
-    tile.addEventListener("mouseleave", () => {
-      tileHovered = false;
-      cornerPinned = false;
-      pendingStartWithSound = null;
-      stopPreview();
-      if (hasAudio !== false) {
-        hideSoundIcon(true);
-      }
-    });
-
-    tile.addEventListener("mousemove", (event) => {
-      if (hasAudio !== false) {
-        syncCornerState(event);
-      }
-    });
-
-    if (hasAudio !== false) {
-      hotspot.addEventListener("mouseenter", () => {
-        cornerPinned = true;
-        showSoundIcon({ persistent: true });
-      });
-
-      hotspot.addEventListener("mouseleave", () => {
-        cornerPinned = false;
-        if (tileHovered) {
-          showSoundIcon();
-        } else {
-          hideSoundIcon(true);
-        }
-      });
-    }
-
-    // Click toggles sound on/off for the selected tile.
-    tile.addEventListener("click", () => {
-      if (hasAudio === false) return;
-      const soundIsOn = tile.classList.contains("is-playing") && !video.muted;
-      if (soundIsOn) {
-        video.muted = true;
-        setSoundIcon(true);
-        showSoundIcon({ persistent: cornerPinned });
-        return;
-      }
-
-      tiles.forEach((otherTile) => {
-        if (otherTile !== tile) {
-          const otherVideo = otherTile.querySelector(".g-vid");
-          const otherIcon = otherTile.querySelector(".g-audio-icon");
-          if (otherVideo) {
-            otherTile.classList.remove("is-playing");
-            otherVideo.muted = true;
-            otherVideo.pause();
-            otherVideo.currentTime = 0;
-          }
-          if (otherIcon) {
-            otherIcon.classList.add("is-muted");
-            otherIcon.classList.remove("is-unmuted");
-            const otherTimer = iconTimers.get(otherIcon);
-            if (otherTimer) clearTimeout(otherTimer);
-            otherIcon.classList.remove("is-visible");
-            iconTimers.delete(otherIcon);
-          }
-        }
-      });
-      startPreview(true);
-      showSoundIcon({ persistent: cornerPinned });
     });
   });
 
-  if ("IntersectionObserver" in window) {
-    const preloadObserver = new IntersectionObserver(
-      (entries, observer) => {
-        entries.forEach((entry) => {
-          if (!entry.isIntersecting) return;
-          const tile = entry.target;
-          const primePreview = previewPrimerMap.get(tile);
-          if (primePreview) primePreview();
-          observer.unobserve(tile);
-        });
-      },
-      { rootMargin: "220px 0px" }
-    );
+  const indexButtons = Array.from(index.querySelectorAll(".gallery-index-item"));
+  let currentWork = null;
 
-    tiles.forEach((tile) => {
-      if (tile.dataset.eager === "1") return;
-      preloadObserver.observe(tile);
+  function updateUrl(work, replace = false) {
+    const url = new URL(window.location.href);
+    url.searchParams.set("work", work.slug);
+    const method = replace ? "replaceState" : "pushState";
+    window.history[method]({}, "", url);
+  }
+
+  function syncSelectionState() {
+    indexButtons.forEach((button) => {
+      button.classList.toggle("is-active", button.dataset.work === currentWork?.slug);
     });
   }
+
+  function loadStageThumb(work) {
+    stageThumb.alt = work.alt;
+    stageThumb.src = encodeURI(work.thumb);
+  }
+
+  function playStageVideo() {
+    const promise = stageVideo.play();
+    if (promise && typeof promise.catch === "function") {
+      promise.catch(() => {});
+    }
+  }
+
+  function applyWork(work, { updateHistory = true, replaceHistory = false } = {}) {
+    if (!work) return;
+
+    currentWork = work;
+    syncSelectionState();
+
+    stage.classList.remove("is-video-ready");
+    loadStageThumb(work);
+    stageYear.textContent = formatYear(work.created);
+    stageYear.hidden = !stageYear.textContent;
+
+    stageVideo.pause();
+    stageVideo.currentTime = 0;
+    stageVideo.muted = true;
+    setAudioButtonState(true);
+    setAudioAvailability(work.hasAudio !== false);
+    stageVideo.src = encodeURI(work.fullSrc || work.previewSrc || work.src);
+    stageVideo.load();
+    playStageVideo();
+
+    if (updateHistory) {
+      updateUrl(work, replaceHistory);
+    }
+  }
+
+  stageThumb.addEventListener("load", () => {
+    setRatio(stageThumb.naturalWidth, stageThumb.naturalHeight);
+  });
+
+  stageThumb.addEventListener("error", () => {
+    if (!currentWork) return;
+    const fallback = currentWork.thumbFallback || "";
+    if (fallback && decodeURI(stageThumb.getAttribute("src") || "") !== currentWork.thumbFallback) {
+      stageThumb.setAttribute("src", fallback);
+    }
+  });
+
+  stageVideo.addEventListener("loadedmetadata", () => {
+    setRatio(stageVideo.videoWidth, stageVideo.videoHeight);
+  });
+
+  stageVideo.addEventListener("loadeddata", () => {
+    stage.classList.add("is-video-ready");
+  });
+
+  stageVideo.addEventListener("canplay", () => {
+    stage.classList.add("is-video-ready");
+  });
+
+  stageVideo.addEventListener("ended", () => {
+    playStageVideo();
+  });
+
+  audioBtn.addEventListener("click", () => {
+    toggleStageSound();
+  });
+
+  indexButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const selected = works.find((item) => item.slug === button.dataset.work);
+      if (!selected) return;
+      applyWork(selected);
+    });
+  });
+
+  window.addEventListener("popstate", () => {
+    const requested = slugify(new URLSearchParams(window.location.search).get("work") || "");
+    const nextWork =
+      works.find((item) => item.slug === requested || item.key === requested) ||
+      works[0];
+    applyWork(nextWork, { updateHistory: false });
+  });
+
+  document.addEventListener("click", (event) => {
+    const target = event.target;
+    if (!(target instanceof Element)) return;
+    if (target.closest("a, button, input, textarea, select, label, .gallery-index")) return;
+    toggleStageSound();
+  });
+
+  const requested = slugify(new URLSearchParams(window.location.search).get("work") || "");
+  const initialWork =
+    works.find((item) => item.slug === requested || item.key === requested || srcKey(item.src) === requested) ||
+    works[0];
+
+  applyWork(initialWork, { replaceHistory: true });
 })();

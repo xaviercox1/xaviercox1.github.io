@@ -67,6 +67,10 @@
     toggleSound();
   }
 
+  function shouldIgnoreGlobalSoundClick(target) {
+    return !!target.closest("a, button, input, textarea, select, label");
+  }
+
   soundBtn.addEventListener("click", (event) => {
     event.stopPropagation();
     handleSoundToggleRequest();
@@ -74,6 +78,14 @@
 
   videoShell.addEventListener("click", (event) => {
     if (event.target === soundBtn || soundBtn.contains(event.target)) return;
+    handleSoundToggleRequest();
+  });
+
+  document.addEventListener("click", (event) => {
+    const target = event.target;
+    if (!(target instanceof Element)) return;
+    if (shouldIgnoreGlobalSoundClick(target)) return;
+    if (videoShell.contains(target)) return;
     handleSoundToggleRequest();
   });
 

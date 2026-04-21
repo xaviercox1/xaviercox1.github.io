@@ -220,6 +220,10 @@
     await toggleSound();
   }
 
+  function shouldIgnoreGlobalSoundClick(target) {
+    return !!target.closest("a, button, input, textarea, select, label");
+  }
+
   soundBtn?.addEventListener("click", async (event) => {
     event.stopPropagation();
     await handleSoundToggleRequest();
@@ -227,6 +231,14 @@
 
   videoShell?.addEventListener("click", async (event) => {
     if (soundBtn && (event.target === soundBtn || soundBtn.contains(event.target))) return;
+    await handleSoundToggleRequest();
+  });
+
+  document.addEventListener("click", async (event) => {
+    const target = event.target;
+    if (!(target instanceof Element)) return;
+    if (shouldIgnoreGlobalSoundClick(target)) return;
+    if (videoShell && videoShell.contains(target)) return;
     await handleSoundToggleRequest();
   });
 

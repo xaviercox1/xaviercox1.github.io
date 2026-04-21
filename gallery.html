@@ -11,32 +11,45 @@
   <div class="cursor-blur"></div>
   <div class="cursor-dot"></div>
 
-  <header class="project-nav">
-    <a href="index.html" class="reveal-right" data-delay="0">← back</a>
+  <header class="project-nav project-nav--icon">
+    <a href="index.html" class="reveal-right" data-delay="0" aria-label="Back">←</a>
   </header>
 
   <main class="gallery-wrap">
-    <div class="gallery-head reveal" data-delay="120">
-      <h1><span class="hl">Gallery</span></h1>
+    <div class="gallery-shell">
+      <section class="gallery-stage reveal" data-delay="120" id="galleryStage" aria-label="Selected work">
+        <div class="gallery-stage-media">
+          <img class="gallery-stage-thumb" id="galleryStageThumb" alt="" decoding="async" />
+          <video class="gallery-stage-video" id="galleryStageVideo" muted playsinline loop preload="metadata"></video>
+          <span class="gallery-stage-year" id="galleryStageYear" aria-hidden="true"></span>
+        </div>
+      </section>
 
-      <div class="gallery-size">
-        <input
-          id="sizeSlider"
-          class="gallery-slider"
-          type="range"
-          min="0"
-          max="1"
-          step="any"
-          value="1"
-          aria-label="Grid size"
-        />
-      </div>
+      <aside class="gallery-index reveal-right" data-delay="180" aria-label="Gallery index">
+        <div class="gallery-index-list" id="galleryIndex"></div>
+      </aside>
+
+      <button
+        class="gallery-audio-btn is-muted"
+        id="galleryAudio"
+        type="button"
+        aria-label="Unmute video"
+      >
+        <svg class="gallery-audio-icon gallery-audio-icon-muted" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M11 6L7.4 9H4v6h3.4L11 18V6z"></path>
+          <line x1="16" y1="9" x2="21" y2="14"></line>
+          <line x1="21" y1="9" x2="16" y2="14"></line>
+        </svg>
+        <svg class="gallery-audio-icon gallery-audio-icon-unmuted" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M11 6L7.4 9H4v6h3.4L11 18V6z"></path>
+          <path d="M15.5 9.5a4 4 0 0 1 0 5"></path>
+          <path d="M18.2 7.6a7 7 0 0 1 0 8.8"></path>
+        </svg>
+      </button>
     </div>
-
-    <section class="gallery-grid reveal" data-delay="200" id="galleryGrid" aria-label="Gallery grid"></section>
   </main>
 
   <script src="script.js"></script>
-  <script src="gallery.js?v=20260213d"></script>
+  <script src="gallery.js?v=20260421d"></script>
 </body>
 </html>

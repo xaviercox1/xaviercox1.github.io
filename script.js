@@ -16,8 +16,8 @@ if (cursorDot) {
   const homeOrbitPanel = null;
   let mouseX = window.innerWidth / 2;
   let mouseY = window.innerHeight / 2;
-  const idleDelayDuration = 500;
-  const idleFadeDuration = 2000;
+  const idleDelayDuration = 1050;
+  const idleFadeDuration = 450;
   const idleMovementThreshold = 1.5;
   const baseScaleSmoothing = 13;
   const cursorProjectionSmoothing = 10;
@@ -69,9 +69,9 @@ if (cursorDot) {
       return { scaleFactor: 0, opacity: 0 };
     }
 
-    const acceleratedProgress = Math.pow(idleProgress, 2.35);
+    const acceleratedProgress = Math.pow(idleProgress, 1.85);
     const scaleFactor = 1 - acceleratedProgress;
-    const opacity = 1 - Math.pow(idleProgress, 1.1);
+    const opacity = 1 - Math.pow(idleProgress, 0.92);
     return { scaleFactor, opacity };
   }
 
@@ -1207,9 +1207,20 @@ if (cursorDot) {
     );
   }
 
-  soundToggle.addEventListener("click", () => {
+  function toggleSound() {
     video.muted = !video.muted;
     updateLabel();
+  }
+
+  soundToggle.addEventListener("click", () => {
+    toggleSound();
+  });
+
+  document.addEventListener("click", (event) => {
+    const target = event.target;
+    if (!(target instanceof Element)) return;
+    if (target.closest("a, button, input, textarea, select, label")) return;
+    toggleSound();
   });
 
   updateLabel();
