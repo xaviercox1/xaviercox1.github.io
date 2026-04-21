@@ -3,10 +3,11 @@
   const stage = document.getElementById("galleryStage");
   const stageThumb = document.getElementById("galleryStageThumb");
   const stageVideo = document.getElementById("galleryStageVideo");
-  const stageYear = document.getElementById("galleryStageYear");
   const audioBtn = document.getElementById("galleryAudio");
+  const indexYear = document.getElementById("galleryIndexYear");
+  const mobileGalleryQuery = window.matchMedia("(max-width: 760px)");
 
-  if (!index || !stage || !stageThumb || !stageVideo || !stageYear || !audioBtn) return;
+  if (!index || !stage || !stageThumb || !stageVideo || !audioBtn) return;
 
   const knownWorks = [
     {
@@ -286,6 +287,34 @@
     indexButtons.forEach((button) => {
       button.classList.toggle("is-active", button.dataset.work === currentWork?.slug);
     });
+    updateIndexYear();
+  }
+
+  function updateIndexYear() {
+    if (!indexYear) return;
+
+    const year = formatYear(currentWork?.created);
+    const activeButton = index.querySelector(".gallery-index-item.is-active");
+
+    if (!year || !activeButton) {
+      indexYear.hidden = true;
+      indexYear.textContent = "";
+      return;
+    }
+
+    const buttonRect = activeButton.getBoundingClientRect();
+    indexYear.textContent = year;
+    indexYear.hidden = false;
+
+    if (mobileGalleryQuery.matches) {
+      indexYear.style.left = `${buttonRect.left + buttonRect.width / 2}px`;
+      indexYear.style.top = `${buttonRect.top - 6}px`;
+      indexYear.style.transform = "translate(-50%, -100%)";
+    } else {
+      indexYear.style.left = `${buttonRect.left - 8}px`;
+      indexYear.style.top = `${buttonRect.top + buttonRect.height / 2}px`;
+      indexYear.style.transform = "translate(-100%, -50%)";
+    }
   }
 
   function loadStageThumb(work) {
@@ -308,8 +337,6 @@
 
     stage.classList.remove("is-video-ready");
     loadStageThumb(work);
-    stageYear.textContent = formatYear(work.created);
-    stageYear.hidden = !stageYear.textContent;
 
     stageVideo.pause();
     stageVideo.currentTime = 0;
@@ -371,6 +398,14 @@
       works.find((item) => item.slug === requested || item.key === requested) ||
       works[0];
     applyWork(nextWork, { updateHistory: false });
+  });
+
+  index.addEventListener("scroll", () => {
+    updateIndexYear();
+  }, { passive: true });
+
+  window.addEventListener("resize", () => {
+    updateIndexYear();
   });
 
   document.addEventListener("click", (event) => {
