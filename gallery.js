@@ -3,11 +3,63 @@
   const stage = document.getElementById("galleryStage");
   const stageThumb = document.getElementById("galleryStageThumb");
   const stageVideo = document.getElementById("galleryStageVideo");
+  const stageNav = document.getElementById("galleryStageNav");
+  const stagePrev = document.getElementById("galleryStagePrev");
+  const stageNext = document.getElementById("galleryStageNext");
   const audioBtn = document.getElementById("galleryAudio");
   const indexYear = document.getElementById("galleryIndexYear");
   const mobileGalleryQuery = window.matchMedia("(max-width: 760px)");
 
   if (!index || !stage || !stageThumb || !stageVideo || !audioBtn) return;
+
+  const groupedWorks = [
+    {
+      slug: "intrinsik-motion-graphics",
+      alt: "Intrinsik Motion Graphics",
+      created: "2026-01-01T00:00:00+11:00",
+      layout: "portrait-stack",
+      items: [
+        {
+          src: "Content/Intrinsik/Sensor Systems.mp4",
+          thumb: "Content/Intrinsik/Thumbnails/Sensor Systems.png",
+          alt: "Sensor Systems",
+          hasAudio: null,
+        },
+        {
+          src: "Content/Intrinsik/Toobris.mp4",
+          thumb: "Content/Intrinsik/Thumbnails/Toobris.png",
+          alt: "Toobris",
+          hasAudio: null,
+        },
+        {
+          src: "Content/Intrinsik/lilac extended.mp4",
+          thumb: "Content/Intrinsik/Thumbnails/Lilac.png",
+          alt: "Lilac Extended",
+          hasAudio: null,
+        },
+      ],
+    },
+    {
+      slug: "intrinsik-live-performance",
+      alt: "Intrinsik Live Performance",
+      created: "2026-01-01T00:00:00+11:00",
+      layout: "landscape-stack",
+      items: [
+        {
+          src: "landscape-promo.mp4",
+          thumb: "Content/Thumbnails/promo.png",
+          alt: "Live Promo 1",
+          hasAudio: null,
+        },
+        {
+          src: "landscape-promo2.mp4",
+          thumb: "Content/Thumbnails/promo2.png",
+          alt: "Live Promo 2",
+          hasAudio: null,
+        },
+      ],
+    },
+  ];
 
   const knownWorks = [
     {
@@ -163,6 +215,16 @@
   function setRatio(width, height) {
     if (!width || !height) return;
     stage.style.setProperty("--stage-ratio", `${width} / ${height}`);
+    const ratio = width / height;
+    let shape = "landscape";
+
+    if (ratio < 0.92) {
+      shape = "portrait";
+    } else if (ratio <= 1.08) {
+      shape = "square";
+    }
+
+    stage.dataset.mediaShape = shape;
   }
 
   function formatYear(created) {
@@ -183,8 +245,63 @@
     audioBtn.disabled = !hasAudio;
   }
 
+  function normalizeEntry(item, sourceOrder) {
+    const fullSource = normalizeSrc(item.fullSrc || item.src);
+    const previewSource = normalizeSrc(item.previewSrc || fullSource);
+    const title = item.alt || cleanTitle(item.src);
+    return {
+      key: srcKey(item.src || title),
+      slug: slugify(title || item.src),
+      src: fullSource,
+      fullSrc: fullSource,
+      previewSrc: previewSource,
+      thumb: item.thumb || defaultThumb(item.src),
+      thumbFallback: item.thumb || defaultThumbFallback(item.src),
+      alt: title,
+      created: item.created || "",
+      hasAudio: typeof item.hasAudio === "boolean" ? item.hasAudio : null,
+      sourceOrder,
+      type: "single",
+    };
+  }
+
+  function normalizeGroup(group, sourceOrder) {
+    const items = group.items.map((item, idx) =>
+      normalizeEntry(
+        {
+          ...item,
+          created: item.created || group.created || "",
+        },
+        sourceOrder + idx / 100
+      )
+    );
+
+    return {
+      key: `group:${group.slug}`,
+      slug: group.slug,
+      src: `group:${group.slug}`,
+      alt: group.alt,
+      created: group.created || "",
+      sourceOrder,
+      type: "group",
+      layout: group.layout || "portrait-stack",
+      activeIndex: 0,
+      items,
+    };
+  }
+
+  function getDisplayedEntry(work) {
+    if (!work) return null;
+    if (work.type !== "group") return work;
+    if (!work.items.length) return null;
+    const total = work.items.length;
+    const safeIndex = ((work.activeIndex || 0) % total + total) % total;
+    return work.items[safeIndex];
+  }
+
   function toggleStageSound() {
-    if (!currentWork || currentWork.hasAudio === false) return;
+    const displayedEntry = getDisplayedEntry(currentWork);
+    if (!displayedEntry || displayedEntry.hasAudio === false) return;
     const nextMuted = !stageVideo.muted;
     stageVideo.muted = nextMuted;
     setAudioButtonState(nextMuted);
@@ -208,23 +325,8 @@
 
   manifestItems.forEach((item, idx) => {
     if (isExcludedWork(item)) return;
-    const key = srcKey(item.src);
-    const fullSource = normalizeSrc(item.fullSrc || item.src);
-    const previewSource = normalizeSrc(item.previewSrc || fullSource);
-    const title = item.alt || cleanTitle(item.src);
-    workMap.set(key, {
-      key,
-      slug: slugify(title || item.src),
-      src: fullSource,
-      fullSrc: fullSource,
-      previewSrc: previewSource,
-      thumb: item.thumb || defaultThumb(item.src),
-      thumbFallback: defaultThumbFallback(item.src),
-      alt: title,
-      created: item.created || "",
-      hasAudio: typeof item.hasAudio === "boolean" ? item.hasAudio : null,
-      sourceOrder: idx,
-    });
+    const normalized = normalizeEntry(item, idx);
+    workMap.set(srcKey(item.src), normalized);
   });
 
   knownWorks.forEach((item, idx) => {
@@ -232,28 +334,43 @@
     if (isExcludedWork(temp)) return;
     const key = srcKey(item.src);
     if (workMap.has(key)) return;
-    const fullSource = normalizeSrc(item.src);
-    const title = item.alt || cleanTitle(item.src);
-    workMap.set(key, {
-      key,
-      slug: slugify(title || item.src),
-      src: fullSource,
-      fullSrc: fullSource,
-      previewSrc: fullSource,
-      thumb: item.thumb || defaultThumb(item.src),
-      thumbFallback: item.thumb || defaultThumbFallback(item.src),
-      alt: title,
-      created: item.created || "",
-      hasAudio: typeof item.hasAudio === "boolean" ? item.hasAudio : null,
-      sourceOrder: 1000 + idx,
-    });
+    workMap.set(key, normalizeEntry(item, 1000 + idx));
   });
 
-  const works = Array.from(workMap.values()).sort(sortByMixedOrder);
+  const works = [
+    ...Array.from(workMap.values()),
+    ...groupedWorks.map((group, idx) => normalizeGroup(group, 2000 + idx)),
+  ].sort(sortByMixedOrder);
+
   if (!works.length) return;
 
   index.innerHTML = works
     .map((item) => {
+      if (item.type === "group") {
+        const cluster = item.items
+          .map((entry) => {
+            const thumb = encodeURI(entry.thumb);
+            const thumbFallback = encodeURI(entry.thumbFallback);
+            return `
+              <span class="gallery-index-group-cell" aria-hidden="true">
+                <img class="gallery-index-group-thumb" src="${thumb}" data-fallback="${thumbFallback}" alt="" loading="lazy" decoding="async" />
+              </span>
+            `;
+          })
+          .join("");
+
+        return `
+          <button
+            type="button"
+            class="gallery-index-item gallery-index-item--group gallery-index-item--${item.layout}"
+            data-work="${item.slug}"
+            aria-label="${item.alt}"
+          >
+            ${cluster}
+          </button>
+        `;
+      }
+
       const thumb = encodeURI(item.thumb);
       const thumbFallback = encodeURI(item.thumbFallback);
       return `
@@ -264,14 +381,16 @@
     })
     .join("");
 
-  index.querySelectorAll(".gallery-index-thumb").forEach((img) => {
-    img.addEventListener("error", () => {
-      const fallback = img.dataset.fallback || "";
-      if (fallback && img.getAttribute("src") !== fallback) {
-        img.setAttribute("src", fallback);
-      }
+  index
+    .querySelectorAll(".gallery-index-thumb, .gallery-index-group-thumb")
+    .forEach((img) => {
+      img.addEventListener("error", () => {
+        const fallback = img.dataset.fallback || "";
+        if (fallback && img.getAttribute("src") !== fallback) {
+          img.setAttribute("src", fallback);
+        }
+      });
     });
-  });
 
   const indexButtons = Array.from(index.querySelectorAll(".gallery-index-item"));
   let currentWork = null;
@@ -281,13 +400,6 @@
     url.searchParams.set("work", work.slug);
     const method = replace ? "replaceState" : "pushState";
     window.history[method]({}, "", url);
-  }
-
-  function syncSelectionState() {
-    indexButtons.forEach((button) => {
-      button.classList.toggle("is-active", button.dataset.work === currentWork?.slug);
-    });
-    updateIndexYear();
   }
 
   function updateIndexYear() {
@@ -317,9 +429,24 @@
     }
   }
 
-  function loadStageThumb(work) {
-    stageThumb.alt = work.alt;
-    stageThumb.src = encodeURI(work.thumb);
+  function syncSelectionState() {
+    indexButtons.forEach((button) => {
+      button.classList.toggle("is-active", button.dataset.work === currentWork?.slug);
+    });
+    updateIndexYear();
+  }
+
+  function syncStageNav() {
+    if (!stageNav || !stagePrev || !stageNext) return;
+    const isGroup = currentWork?.type === "group" && currentWork.items.length > 1;
+    stageNav.hidden = !isGroup;
+    stagePrev.disabled = !isGroup;
+    stageNext.disabled = !isGroup;
+  }
+
+  function loadStageThumb(entry) {
+    stageThumb.alt = entry.alt;
+    stageThumb.src = encodeURI(entry.thumb);
   }
 
   function playStageVideo() {
@@ -329,27 +456,47 @@
     }
   }
 
+  function renderCurrentWork({ preserveMute = false } = {}) {
+    const entry = getDisplayedEntry(currentWork);
+    if (!currentWork || !entry) return;
+
+    const previousMutedState = stageVideo.muted;
+    stage.classList.remove("is-video-ready");
+    loadStageThumb(entry);
+
+    stageVideo.pause();
+    stageVideo.currentTime = 0;
+    stageVideo.muted =
+      preserveMute && entry.hasAudio !== false ? previousMutedState : true;
+    setAudioButtonState(stageVideo.muted);
+    setAudioAvailability(entry.hasAudio !== false);
+    stageVideo.src = encodeURI(entry.fullSrc || entry.previewSrc || entry.src);
+    stageVideo.load();
+    playStageVideo();
+    syncStageNav();
+  }
+
   function applyWork(work, { updateHistory = true, replaceHistory = false } = {}) {
     if (!work) return;
 
     currentWork = work;
+    if (currentWork.type === "group" && !Number.isInteger(currentWork.activeIndex)) {
+      currentWork.activeIndex = 0;
+    }
+
     syncSelectionState();
-
-    stage.classList.remove("is-video-ready");
-    loadStageThumb(work);
-
-    stageVideo.pause();
-    stageVideo.currentTime = 0;
-    stageVideo.muted = true;
-    setAudioButtonState(true);
-    setAudioAvailability(work.hasAudio !== false);
-    stageVideo.src = encodeURI(work.fullSrc || work.previewSrc || work.src);
-    stageVideo.load();
-    playStageVideo();
+    renderCurrentWork();
 
     if (updateHistory) {
       updateUrl(work, replaceHistory);
     }
+  }
+
+  function stepGroup(direction) {
+    if (!currentWork || currentWork.type !== "group" || currentWork.items.length < 2) return;
+    const count = currentWork.items.length;
+    currentWork.activeIndex = (currentWork.activeIndex + direction + count) % count;
+    renderCurrentWork({ preserveMute: true });
   }
 
   stageThumb.addEventListener("load", () => {
@@ -357,9 +504,10 @@
   });
 
   stageThumb.addEventListener("error", () => {
-    if (!currentWork) return;
-    const fallback = currentWork.thumbFallback || "";
-    if (fallback && decodeURI(stageThumb.getAttribute("src") || "") !== currentWork.thumbFallback) {
+    const entry = getDisplayedEntry(currentWork);
+    if (!entry) return;
+    const fallback = entry.thumbFallback || "";
+    if (fallback && decodeURI(stageThumb.getAttribute("src") || "") !== entry.thumbFallback) {
       stageThumb.setAttribute("src", fallback);
     }
   });
@@ -384,6 +532,14 @@
     toggleStageSound();
   });
 
+  stagePrev?.addEventListener("click", () => {
+    stepGroup(-1);
+  });
+
+  stageNext?.addEventListener("click", () => {
+    stepGroup(1);
+  });
+
   indexButtons.forEach((button) => {
     button.addEventListener("click", () => {
       const selected = works.find((item) => item.slug === button.dataset.work);
@@ -400,13 +556,23 @@
     applyWork(nextWork, { updateHistory: false });
   });
 
-  index.addEventListener("scroll", () => {
-    updateIndexYear();
-  }, { passive: true });
+  index.addEventListener(
+    "scroll",
+    () => {
+      updateIndexYear();
+    },
+    { passive: true }
+  );
 
   window.addEventListener("resize", () => {
     updateIndexYear();
   });
+
+  if (typeof mobileGalleryQuery.addEventListener === "function") {
+    mobileGalleryQuery.addEventListener("change", updateIndexYear);
+  } else if (typeof mobileGalleryQuery.addListener === "function") {
+    mobileGalleryQuery.addListener(updateIndexYear);
+  }
 
   document.addEventListener("click", (event) => {
     const target = event.target;

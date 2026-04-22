@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <title>Gallery — Xavier Cox</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="style.css?v=20260421h" />
+  <link rel="stylesheet" href="style.css?v=20260422e" />
   <link rel="icon" type="image/png" href="favicon.png" />
 </head>
 <body>
@@ -21,6 +21,10 @@
         <div class="gallery-stage-media">
           <img class="gallery-stage-thumb" id="galleryStageThumb" alt="" decoding="async" />
           <video class="gallery-stage-video" id="galleryStageVideo" muted playsinline loop preload="metadata"></video>
+        </div>
+        <div class="gallery-stage-nav" id="galleryStageNav" hidden aria-label="Selected group navigation">
+          <button class="gallery-stage-nav-btn" id="galleryStagePrev" type="button" aria-label="Previous video">←</button>
+          <button class="gallery-stage-nav-btn" id="galleryStageNext" type="button" aria-label="Next video">→</button>
         </div>
       </section>
 
@@ -50,6 +54,6 @@
   </main>
 
   <script src="script.js"></script>
-  <script src="gallery.js?v=20260421g"></script>
+  <script src="gallery.js?v=20260422e"></script>
 </body>
 </html>
