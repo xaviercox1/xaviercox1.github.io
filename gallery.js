@@ -46,13 +46,13 @@
       layout: "landscape-stack",
       items: [
         {
-          src: "landscape-promo.mp4",
+          src: "./landscape-promo.mp4",
           thumb: "Content/Thumbnails/promo.png",
           alt: "Live Promo 1",
           hasAudio: null,
         },
         {
-          src: "landscape-promo2.mp4",
+          src: "./landscape-promo2.mp4",
           thumb: "Content/Thumbnails/promo2.png",
           alt: "Live Promo 2",
           hasAudio: null,
@@ -205,7 +205,25 @@
     return hash >>> 0;
   }
 
+  const preferredOrder = new Map([
+    ["intrinsik-live-performance", 0],
+    ["intrinsik-motion-graphics", 1],
+    ["joe-king", 2],
+    ["magma", 3],
+    ["tubular-bells", 4],
+    ["klf", 5],
+  ]);
+
   function sortByMixedOrder(a, b) {
+    const ap = preferredOrder.get(a.slug);
+    const bp = preferredOrder.get(b.slug);
+
+    if (Number.isFinite(ap) || Number.isFinite(bp)) {
+      const ar = Number.isFinite(ap) ? ap : Number.MAX_SAFE_INTEGER;
+      const br = Number.isFinite(bp) ? bp : Number.MAX_SAFE_INTEGER;
+      if (ar !== br) return ar - br;
+    }
+
     const ah = hashString(`${a.alt}|${a.src}`);
     const bh = hashString(`${b.alt}|${b.src}`);
     if (ah !== bh) return ah - bh;
