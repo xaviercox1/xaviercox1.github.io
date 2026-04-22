@@ -4,10 +4,10 @@
   <meta charset="UTF-8" />
   <title>Microcosm — Xavier Cox</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css?v=20260422m" />
   <link rel="icon" type="image/png" href="favicon.png" />
 </head>
-<body>
+<body class="microcosm-page">
   <div class="cursor-blur"></div>
   <div class="cursor-dot"></div>
 
@@ -17,16 +17,24 @@
 
   <main class="project-hero">
     <div class="video-hero video-hero--microcosm reveal" data-delay="120">
-      <video
-        id="microVideo"
-        class="project-video microcosm-video"
-        autoplay
-        muted
-        playsinline
-        preload="auto"
-      >
-        <source src="Microcosm/Title.mp4" type="video/mp4" />
-      </video>
+      <div class="microcosm-stage" id="microStage">
+        <video
+          id="microVideoA"
+          class="project-video microcosm-video is-active"
+          autoplay
+          muted
+          playsinline
+          preload="metadata"
+        ></video>
+        <video
+          id="microVideoB"
+          class="project-video microcosm-video"
+          autoplay
+          muted
+          playsinline
+          preload="metadata"
+        ></video>
+      </div>
       <button class="microcosm-audio-btn is-muted" id="microSound" type="button" aria-label="Enable sound">
         <svg class="microcosm-audio-icon microcosm-audio-icon-muted" viewBox="0 0 24 24" aria-hidden="true">
           <path d="M10 8L6.4 10.8H4v2.4h2.4L10 16V8z"></path>
@@ -39,6 +47,24 @@
           <path d="M17.5 8.6c2.2 2 2.2 4.8 0 6.8"></path>
         </svg>
       </button>
+      <button class="microcosm-wide-btn" id="microWide" type="button" aria-label="Toggle widescreen mode">
+        <svg class="microcosm-wide-icon microcosm-wide-icon-enter" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M8 4H4v4"></path>
+          <path d="M16 4h4v4"></path>
+          <path d="M4 16v4h4"></path>
+          <path d="M20 16v4h-4"></path>
+        </svg>
+        <svg class="microcosm-wide-icon microcosm-wide-icon-exit" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M9 4H4v5"></path>
+          <path d="M15 4h5v5"></path>
+          <path d="M4 15v5h5"></path>
+          <path d="M20 15v5h-5"></path>
+          <path d="M9 9L4 4"></path>
+          <path d="M15 9l5-5"></path>
+          <path d="M9 15l-5 5"></path>
+          <path d="M15 15l5 5"></path>
+        </svg>
+      </button>
       <div class="microcosm-audio-hotspot" id="microSoundHotspot" aria-hidden="true"></div>
     </div>
 
@@ -48,6 +74,9 @@
           Microcosm
         </button>
       </h1>
+      <p class="project-subhead reveal" data-delay="180">
+        Ableton · TouchDesigner
+      </p>
       <div class="microcosm-controls reveal" data-delay="260">
         <div class="microcosm-scenes" aria-label="Microcosm scene navigation">
           <button class="microcosm-scene-btn" type="button" data-scene="1" aria-label="Play scene 1">1</button>
@@ -58,18 +87,15 @@
           <button class="microcosm-scene-btn" type="button" data-scene="6" aria-label="Play scene 6">6</button>
         </div>
       </div>
-      <p class="project-subhead reveal" data-delay="180">
-        Ableton · TouchDesigner
-      </p>
-      <div class="project-text">
+      <!-- <div class="project-text">
         <p class="reveal" data-delay="320">
           Microcosm presents a speculative microscope, framing a digital environment as a living system. The viewer drifts through forms that feel biological, unstable, and constantly in flux. Sound and visuals are generated together, designed to continuously react and influence one another.
         </p>
-      </div>
+      </div> -->
     </div>
   </main>
 
   <script src="script.js"></script>
-  <script src="microcosm.js"></script>
+  <script src="microcosm.js?v=20260422k"></script>
 </body>
 </html>
