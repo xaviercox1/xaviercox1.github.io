@@ -1464,16 +1464,42 @@ a:hover {
 
 .industrique-more-panel {
   width: 100%;
+  opacity: 0;
+  filter: blur(14px);
+  transform: translateY(14px);
+  transition:
+    opacity 420ms ease,
+    filter 520ms ease,
+    transform 520ms ease;
+  will-change: opacity, filter, transform;
 }
 
 .industrique-more-panel[hidden] {
   display: none !important;
 }
 
+.industrique-more-panel.is-open {
+  opacity: 1;
+  filter: blur(0);
+  transform: translateY(0);
+}
+
+.industrique-more-panel.is-closing {
+  opacity: 0;
+  filter: blur(0);
+  transform: translateY(0);
+  transition:
+    opacity 260ms ease,
+    filter 260ms ease,
+    transform 260ms ease;
+}
+
 .industrique-more-copy {
   margin-top: 18px;
   padding-top: 18px;
   border-top: 1px solid rgba(245, 245, 245, 0.08);
+  display: flex;
+  justify-content: flex-end;
 }
 
 .industrique-more-copy p {
@@ -1482,6 +1508,7 @@ a:hover {
   color: rgba(245, 245, 245, 0.58);
   font-size: 0.84rem;
   line-height: 1.55;
+  text-align: right;
 }
 
 .industrique-more-portraits {

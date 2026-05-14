@@ -9,6 +9,7 @@
   const screenVideoB = document.getElementById("industriqueScreenVideoB");
   const moreToggle = document.getElementById("industriqueMoreToggle");
   const morePanel = document.getElementById("industriqueMorePanel");
+  let moreRestoreCenter = null;
 
   if (!stage || !mainImage) return;
 
@@ -232,8 +233,42 @@
 
   moreToggle?.addEventListener("click", () => {
     if (!morePanel) return;
-    const isOpen = !morePanel.hidden;
-    morePanel.hidden = isOpen;
-    moreToggle.setAttribute("aria-expanded", String(!isOpen));
+    const isOpen = moreToggle.getAttribute("aria-expanded") === "true";
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    function restoreMoreCenter() {
+      if (moreRestoreCenter === null) return;
+      const targetScrollY = Math.max(0, moreRestoreCenter - window.innerHeight / 2);
+      window.scrollTo({
+        top: targetScrollY,
+        behavior: prefersReducedMotion ? "auto" : "smooth",
+      });
+    }
+
+    if (isOpen) {
+      morePanel.classList.remove("is-open");
+      morePanel.classList.add("is-closing");
+      moreToggle.setAttribute("aria-expanded", "false");
+      moreToggle.textContent = "more";
+
+      window.setTimeout(() => {
+        if (moreToggle.getAttribute("aria-expanded") === "false") {
+          morePanel.hidden = true;
+          morePanel.classList.remove("is-closing");
+          restoreMoreCenter();
+        }
+      }, 280);
+      return;
+    }
+
+    moreRestoreCenter = window.scrollY + window.innerHeight / 2;
+    morePanel.hidden = false;
+    morePanel.classList.remove("is-closing");
+    moreToggle.setAttribute("aria-expanded", "true");
+    moreToggle.textContent = "less";
+
+    window.requestAnimationFrame(() => {
+      morePanel.classList.add("is-open");
+    });
   });
 })();
