@@ -410,6 +410,7 @@ if (cursorDot) {
   const eyeBackdrop = eyeArt?.querySelector(".eye-backdrop");
   const eyeField = eyeArt?.querySelector(".eye-field");
   if (!eyeArt || !eyePlane || !eyeBackdrop || !eyeField) return;
+  eyeArt.classList.add("is-loading-media");
 
   const frameBasePath = "WebArt/Eye/eyeball_png_sequence/";
   const eyeFrames = [
@@ -540,6 +541,7 @@ if (cursorDot) {
     eyeRevealScheduled = true;
     const remainingDelay = Math.max(eyeRevealReadyTime - performance.now(), 0);
     window.setTimeout(() => {
+      eyeArt.classList.remove("is-loading-media");
       eyeArt.classList.add("is-revealed");
     }, remainingDelay);
   }
@@ -1033,6 +1035,99 @@ if (cursorDot) {
       }, delay);
     });
   });
+})();
+
+// === Shared media loading indicator ===
+(function () {
+  const mediaSelector = "img, video, iframe";
+  const wrapperSelector = [
+    ".g-media",
+    ".video-hero",
+    ".industrique-gallery",
+    ".industrique-video-shell",
+    ".gallery-stage-media",
+    ".intrinsik-landscape-shell",
+  ].join(", ");
+
+  function getLoaderTarget(media) {
+    if (media.classList.contains("industrique-screen-video")) return null;
+    return media.closest(wrapperSelector) || media.parentElement;
+  }
+
+  function isReady(media) {
+    if (media.tagName === "IMG") {
+      return media.complete && media.naturalWidth > 0;
+    }
+
+    if (media.tagName === "VIDEO") {
+      if (!media.currentSrc && !media.getAttribute("src") && !media.querySelector("source")) {
+        return true;
+      }
+      return media.readyState >= 2;
+    }
+
+    if (media.tagName === "IFRAME") {
+      return media.dataset.loaderReady === "1";
+    }
+
+    return true;
+  }
+
+  function syncMedia(media) {
+    const target = getLoaderTarget(media);
+    if (!target) return;
+    target.classList.toggle("is-loading-media", !isReady(media));
+  }
+
+  function bindMedia(media) {
+    if (media.dataset.loaderBound === "1") {
+      syncMedia(media);
+      return;
+    }
+
+    media.dataset.loaderBound = "1";
+    syncMedia(media);
+
+    if (media.tagName === "IMG") {
+      media.addEventListener("load", () => syncMedia(media));
+      media.addEventListener("error", () => syncMedia(media));
+      return;
+    }
+
+    if (media.tagName === "VIDEO") {
+      ["loadstart", "waiting", "loadeddata", "canplay", "playing", "error"].forEach((eventName) => {
+        media.addEventListener(eventName, () => syncMedia(media));
+      });
+      return;
+    }
+
+    if (media.tagName === "IFRAME") {
+      media.addEventListener("load", () => {
+        media.dataset.loaderReady = "1";
+        syncMedia(media);
+      });
+    }
+  }
+
+  function bindAll(root = document) {
+    root.querySelectorAll(mediaSelector).forEach(bindMedia);
+  }
+
+  bindAll();
+
+  const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      mutation.addedNodes.forEach((node) => {
+        if (!(node instanceof Element)) return;
+        if (node.matches(mediaSelector)) {
+          bindMedia(node);
+        }
+        bindAll(node);
+      });
+    });
+  });
+
+  observer.observe(document.documentElement, { childList: true, subtree: true });
 })();
 
 // === Local file fallback for YouTube embeds ===

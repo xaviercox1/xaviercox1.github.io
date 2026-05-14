@@ -5,6 +5,7 @@
   const nextButton = document.getElementById("industriqueNext");
   const cursorDot = document.querySelector(".cursor-dot");
   const controlsVideo = document.querySelector(".industrique-video");
+  const screenReel = document.querySelector(".industrique-screen-reel");
   const screenVideoA = document.getElementById("industriqueScreenVideoA");
   const screenVideoB = document.getElementById("industriqueScreenVideoB");
   const moreToggle = document.getElementById("industriqueMoreToggle");
@@ -169,6 +170,7 @@
     const screenSources = [3, 4, 5, 6, 7, 8, 9, 10].map((number) => ({
       webm: `Content/Intrinsik Industrique/Videos/Industrique${number}.webm`,
       mp4: `Content/Intrinsik Industrique/Videos/Industrique${number}.mp4`,
+      poster: number === 3 ? "Content/Intrinsik Industrique/Videos/Industrique3-poster.png" : "",
     }));
     let activeScreenIndex = 0;
     let activeScreenVideo = screenVideoA;
@@ -186,6 +188,7 @@
       mp4Source.type = "video/mp4";
 
       video.append(webmSource, mp4Source);
+      video.poster = source.poster ? encodedSource(source.poster) : "";
       video.load();
     }
 
@@ -194,6 +197,10 @@
       if (promise && typeof promise.catch === "function") {
         promise.catch(() => {});
       }
+    }
+
+    function setScreenLoading(isLoading) {
+      screenReel?.classList.toggle("is-loading-media", isLoading);
     }
 
     function wrapScreenIndex(index) {
@@ -210,6 +217,7 @@
     function advanceScreenVideo() {
       activeScreenVideo.classList.remove("is-active");
       activeScreenVideo.pause();
+      setScreenLoading(true);
 
       activeScreenIndex = wrapScreenIndex(activeScreenIndex + 1);
       const previousActiveVideo = activeScreenVideo;
@@ -223,10 +231,24 @@
     }
 
     setScreenSources(activeScreenVideo, screenSources[activeScreenIndex]);
+    setScreenLoading(true);
     prepareStandbyVideo();
     activeScreenVideo.addEventListener("canplay", () => {
+      setScreenLoading(false);
       playScreenVideo(activeScreenVideo);
     }, { once: true });
+    screenVideoA.addEventListener("canplay", () => {
+      if (screenVideoA.classList.contains("is-active")) setScreenLoading(false);
+    });
+    screenVideoB.addEventListener("canplay", () => {
+      if (screenVideoB.classList.contains("is-active")) setScreenLoading(false);
+    });
+    screenVideoA.addEventListener("playing", () => {
+      if (screenVideoA.classList.contains("is-active")) setScreenLoading(false);
+    });
+    screenVideoB.addEventListener("playing", () => {
+      if (screenVideoB.classList.contains("is-active")) setScreenLoading(false);
+    });
     screenVideoA.addEventListener("ended", advanceScreenVideo);
     screenVideoB.addEventListener("ended", advanceScreenVideo);
   }
