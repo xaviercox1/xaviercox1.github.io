@@ -140,7 +140,7 @@ a:hover {
 /* === Shared loading indicator === */
 .loader,
 .is-loading-media::after {
-  width: 15px;
+  width: 5px;
   aspect-ratio: 1;
   border-radius: 50%;
   animation: l5 1s infinite linear alternate;
@@ -187,19 +187,19 @@ a:hover {
 
 @keyframes l5 {
   0% {
-    box-shadow: 20px 0 var(--loader-color), -20px 0 var(--loader-dim);
+    box-shadow: 6px 0 var(--loader-color), -6px 0 var(--loader-dim);
     background: var(--loader-color);
   }
   33% {
-    box-shadow: 20px 0 var(--loader-color), -20px 0 var(--loader-dim);
+    box-shadow: 6px 0 var(--loader-color), -6px 0 var(--loader-dim);
     background: var(--loader-dim);
   }
   66% {
-    box-shadow: 20px 0 var(--loader-dim), -20px 0 var(--loader-color);
+    box-shadow: 6px 0 var(--loader-dim), -6px 0 var(--loader-color);
     background: var(--loader-dim);
   }
   100% {
-    box-shadow: 20px 0 var(--loader-dim), -20px 0 var(--loader-color);
+    box-shadow: 6px 0 var(--loader-dim), -6px 0 var(--loader-color);
     background: var(--loader-color);
   }
 }
@@ -1313,9 +1313,9 @@ a:hover {
 
 .industrique-media-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.04fr) minmax(280px, 0.56fr);
+  grid-template-columns: minmax(0, 1fr) minmax(360px, 0.72fr);
   gap: clamp(20px, 3.4vw, 44px);
-  align-items: end;
+  align-items: center;
 }
 
 .industrique-gallery {
@@ -1329,7 +1329,7 @@ a:hover {
   margin: 0;
   position: relative;
   width: 100%;
-  height: clamp(260px, 30vw, 390px);
+  height: clamp(250px, 29.8vw, 376px);
   border-radius: 14px;
   background: #000;
   outline: 0;
@@ -1433,11 +1433,12 @@ a:hover {
 .industrique-loop {
   min-width: 0;
   align-self: center;
+  width: 100%;
 }
 
 .industrique-video-shell {
   width: 100%;
-  height: clamp(260px, 30vw, 390px);
+  height: clamp(250px, 29.8vw, 376px);
   border-radius: 14px;
   overflow: hidden;
   background: #000;

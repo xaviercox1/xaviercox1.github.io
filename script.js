@@ -410,7 +410,6 @@ if (cursorDot) {
   const eyeBackdrop = eyeArt?.querySelector(".eye-backdrop");
   const eyeField = eyeArt?.querySelector(".eye-field");
   if (!eyeArt || !eyePlane || !eyeBackdrop || !eyeField) return;
-  eyeArt.classList.add("is-loading-media");
 
   const frameBasePath = "WebArt/Eye/eyeball_png_sequence/";
   const eyeFrames = [
@@ -541,7 +540,6 @@ if (cursorDot) {
     eyeRevealScheduled = true;
     const remainingDelay = Math.max(eyeRevealReadyTime - performance.now(), 0);
     window.setTimeout(() => {
-      eyeArt.classList.remove("is-loading-media");
       eyeArt.classList.add("is-revealed");
     }, remainingDelay);
   }
@@ -1039,6 +1037,16 @@ if (cursorDot) {
 
 // === Shared media loading indicator ===
 (function () {
+  const excludedPages = new Set([
+    "",
+    "index.html",
+    "beneath-your-eyes.html",
+    "microcosm.html",
+    "virtual-environment.html",
+  ]);
+  const pageName = window.location.pathname.split("/").pop();
+  if (excludedPages.has(pageName)) return;
+
   const mediaSelector = "img, video, iframe";
   const wrapperSelector = [
     ".g-media",

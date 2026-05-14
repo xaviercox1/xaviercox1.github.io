@@ -128,10 +128,10 @@
   preloadPhoto(1);
 
   if (controlsVideo) {
-    const loopPaddingSeconds = 0.16;
-    const loopStartSeconds = 0.04;
+    const loopPaddingSeconds = 0.72;
+    const loopStartSeconds = 0.06;
 
-    controlsVideo.loop = false;
+    controlsVideo.loop = true;
 
     function playControlsVideo() {
       const promise = controlsVideo.play();
@@ -150,20 +150,30 @@
         controlsVideo.currentTime = loopStartSeconds;
         playControlsVideo();
       }
+    }
 
-      requestAnimationFrame(tightenControlsLoop);
+    function watchControlsLoop() {
+      tightenControlsLoop();
+      if (typeof controlsVideo.requestVideoFrameCallback === "function") {
+        controlsVideo.requestVideoFrameCallback(watchControlsLoop);
+      } else {
+        requestAnimationFrame(watchControlsLoop);
+      }
     }
 
     controlsVideo.addEventListener("loadedmetadata", () => {
+      controlsVideo.currentTime = loopStartSeconds;
       playControlsVideo();
     });
+
+    controlsVideo.addEventListener("timeupdate", tightenControlsLoop);
 
     controlsVideo.addEventListener("ended", () => {
       controlsVideo.currentTime = loopStartSeconds;
       playControlsVideo();
     });
 
-    tightenControlsLoop();
+    watchControlsLoop();
   }
 
   if (screenVideoA && screenVideoB) {
