@@ -123,7 +123,6 @@
     }
   });
 
-  updateCount();
   preloadPhoto(1);
 
   if (controlsVideo) {
