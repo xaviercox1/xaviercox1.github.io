@@ -2,4 +2,11 @@
 !Content/*.mp4
 !Content/**/*.mp4
 
+Content/Intrinsik Industrique/*.MP4
+Content/Intrinsik Industrique/*.mp4
+Content/Intrinsik Industrique/*.MOV
+Content/Intrinsik Industrique/*.mov
+Content/Intrinsik Industrique/*.png
+Content/Intrinsik Industrique/.DS_Store
+
 .DS_Store
