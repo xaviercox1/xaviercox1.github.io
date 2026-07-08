@@ -1,0 +1,788 @@
+.testing-page {
+  --testing-canvas-width: 1080px;
+  --testing-canvas-height: 1080px;
+  --testing-canvas-aspect: 1 / 1;
+  min-height: 100%;
+  overflow-x: hidden;
+  background: #000;
+}
+
+.testing-shell {
+  width: min(1420px, calc(100vw - 120px));
+  margin-top: 40px;
+  margin-left: 60px;
+  padding-bottom: 80px;
+}
+
+.testing-header {
+  max-width: min(100%, 1240px);
+  margin-bottom: 0.95rem;
+}
+
+.testing-back {
+  width: fit-content;
+}
+
+.testing-title-line {
+  margin-top: 1.35rem;
+}
+
+.testing-title-line + .testing-title-line {
+  margin-top: 0.4rem;
+}
+
+.output-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  width: min(100%, 620px);
+  margin-top: 1.1rem;
+  margin-bottom: 0.1rem;
+}
+
+.output-button {
+  min-height: 30px;
+  padding: 0 10px;
+  border: 1px solid rgba(245, 245, 245, 0.34);
+  background: transparent;
+  color: #d8d8d8;
+  font: inherit;
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.output-button:hover:not(:disabled),
+.output-button.is-active {
+  border-color: #f5f5f5;
+  background: #f5f5f5;
+  color: #050505;
+}
+
+.output-button:disabled {
+  cursor: default;
+  opacity: 0.35;
+}
+
+.output-size-field {
+  display: inline-grid;
+  grid-template-columns: auto 70px;
+  gap: 5px;
+  align-items: center;
+  min-height: 30px;
+  color: #d8d8d8;
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.output-size-field input {
+  width: 70px;
+  min-height: 30px;
+  border: 1px solid rgba(245, 245, 245, 0.34);
+  background: transparent;
+  color: #f5f5f5;
+  font: inherit;
+  text-align: center;
+}
+
+.output-status {
+  min-height: 14px;
+  color: #9d9d9d;
+  font-size: 0.66rem;
+  line-height: 1.2;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.testing-page-toggle {
+  display: inline-flex;
+  max-width: 100%;
+  gap: 0.7ch;
+  align-items: baseline;
+  padding: 0;
+  border: 0;
+  border-bottom: 1px solid rgba(245, 245, 245, 0.4);
+  background: transparent;
+  color: #f5f5f5;
+  font: inherit;
+  line-height: inherit;
+  text-align: left;
+}
+
+.testing-page-toggle:hover {
+  border-bottom-color: rgba(245, 245, 245, 0.9);
+}
+
+.testing-page-toggle__arrow {
+  display: inline-block;
+  min-width: 1ch;
+}
+
+.testing-panel {
+  width: min(100%, 1180px);
+  padding-top: 1.45rem;
+  padding-bottom: 0.55rem;
+}
+
+.experiment-lines {
+  display: grid;
+  gap: 0.48rem;
+}
+
+.experiment-line {
+  margin-top: 0;
+  margin-left: 1.35rem;
+}
+
+.experiment-toggle {
+  display: inline-flex;
+  max-width: 100%;
+  gap: 0.6ch;
+  align-items: baseline;
+  padding: 0;
+  border: 0;
+  border-bottom: 1px solid transparent;
+  background: transparent;
+  color: #d8d8d8;
+  font: inherit;
+  line-height: inherit;
+  text-align: left;
+}
+
+.experiment-toggle:hover,
+.experiment-toggle[aria-expanded="true"] {
+  color: #f5f5f5;
+  border-bottom-color: rgba(245, 245, 245, 0.45);
+}
+
+.experiment-toggle__dot {
+  display: inline-block;
+  width: 1ch;
+  color: #f5f5f5;
+}
+
+.date-experiment[hidden] {
+  display: none;
+}
+
+.date-experiment {
+  margin: 0.75rem 0 1.25rem 1.35rem;
+}
+
+.testing-artwork {
+  display: grid;
+  place-items: center;
+  width: min(100%, 820px);
+  min-height: min(84vh, 1040px);
+  padding: clamp(12px, 2.4vw, 28px);
+  background: #080808;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+#text-gradient-canvas {
+  display: block;
+  width: min(100%, var(--testing-canvas-width));
+  height: auto;
+  aspect-ratio: var(--testing-canvas-aspect);
+  background: #f6f0e5;
+  box-shadow: 0 18px 70px rgba(0, 0, 0, 0.58);
+}
+
+.testing-workspace {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  gap: 22px;
+  align-items: start;
+}
+
+.type-physics-workspace {
+  display: grid;
+  grid-template-columns: 300px minmax(0, 1fr);
+  gap: 22px;
+  align-items: start;
+}
+
+.grid-text-workspace {
+  display: grid;
+  grid-template-columns: 300px minmax(0, 1fr);
+  gap: 22px;
+  align-items: start;
+}
+
+.testing-controls,
+.physics-controls {
+  position: sticky;
+  top: 24px;
+  display: grid;
+  gap: 18px;
+  padding: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.physics-controls {
+  display: block;
+}
+
+.rhythm-controls {
+  display: grid;
+  gap: 12px;
+  max-height: calc(100vh - 48px);
+  overflow: auto;
+  scrollbar-width: thin;
+}
+
+.testing-controls label,
+.physics-controls label {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  color: #d8d8d8;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.testing-controls input[type="range"],
+.physics-controls input[type="range"] {
+  width: 100%;
+  accent-color: #f5f5f5;
+}
+
+.physics-controls input[type="text"],
+.physics-controls select,
+.physics-controls input[type="color"] {
+  width: 100%;
+  min-height: 32px;
+  padding: 0 8px;
+  border: 1px solid rgba(245, 245, 245, 0.38);
+  border-radius: 0;
+  background: #f5f5f5;
+  color: #050505;
+  font: inherit;
+}
+
+.physics-controls input[type="color"] {
+  width: 52px;
+  padding: 2px;
+}
+
+.rhythm-control-section {
+  display: grid;
+  gap: 6px;
+  padding: 0 0 13px;
+  border-bottom: 1px solid rgba(245, 245, 245, 0.14);
+}
+
+.rhythm-control-section:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.rhythm-control-section h3 {
+  margin: 0 0 3px;
+  color: #f5f5f5;
+  font: inherit;
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.rhythm-controls label {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+  min-height: 34px;
+}
+
+.rhythm-controls label > span:first-child {
+  min-width: 0;
+  color: #d8d8d8;
+  overflow-wrap: anywhere;
+}
+
+.rhythm-controls .rhythm-wide,
+.rhythm-controls .physics-text-field {
+  grid-template-columns: 1fr;
+  gap: 7px;
+}
+
+.rhythm-controls select {
+  width: 132px;
+  min-height: 32px;
+}
+
+.wave-editor {
+  display: grid;
+  grid-column: 1 / -1;
+  min-height: 116px;
+  margin-bottom: 5px;
+  border: 1px solid rgba(245, 245, 245, 0.28);
+  background: #f5f5f5;
+}
+
+.wave-editor--value {
+  background: #050505;
+  border-color: rgba(245, 245, 245, 0.34);
+}
+
+#grid5-wave-graph,
+#grid6-wave-graph {
+  display: block;
+  width: 100%;
+  height: 116px;
+  cursor: crosshair;
+  touch-action: none;
+}
+
+#grid6-wave-graph {
+  height: 138px;
+}
+
+.physics-file-field {
+  position: relative;
+  min-height: 34px;
+  border: 1px dashed rgba(245, 245, 245, 0.34);
+  padding: 0 8px;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.physics-file-field:hover {
+  border-color: rgba(245, 245, 245, 0.82);
+}
+
+.physics-file-field input {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.physics-text-field {
+  display: grid;
+  grid-template-columns: 1fr;
+}
+
+.physics-source-control {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+  min-height: 40px;
+  color: #d8d8d8;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.physics-source-buttons {
+  display: inline-grid;
+  grid-template-columns: repeat(2, 58px);
+  gap: 4px;
+}
+
+.physics-source-button {
+  min-height: 30px;
+  border: 1px solid rgba(245, 245, 245, 0.34);
+  background: transparent;
+  color: #d8d8d8;
+  font: inherit;
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.physics-source-button:hover,
+.physics-source-button.is-active {
+  border-color: #f5f5f5;
+  background: #f5f5f5;
+  color: #050505;
+}
+
+.physics-source-select {
+  display: none;
+}
+
+.physics-source-status {
+  min-height: 16px;
+  margin: -2px 0 3px;
+  color: #9d9d9d;
+  font-size: 0.68rem;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.physics-controls.is-image-source .physics-text-field {
+  display: none;
+}
+
+.physics-tablist {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 5px;
+  margin-bottom: 10px;
+}
+
+.physics-tablist--wide {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.preset-bar {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 5px;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(245, 245, 245, 0.16);
+}
+
+.preset-field {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 5px;
+  min-height: auto;
+}
+
+.preset-field span {
+  color: #d8d8d8;
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.preset-field input,
+.preset-field select {
+  width: 100%;
+  min-height: 32px;
+}
+
+.preset-button {
+  min-height: 31px;
+  border: 1px solid rgba(245, 245, 245, 0.34);
+  background: transparent;
+  color: #d8d8d8;
+  font: inherit;
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.preset-button:hover {
+  border-color: #f5f5f5;
+  background: #f5f5f5;
+  color: #050505;
+}
+
+.preset-button--wide,
+.preset-status {
+  grid-column: 1 / -1;
+}
+
+.preset-status {
+  min-height: 14px;
+  color: #9d9d9d;
+  font-size: 0.66rem;
+  line-height: 1.2;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.physics-tab {
+  min-height: 30px;
+  padding: 0 7px;
+  border: 1px solid rgba(245, 245, 245, 0.28);
+  background: transparent;
+  color: #d8d8d8;
+  font: inherit;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.physics-tab:hover,
+.physics-tab.is-active {
+  border-color: rgba(245, 245, 245, 0.82);
+  background: #f5f5f5;
+  color: #050505;
+}
+
+.physics-tab-panel {
+  display: none;
+  gap: 5px;
+}
+
+.physics-tab-panel.is-active {
+  display: grid;
+}
+
+.physics-controls .physics-tab-panel label {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+  min-height: 40px;
+}
+
+.physics-controls .physics-tab-panel label > span:first-child,
+.physics-controls .physics-text-field > span {
+  min-width: 0;
+  color: #d8d8d8;
+  overflow-wrap: anywhere;
+}
+
+.physics-controls .physics-tab-panel select {
+  width: 132px;
+  min-height: 32px;
+}
+
+.physics-controls .testing-toggle {
+  grid-template-columns: minmax(0, 1fr) auto;
+  min-height: 32px;
+}
+
+.physics-controls .testing-toggle input {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.physics-controls .testing-toggle span {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.physics-controls > button {
+  width: 100%;
+  margin-top: 14px;
+}
+
+.knob-shell {
+  --knob-angle: -135deg;
+  position: relative;
+  display: grid;
+  grid-template-columns: 32px;
+  align-items: center;
+  justify-content: end;
+  width: 32px;
+  color: #f5f5f5;
+  cursor: ns-resize;
+  touch-action: none;
+}
+
+.knob-shell input[type="range"] {
+  position: absolute;
+  inset: 0 auto auto 0;
+  width: 32px;
+  height: 32px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.knob-dial {
+  position: relative;
+  width: 32px;
+  height: 32px;
+  border: 1px solid #f5f5f5;
+  border-radius: 50%;
+  background: #f5f5f5;
+}
+
+.knob-dial::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 2px;
+  width: 2px;
+  height: 14px;
+  border-radius: 999px;
+  background: #050505;
+  transform: translateX(-50%) rotate(var(--knob-angle));
+  transform-origin: 50% 14px;
+}
+
+.knob-shell:hover .knob-dial,
+.knob-shell:focus-visible .knob-dial,
+.knob-shell.is-dragging .knob-dial {
+  border-color: #f5f5f5;
+  box-shadow: 0 0 0 1px rgba(245, 245, 245, 0.28);
+}
+
+.knob-value {
+  display: none;
+}
+
+.file-drop {
+  min-height: 92px;
+  place-items: center;
+  border: 1px dashed rgba(255, 255, 255, 0.42);
+  background: #101010;
+  text-align: center;
+}
+
+.file-drop input {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.file-drop span {
+  color: #f5f5f5;
+}
+
+.testing-toggle {
+  grid-template-columns: 18px 1fr;
+  align-items: center;
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 0.92rem;
+}
+
+.testing-toggle input {
+  width: 16px;
+  height: 16px;
+  accent-color: #f5f5f5;
+}
+
+.testing-controls button,
+.physics-controls > button {
+  min-height: 40px;
+  border: 1px solid rgba(245, 245, 245, 0.76);
+  border-radius: 0;
+  background: #f5f5f5;
+  color: #050505;
+  font: inherit;
+}
+
+.testing-controls button:hover,
+.physics-controls > button:hover,
+.file-drop:hover {
+  filter: invert(1);
+}
+
+.testing-stage {
+  display: grid;
+  place-items: center;
+  min-height: min(78vh, 920px);
+  padding: clamp(10px, 2vw, 24px);
+  background: #090909;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+#pattern-canvas {
+  display: block;
+  width: min(100%, var(--testing-canvas-width));
+  height: auto;
+  aspect-ratio: var(--testing-canvas-aspect);
+  background: #fff;
+  box-shadow: 0 18px 70px rgba(0, 0, 0, 0.42);
+}
+
+.type-physics-stage {
+  display: grid;
+  place-items: center;
+  min-height: min(78vh, 780px);
+  padding: clamp(10px, 2vw, 24px);
+  background: #070707;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+#type-physics-canvas,
+#type-gradient-physics-canvas,
+#grid-text-canvas,
+#grid-edit-2-canvas,
+#grid-edit-3-canvas,
+#grid-edit-4-canvas,
+#grid-edit-5-canvas,
+#grid-edit-6-canvas,
+#type-identity-canvas,
+#orbit-type-canvas {
+  display: block;
+  width: min(100%, var(--testing-canvas-width));
+  height: auto;
+  aspect-ratio: var(--testing-canvas-aspect);
+  background: #050505;
+  box-shadow: 0 18px 70px rgba(0, 0, 0, 0.5);
+  touch-action: none;
+}
+
+#orbit-type-canvas {
+  cursor: grab;
+}
+
+#orbit-type-canvas.is-dragging {
+  cursor: grabbing;
+}
+
+.grid-text-stage {
+  display: grid;
+  place-items: center;
+  min-height: min(78vh, 780px);
+  padding: clamp(10px, 2vw, 24px);
+  background: #070707;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+@media (max-width: 820px) {
+  .testing-shell {
+    width: calc(100vw - 48px);
+    margin-top: 24px;
+    margin-left: 24px;
+    padding-bottom: 56px;
+  }
+
+  #text-gradient-canvas {
+    width: 100%;
+    height: auto;
+  }
+
+  .testing-workspace,
+  .type-physics-workspace,
+  .grid-text-workspace {
+    grid-template-columns: 1fr;
+  }
+
+  .testing-controls,
+  .physics-controls {
+    position: static;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .file-drop,
+  .testing-controls button,
+  .physics-controls > button {
+    grid-column: 1 / -1;
+  }
+
+  #type-physics-canvas,
+    #type-gradient-physics-canvas,
+    #grid-text-canvas,
+    #grid-edit-2-canvas,
+    #grid-edit-3-canvas,
+    #grid-edit-4-canvas,
+    #grid-edit-5-canvas,
+    #grid-edit-6-canvas,
+    #type-identity-canvas,
+    #orbit-type-canvas {
+    width: 100%;
+    height: auto;
+  }
+}
+
+@media (max-width: 520px) {
+  .testing-controls,
+  .physics-controls {
+    grid-template-columns: 1fr;
+  }
+}

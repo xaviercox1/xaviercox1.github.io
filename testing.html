@@ -1,0 +1,2799 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Testing - Xavier Cox</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="stylesheet" href="style.css?v=20260422b" />
+  <link rel="stylesheet" href="testing.css?v=20260704c" />
+  <link rel="icon" type="image/png" href="favicon.png" />
+</head>
+<body class="testing-page">
+  <div class="cursor-blur"></div>
+  <div class="cursor-dot"></div>
+
+  <main class="testing-shell">
+    <header class="testing-header">
+      <p class="line">
+        <span class="hl">
+          <a class="testing-back" href="index.html">Xavier Cox</a>
+        </span>
+      </p>
+
+      <div class="output-controls" aria-label="Testing page output controls">
+        <button class="output-button" id="output-play-pause" type="button" aria-pressed="false">Pause</button>
+        <button class="output-button" id="output-record" type="button">Record</button>
+        <button class="output-button" id="output-stop-record" type="button" disabled>Stop</button>
+        <label class="output-size-field">
+          <span>W</span>
+          <input id="output-canvas-width" type="number" min="320" max="3840" step="10" value="1080" />
+        </label>
+        <label class="output-size-field">
+          <span>H</span>
+          <input id="output-canvas-height" type="number" min="320" max="3840" step="10" value="1080" />
+        </label>
+        <button class="output-button" id="output-apply-size" type="button">Apply Size</button>
+        <span class="output-status" id="output-status" aria-live="polite"></span>
+      </div>
+
+      <p class="line testing-title-line">
+        <button
+          class="testing-page-toggle"
+          type="button"
+          aria-expanded="false"
+          aria-controls="date-1-panel"
+        >
+          <span>1/7</span>
+          <span class="testing-page-toggle__arrow" aria-hidden="true">↓</span>
+        </button>
+      </p>
+
+      <div class="testing-panel" id="date-1-panel" hidden>
+        <div class="experiment-lines" data-experiment-group="date-1">
+        <p class="line experiment-line">
+          <button
+            class="experiment-toggle"
+            type="button"
+            aria-expanded="false"
+            aria-controls="text-gradient-panel"
+          >
+            <span class="experiment-toggle__dot" aria-hidden="true">·</span>
+            <span>Text Gradient Map</span>
+            <span class="testing-page-toggle__arrow" aria-hidden="true">↓</span>
+          </button>
+        </p>
+
+        <div class="date-experiment" id="text-gradient-panel" hidden>
+          <section class="testing-artwork" aria-label="Text gradient map canvas artwork">
+            <canvas id="text-gradient-canvas" aria-label="Double sphere text gradient map"></canvas>
+          </section>
+        </div>
+
+        <p class="line experiment-line">
+          <button
+            class="experiment-toggle"
+            type="button"
+            aria-expanded="false"
+            aria-controls="pattern-image-panel"
+          >
+            <span class="experiment-toggle__dot" aria-hidden="true">·</span>
+            <span>Pattern Image Test</span>
+            <span class="testing-page-toggle__arrow" aria-hidden="true">↓</span>
+          </button>
+        </p>
+
+        <div class="date-experiment" id="pattern-image-panel" hidden>
+          <section class="testing-workspace" aria-label="Pattern image generator">
+            <form class="testing-controls" id="pattern-controls">
+              <label class="file-drop" for="source-image">
+                <input id="source-image" type="file" accept="image/*" />
+                <span>Import Photo</span>
+              </label>
+
+              <label>
+                <span>Block Size</span>
+                <input id="tile-size" type="range" min="8" max="34" value="18" />
+              </label>
+
+              <label>
+                <span>Contrast</span>
+                <input id="contrast" type="range" min="70" max="180" value="122" />
+              </label>
+
+              <label>
+                <span>Dither</span>
+                <input id="dither" type="range" min="0" max="70" value="18" />
+              </label>
+
+              <label>
+                <span>Pattern Count</span>
+                <input id="pattern-count" type="range" min="6" max="16" value="14" />
+              </label>
+
+              <label class="testing-toggle">
+                <input id="invert" type="checkbox" />
+                <span>Invert</span>
+              </label>
+
+              <button type="button" id="export-image">Export PNG</button>
+            </form>
+
+            <div class="testing-stage">
+              <canvas id="pattern-canvas" width="960" height="960" aria-label="Generated pattern image"></canvas>
+            </div>
+          </section>
+        </div>
+
+        <p class="line experiment-line">
+          <button
+            class="experiment-toggle"
+            type="button"
+            aria-expanded="false"
+            aria-controls="type-physics-panel"
+          >
+            <span class="experiment-toggle__dot" aria-hidden="true">·</span>
+            <span>Tangible Type Physics</span>
+            <span class="testing-page-toggle__arrow" aria-hidden="true">↓</span>
+          </button>
+        </p>
+
+        <div class="date-experiment" id="type-physics-panel" hidden>
+          <section class="type-physics-workspace" aria-label="Tangible type physics canvas">
+            <form class="physics-controls" id="type-physics-controls">
+            <div class="physics-tablist" role="tablist" aria-label="Tangible type controls">
+              <button class="physics-tab is-active" type="button" role="tab" aria-selected="true" data-tab-target="type-tab-physics">Physics</button>
+              <button class="physics-tab" type="button" role="tab" aria-selected="false" data-tab-target="type-tab-type">Shape</button>
+              <button class="physics-tab" type="button" role="tab" aria-selected="false" data-tab-target="type-tab-look">Look</button>
+              <button class="physics-tab" type="button" role="tab" aria-selected="false" data-tab-target="type-tab-force">Force</button>
+            </div>
+
+            <div class="physics-tab-panel is-active" id="type-tab-physics" role="tabpanel">
+              <label>
+                <span>Gravity</span>
+                <input id="type-gravity" type="range" min="0" max="100" value="48" />
+              </label>
+
+              <label>
+                <span>Sturdy</span>
+                <input id="type-sturdy" type="range" min="0" max="100" value="58" />
+              </label>
+
+              <label>
+                <span>Spring Strength</span>
+                <input id="type-spring" type="range" min="0" max="100" value="58" />
+              </label>
+
+              <label>
+                <span>Home Pull</span>
+                <input id="type-home" type="range" min="0" max="100" value="52" />
+              </label>
+
+              <label>
+                <span>Bounce</span>
+                <input id="type-bounce" type="range" min="0" max="100" value="42" />
+              </label>
+
+              <label>
+                <span>Air Drag</span>
+                <input id="type-drag" type="range" min="0" max="100" value="18" />
+              </label>
+
+              <label>
+                <span>Floor Friction</span>
+                <input id="type-floor-friction" type="range" min="0" max="100" value="36" />
+              </label>
+
+              <label>
+                <span>Mass</span>
+                <input id="type-mass" type="range" min="20" max="180" value="86" />
+              </label>
+
+              <label>
+                <span>Solver Steps</span>
+                <input id="type-solver-steps" type="range" min="1" max="6" value="3" />
+              </label>
+            </div>
+
+            <div class="physics-tab-panel" id="type-tab-type" role="tabpanel">
+              <label class="physics-text-field">
+                <span>Text</span>
+                <input id="type-text" type="text" value="COLLAPSE" autocomplete="off" />
+              </label>
+
+              <div class="physics-source-control">
+                <span>Source</span>
+                <div class="physics-source-buttons" aria-label="Source">
+                  <button class="physics-source-button is-active" type="button" data-source-value="text" aria-pressed="true">Text</button>
+                  <button class="physics-source-button" type="button" data-source-value="image" aria-pressed="false">Image</button>
+                </div>
+                <select class="physics-source-select" id="type-source-mode" aria-label="Source">
+                  <option value="text">Text</option>
+                  <option value="image">Imported Image</option>
+                </select>
+              </div>
+
+              <label class="physics-file-field" for="type-image-file">
+                <span>Import Image</span>
+                <input id="type-image-file" type="file" accept="image/*" />
+              </label>
+
+              <p class="physics-source-status" id="type-image-status">No image loaded</p>
+
+              <label>
+                <span>Image Threshold</span>
+                <input id="type-image-threshold" type="range" min="0" max="100" value="58" />
+              </label>
+
+              <label class="testing-toggle">
+                <input id="type-image-invert" type="checkbox" />
+                <span>Invert Image</span>
+              </label>
+
+              <label>
+                <span>Source Size</span>
+                <input id="type-size" type="range" min="52" max="180" value="118" />
+              </label>
+
+              <label>
+                <span>Outline Size</span>
+                <input id="type-outline" type="range" min="2" max="18" value="7" />
+              </label>
+
+              <label>
+                <span>Shape</span>
+                <select id="type-shape">
+                  <option value="circle">Circles</option>
+                  <option value="square">Squares</option>
+                  <option value="line">Connected Lines</option>
+                </select>
+              </label>
+
+              <label>
+                <span>Text Mode</span>
+                <select id="type-text-mode">
+                  <option value="stroke">Stroke</option>
+                  <option value="fill">Fill</option>
+                </select>
+              </label>
+
+              <label class="testing-toggle">
+                <input id="type-grid-repeat" type="checkbox" />
+                <span>Grid Repeat</span>
+              </label>
+
+              <label>
+                <span>Repeat Crop X</span>
+                <input id="type-repeat-crop-x" type="range" min="0" max="45" value="0" />
+              </label>
+
+              <label>
+                <span>Repeat Crop Y</span>
+                <input id="type-repeat-crop-y" type="range" min="0" max="45" value="0" />
+              </label>
+
+              <label>
+                <span>Variation</span>
+                <input id="type-variation" type="range" min="0" max="100" value="44" />
+              </label>
+            </div>
+
+            <div class="physics-tab-panel" id="type-tab-look" role="tabpanel">
+              <label>
+                <span>Amount of Points</span>
+                <input id="type-point-amount" type="range" min="90" max="5000" value="900" />
+              </label>
+
+              <label>
+                <span>Size of Points</span>
+                <input id="type-point-size" type="range" min="1" max="18" value="6" />
+              </label>
+
+              <label>
+                <span>Point Opacity</span>
+                <input id="type-opacity" type="range" min="0" max="100" value="82" />
+              </label>
+
+              <label>
+                <span>Opacity Variation</span>
+                <input id="type-opacity-variation" type="range" min="0" max="100" value="18" />
+              </label>
+            </div>
+
+            <div class="physics-tab-panel" id="type-tab-force" role="tabpanel">
+              <label>
+                <span>Mouse Force</span>
+                <input id="type-mouse-force" type="range" min="0" max="100" value="68" />
+              </label>
+
+              <label>
+                <span>Mouse Radius</span>
+                <input id="type-mouse-radius" type="range" min="20" max="220" value="120" />
+              </label>
+
+              <label class="testing-toggle">
+                <input id="type-mouse-enabled" type="checkbox" checked />
+                <span>Mouse Force</span>
+              </label>
+            </div>
+
+            <button type="button" id="type-reset">Reset Physics</button>
+            </form>
+
+            <div class="type-physics-stage">
+              <canvas id="type-physics-canvas" aria-label="Physics based tangible text outline"></canvas>
+            </div>
+          </section>
+        </div>
+
+        <p class="line experiment-line">
+          <button
+            class="experiment-toggle"
+            type="button"
+            aria-expanded="false"
+            aria-controls="type-gradient-physics-panel"
+          >
+            <span class="experiment-toggle__dot" aria-hidden="true">·</span>
+            <span>Tangible Type Physics Test 2</span>
+            <span class="testing-page-toggle__arrow" aria-hidden="true">↓</span>
+          </button>
+        </p>
+
+        <div class="date-experiment" id="type-gradient-physics-panel" hidden>
+          <section class="type-physics-workspace" aria-label="Gradient driven tangible type physics canvas">
+            <form class="physics-controls" id="type-gradient-physics-controls">
+            <div class="physics-tablist" role="tablist" aria-label="Gradient type controls">
+              <button class="physics-tab is-active" type="button" role="tab" aria-selected="true" data-tab-target="type2-tab-field">Field</button>
+              <button class="physics-tab" type="button" role="tab" aria-selected="false" data-tab-target="type2-tab-physics">Physics</button>
+              <button class="physics-tab" type="button" role="tab" aria-selected="false" data-tab-target="type2-tab-type">Shape</button>
+              <button class="physics-tab" type="button" role="tab" aria-selected="false" data-tab-target="type2-tab-look">Look</button>
+            </div>
+
+            <div class="physics-tab-panel is-active" id="type2-tab-field" role="tabpanel">
+              <label>
+                <span>Gradient Mode</span>
+                <select id="type2-gradient-mode">
+                  <option value="linear">Linear</option>
+                  <option value="radial">Radial</option>
+                  <option value="conic">Conic</option>
+                </select>
+              </label>
+
+              <label>
+                <span>Gradient Force</span>
+                <input id="type2-gradient-strength" type="range" min="0" max="50" value="28" />
+              </label>
+
+              <label>
+                <span>Gradient Speed</span>
+                <input id="type2-gradient-speed" type="range" min="0" max="200" value="76" />
+              </label>
+
+              <label>
+                <span>Rotation</span>
+                <input id="type2-gradient-rotation" type="range" min="0" max="360" value="32" />
+              </label>
+
+              <label>
+                <span>Scale</span>
+                <input id="type2-gradient-scale" type="range" min="20" max="180" value="96" />
+              </label>
+
+              <label>
+                <span>Contrast</span>
+                <input id="type2-gradient-contrast" type="range" min="0" max="100" value="56" />
+              </label>
+
+              <label>
+                <span>Softness</span>
+                <input id="type2-gradient-softness" type="range" min="0" max="100" value="50" />
+              </label>
+
+              <label>
+                <span>Bands</span>
+                <input id="type2-gradient-bands" type="range" min="1" max="10" value="3" />
+              </label>
+
+              <label>
+                <span>Drift</span>
+                <input id="type2-gradient-drift" type="range" min="0" max="100" value="42" />
+              </label>
+
+              <label>
+                <span>Turbulence</span>
+                <input id="type2-gradient-turbulence" type="range" min="0" max="100" value="16" />
+              </label>
+
+              <label>
+                <span>Field Action</span>
+                <select id="type2-gradient-action">
+                  <option value="away">Away From White</option>
+                  <option value="toward">Toward White</option>
+                  <option value="orbit">Orbit White</option>
+                </select>
+              </label>
+
+              <label class="testing-toggle">
+                <input id="type2-gradient-overlay" type="checkbox" checked />
+                <span>Show Field</span>
+              </label>
+            </div>
+
+            <div class="physics-tab-panel" id="type2-tab-physics" role="tabpanel">
+              <label>
+                <span>Gravity</span>
+                <input id="type2-gravity" type="range" min="0" max="100" value="32" />
+              </label>
+
+              <label>
+                <span>Sturdy</span>
+                <input id="type2-sturdy" type="range" min="0" max="100" value="52" />
+              </label>
+
+              <label>
+                <span>Spring Strength</span>
+                <input id="type2-spring" type="range" min="0" max="100" value="54" />
+              </label>
+
+              <label>
+                <span>Home Pull</span>
+                <input id="type2-home" type="range" min="0" max="100" value="40" />
+              </label>
+
+              <label>
+                <span>Bounce</span>
+                <input id="type2-bounce" type="range" min="0" max="100" value="48" />
+              </label>
+
+              <label>
+                <span>Air Drag</span>
+                <input id="type2-drag" type="range" min="0" max="100" value="20" />
+              </label>
+
+              <label>
+                <span>Floor Friction</span>
+                <input id="type2-floor-friction" type="range" min="0" max="100" value="28" />
+              </label>
+
+              <label>
+                <span>Mass</span>
+                <input id="type2-mass" type="range" min="20" max="180" value="80" />
+              </label>
+
+              <label>
+                <span>Solver Steps</span>
+                <input id="type2-solver-steps" type="range" min="1" max="6" value="4" />
+              </label>
+            </div>
+
+            <div class="physics-tab-panel" id="type2-tab-type" role="tabpanel">
+              <label class="physics-text-field">
+                <span>Text</span>
+                <input id="type2-text" type="text" value="FIELD" autocomplete="off" />
+              </label>
+
+              <div class="physics-source-control">
+                <span>Source</span>
+                <div class="physics-source-buttons" aria-label="Source">
+                  <button class="physics-source-button is-active" type="button" data-source-value="text" aria-pressed="true">Text</button>
+                  <button class="physics-source-button" type="button" data-source-value="image" aria-pressed="false">Image</button>
+                </div>
+                <select class="physics-source-select" id="type2-source-mode" aria-label="Source">
+                  <option value="text">Text</option>
+                  <option value="image">Imported Image</option>
+                </select>
+              </div>
+
+              <label class="physics-file-field" for="type2-image-file">
+                <span>Import Image</span>
+                <input id="type2-image-file" type="file" accept="image/*" />
+              </label>
+
+              <p class="physics-source-status" id="type2-image-status">No image loaded</p>
+
+              <label>
+                <span>Image Threshold</span>
+                <input id="type2-image-threshold" type="range" min="0" max="100" value="58" />
+              </label>
+
+              <label class="testing-toggle">
+                <input id="type2-image-invert" type="checkbox" />
+                <span>Invert Image</span>
+              </label>
+
+              <label>
+                <span>Source Size</span>
+                <input id="type2-size" type="range" min="52" max="180" value="124" />
+              </label>
+
+              <label>
+                <span>Outline Size</span>
+                <input id="type2-outline" type="range" min="2" max="18" value="7" />
+              </label>
+
+              <label>
+                <span>Shape</span>
+                <select id="type2-shape">
+                  <option value="circle">Circles</option>
+                  <option value="square">Squares</option>
+                  <option value="line">Connected Lines</option>
+                </select>
+              </label>
+
+              <label>
+                <span>Text Mode</span>
+                <select id="type2-text-mode">
+                  <option value="stroke">Stroke</option>
+                  <option value="fill">Fill</option>
+                </select>
+              </label>
+
+              <label class="testing-toggle">
+                <input id="type2-grid-repeat" type="checkbox" />
+                <span>Grid Repeat</span>
+              </label>
+
+              <label>
+                <span>Repeat Crop X</span>
+                <input id="type2-repeat-crop-x" type="range" min="0" max="45" value="0" />
+              </label>
+
+              <label>
+                <span>Repeat Crop Y</span>
+                <input id="type2-repeat-crop-y" type="range" min="0" max="45" value="0" />
+              </label>
+
+              <label>
+                <span>Variation</span>
+                <input id="type2-variation" type="range" min="0" max="100" value="54" />
+              </label>
+            </div>
+
+            <div class="physics-tab-panel" id="type2-tab-look" role="tabpanel">
+              <label>
+                <span>Amount of Points</span>
+                <input id="type2-point-amount" type="range" min="90" max="5000" value="1100" />
+              </label>
+
+              <label>
+                <span>Size of Points</span>
+                <input id="type2-point-size" type="range" min="1" max="18" value="5" />
+              </label>
+
+              <label>
+                <span>Point Opacity</span>
+                <input id="type2-opacity" type="range" min="0" max="100" value="76" />
+              </label>
+
+              <label>
+                <span>Opacity Variation</span>
+                <input id="type2-opacity-variation" type="range" min="0" max="100" value="30" />
+              </label>
+            </div>
+
+            <button type="button" id="type2-reset">Reset Physics</button>
+            </form>
+
+            <div class="type-physics-stage">
+              <canvas id="type-gradient-physics-canvas" aria-label="Gradient force tangible text outline"></canvas>
+            </div>
+          </section>
+        </div>
+        </div>
+      </div>
+
+      <p class="line testing-title-line">
+        <button
+          class="testing-page-toggle"
+          type="button"
+          aria-expanded="false"
+          aria-controls="date-2-panel"
+        >
+          <span>2/7</span>
+          <span class="testing-page-toggle__arrow" aria-hidden="true">↓</span>
+        </button>
+      </p>
+
+      <div class="testing-panel" id="date-2-panel" hidden>
+        <div class="experiment-lines" data-experiment-group="date-2">
+        <p class="line experiment-line">
+          <button
+            class="experiment-toggle"
+            type="button"
+            aria-expanded="false"
+            aria-controls="grid-text-panel"
+          >
+            <span class="experiment-toggle__dot" aria-hidden="true">·</span>
+            <span>Grid Text Edit</span>
+            <span class="testing-page-toggle__arrow" aria-hidden="true">↓</span>
+          </button>
+        </p>
+
+      <div class="date-experiment" id="grid-text-panel" hidden>
+        <section class="grid-text-workspace" aria-label="Grid text animation canvas">
+          <form class="physics-controls" id="grid-text-controls">
+            <div class="physics-tablist" role="tablist" aria-label="Grid text controls">
+              <button class="physics-tab is-active" type="button" role="tab" aria-selected="true" data-tab-target="grid-text-tab-text">Text</button>
+              <button class="physics-tab" type="button" role="tab" aria-selected="false" data-tab-target="grid-text-tab-grid">Grid</button>
+              <button class="physics-tab" type="button" role="tab" aria-selected="false" data-tab-target="grid-text-tab-motion">Motion</button>
+              <button class="physics-tab" type="button" role="tab" aria-selected="false" data-tab-target="grid-text-tab-field">Field</button>
+            </div>
+
+            <div class="physics-tab-panel is-active" id="grid-text-tab-text" role="tabpanel">
+              <label class="physics-text-field">
+                <span>Text</span>
+                <input id="grid-text-input" type="text" value="GRID TEXT EDIT" autocomplete="off" />
+              </label>
+
+              <label>
+                <span>Font Size</span>
+                <input id="grid-text-font-size" type="range" min="18" max="180" value="72" />
+              </label>
+
+              <label>
+                <span>Weight</span>
+                <input id="grid-text-weight" type="range" min="200" max="900" step="100" value="700" />
+              </label>
+
+              <label>
+                <span>Letter Space</span>
+                <input id="grid-text-letter-space" type="range" min="-10" max="40" value="0" />
+              </label>
+
+              <label>
+                <span>Mode</span>
+                <select id="grid-text-render-mode">
+                  <option value="fill">Fill</option>
+                  <option value="stroke">Stroke</option>
+                  <option value="both">Fill + Stroke</option>
+                </select>
+              </label>
+            </div>
+
+            <div class="physics-tab-panel" id="grid-text-tab-grid" role="tabpanel">
+              <label>
+                <span>Repeats X</span>
+                <input id="grid-text-repeat-x" type="range" min="0" max="12" value="4" />
+              </label>
+
+              <label>
+                <span>Repeats Y</span>
+                <input id="grid-text-repeat-y" type="range" min="0" max="12" value="3" />
+              </label>
+
+              <label>
+                <span>Gap X</span>
+                <input id="grid-text-gap-x" type="range" min="0" max="120" value="10" />
+              </label>
+
+              <label>
+                <span>Gap Y</span>
+                <input id="grid-text-gap-y" type="range" min="0" max="120" value="10" />
+              </label>
+
+              <label>
+                <span>Cell Padding</span>
+                <input id="grid-text-padding" type="range" min="0" max="80" value="20" />
+              </label>
+
+              <label class="testing-toggle">
+                <input id="grid-text-show-boxes" type="checkbox" checked />
+                <span>Show Boxes</span>
+              </label>
+            </div>
+
+            <div class="physics-tab-panel" id="grid-text-tab-motion" role="tabpanel">
+              <label>
+                <span>Speed</span>
+                <input id="grid-text-speed" type="range" min="0" max="200" value="76" />
+              </label>
+
+              <label>
+                <span>Delay</span>
+                <input id="grid-text-delay" type="range" min="0" max="220" value="58" />
+              </label>
+
+              <label>
+                <span>Wave Shape</span>
+                <select id="grid-text-wave-shape">
+                  <option value="sine">Sine Sway</option>
+                  <option value="triangle">Triangle Ramp</option>
+                  <option value="saw">Saw Ramp</option>
+                </select>
+              </label>
+
+              <label>
+                <span>Position Warp</span>
+                <input id="grid-text-position" type="range" min="0" max="140" value="42" />
+              </label>
+
+              <label>
+                <span>Scale Warp</span>
+                <input id="grid-text-scale" type="range" min="0" max="120" value="24" />
+              </label>
+
+              <label>
+                <span>Rotation Warp</span>
+                <input id="grid-text-rotation" type="range" min="0" max="180" value="32" />
+              </label>
+
+              <label>
+                <span>Skew Warp</span>
+                <input id="grid-text-skew" type="range" min="0" max="120" value="22" />
+              </label>
+            </div>
+
+            <div class="physics-tab-panel" id="grid-text-tab-field" role="tabpanel">
+              <label>
+                <span>Field Mode</span>
+                <select id="grid-text-field-mode">
+                  <option value="linear">Linear</option>
+                  <option value="radial">Radial</option>
+                  <option value="conic">Conic</option>
+                </select>
+              </label>
+
+              <label>
+                <span>Field Angle</span>
+                <input id="grid-text-field-angle" type="range" min="0" max="360" value="45" />
+              </label>
+
+              <label>
+                <span>Field Scale</span>
+                <input id="grid-text-field-scale" type="range" min="20" max="220" value="100" />
+              </label>
+
+              <label>
+                <span>Field Drift</span>
+                <input id="grid-text-field-drift" type="range" min="0" max="120" value="40" />
+              </label>
+
+              <label>
+                <span>Wave Density</span>
+                <input id="grid-text-wave-density" type="range" min="1" max="12" value="4" />
+              </label>
+
+              <label>
+                <span>Opacity</span>
+                <input id="grid-text-opacity" type="range" min="5" max="100" value="86" />
+              </label>
+            </div>
+          </form>
+
+          <div class="grid-text-stage">
+            <canvas id="grid-text-canvas" aria-label="Animated repeated text grid"></canvas>
+          </div>
+        </section>
+      </div>
+
+        <p class="line experiment-line">
+          <button
+            class="experiment-toggle"
+            type="button"
+            aria-expanded="false"
+            aria-controls="grid-edit-2-panel"
+          >
+            <span class="experiment-toggle__dot" aria-hidden="true">·</span>
+            <span>Grid Edit 2</span>
+            <span class="testing-page-toggle__arrow" aria-hidden="true">↓</span>
+          </button>
+        </p>
+
+        <div class="date-experiment" id="grid-edit-2-panel" hidden>
+          <section class="grid-text-workspace" aria-label="Grid edit 2 animation canvas">
+            <form class="physics-controls" id="grid-edit-2-controls">
+              <div class="physics-tablist" role="tablist" aria-label="Grid edit 2 controls">
+                <button class="physics-tab is-active" type="button" role="tab" aria-selected="true" data-tab-target="grid2-tab-type">Type</button>
+                <button class="physics-tab" type="button" role="tab" aria-selected="false" data-tab-target="grid2-tab-grid">Grid</button>
+                <button class="physics-tab" type="button" role="tab" aria-selected="false" data-tab-target="grid2-tab-motion">Motion</button>
+                <button class="physics-tab" type="button" role="tab" aria-selected="false" data-tab-target="grid2-tab-field">Field</button>
+              </div>
+
+              <div class="physics-tab-panel is-active" id="grid2-tab-type" role="tabpanel">
+                <label class="physics-text-field">
+                  <span>Text</span>
+                  <input id="grid2-input" type="text" value="GRID EDIT 2" autocomplete="off" />
+                </label>
+
+                <label>
+                  <span>Font</span>
+                  <select id="grid2-font">
+                    <option value="Helvetica, Arial, sans-serif">Helvetica</option>
+                    <option value="Arial, Helvetica, sans-serif">Arial</option>
+                    <option value="Georgia, serif">Georgia</option>
+                    <option value="'Times New Roman', Times, serif">Times</option>
+                    <option value="'Courier New', Courier, monospace">Courier</option>
+                    <option value="Impact, Haettenschweiler, sans-serif">Impact</option>
+                    <option value="Verdana, Geneva, sans-serif">Verdana</option>
+                    <option value="'Trebuchet MS', Helvetica, sans-serif">Trebuchet</option>
+                  </select>
+                </label>
+
+                <label>
+                  <span>Weight</span>
+                  <input id="grid2-weight" type="range" min="0" max="900" step="100" value="0" />
+                </label>
+
+                <label>
+                  <span>Letter Space</span>
+                  <input id="grid2-letter-space" type="range" min="-10" max="48" value="0" />
+                </label>
+
+                <label>
+                  <span>Mode</span>
+                  <select id="grid2-render-mode">
+                    <option value="fill">Fill</option>
+                    <option value="stroke">Stroke</option>
+                    <option value="both">Fill + Stroke</option>
+                  </select>
+                </label>
+              </div>
+
+              <div class="physics-tab-panel" id="grid2-tab-grid" role="tabpanel">
+                <label>
+                  <span>Repeats X</span>
+                  <input id="grid2-repeat-x" type="range" min="0" max="36" value="0" />
+                </label>
+
+                <label>
+                  <span>Repeats Y</span>
+                  <input id="grid2-repeat-y" type="range" min="0" max="36" value="0" />
+                </label>
+
+                <label>
+                  <span>Margin X</span>
+                  <input id="grid2-margin-x" type="range" min="0" max="360" value="0" />
+                </label>
+
+                <label>
+                  <span>Margin Y</span>
+                  <input id="grid2-margin-y" type="range" min="0" max="360" value="0" />
+                </label>
+
+                <label>
+                  <span>Cell Padding</span>
+                  <input id="grid2-padding" type="range" min="0" max="140" value="0" />
+                </label>
+
+                <label>
+                  <span>Box Crop X</span>
+                  <input id="grid2-crop-x" type="range" min="0" max="45" value="0" />
+                </label>
+
+                <label>
+                  <span>Box Crop Y</span>
+                  <input id="grid2-crop-y" type="range" min="0" max="45" value="0" />
+                </label>
+
+                <label>
+                  <span>Canvas Zoom</span>
+                  <input id="grid2-zoom" type="range" min="0" max="240" value="0" />
+                </label>
+
+                <label class="testing-toggle">
+                  <input id="grid2-crop-to-box" type="checkbox" checked />
+                  <span>Crop To Box</span>
+                </label>
+
+                <label class="testing-toggle">
+                  <input id="grid2-show-boxes" type="checkbox" checked />
+                  <span>Show Boxes</span>
+                </label>
+              </div>
+
+              <div class="physics-tab-panel" id="grid2-tab-motion" role="tabpanel">
+                <label>
+                  <span>Speed</span>
+                  <input id="grid2-speed" type="range" min="0" max="100" value="0" />
+                </label>
+
+                <label>
+                  <span>Delay X</span>
+                  <input id="grid2-delay-x" type="range" min="-200" max="200" value="0" />
+                </label>
+
+                <label>
+                  <span>Delay Y</span>
+                  <input id="grid2-delay-y" type="range" min="-200" max="200" value="0" />
+                </label>
+
+                <label>
+                  <span>Wave Shape</span>
+                  <select id="grid2-wave-shape">
+                    <option value="sine">Sine Sway</option>
+                    <option value="triangle">Triangle Ramp</option>
+                    <option value="saw">Saw Ramp</option>
+                    <option value="reverse-saw">Reverse Saw</option>
+                  </select>
+                </label>
+
+                <label>
+                  <span>Ramp Curve</span>
+                  <select id="grid2-ramp-curve">
+                    <option value="linear">Linear</option>
+                    <option value="smooth">Smooth</option>
+                    <option value="ease-in">Ease In</option>
+                    <option value="ease-out">Ease Out</option>
+                    <option value="ease-in-out">Ease In Out</option>
+                  </select>
+                </label>
+
+                <label>
+                  <span>Position Warp</span>
+                  <input id="grid2-position" type="range" min="0" max="400" value="0" />
+                </label>
+
+                <label>
+                  <span>Scale Warp</span>
+                  <input id="grid2-scale" type="range" min="0" max="300" value="0" />
+                </label>
+
+                <label>
+                  <span>Rotation Warp</span>
+                  <input id="grid2-rotation" type="range" min="0" max="360" value="0" />
+                </label>
+
+                <label>
+                  <span>Skew Warp</span>
+                  <input id="grid2-skew" type="range" min="0" max="220" value="0" />
+                </label>
+              </div>
+
+              <div class="physics-tab-panel" id="grid2-tab-field" role="tabpanel">
+                <label>
+                  <span>Field Mode</span>
+                  <select id="grid2-field-mode">
+                    <option value="linear">Linear</option>
+                    <option value="radial">Radial</option>
+                    <option value="conic">Conic</option>
+                  </select>
+                </label>
+
+                <label>
+                  <span>Field Angle</span>
+                  <input id="grid2-field-angle" type="range" min="0" max="360" value="0" />
+                </label>
+
+                <label>
+                  <span>Field Scale</span>
+                  <input id="grid2-field-scale" type="range" min="0" max="240" value="0" />
+                </label>
+
+                <label>
+                  <span>Field Drift</span>
+                  <input id="grid2-field-drift" type="range" min="0" max="120" value="0" />
+                </label>
+
+                <label>
+                  <span>Wave Density</span>
+                  <input id="grid2-wave-density" type="range" min="0" max="16" value="0" />
+                </label>
+
+                <label>
+                  <span>Opacity</span>
+                  <input id="grid2-opacity" type="range" min="0" max="100" value="100" />
+                </label>
+              </div>
+            </form>
+
+            <div class="grid-text-stage">
+              <canvas id="grid-edit-2-canvas" aria-label="Grid edit 2 repeated text animation"></canvas>
+            </div>
+          </section>
+        </div>
+
+        <p class="line experiment-line">
+          <button
+            class="experiment-toggle"
+            type="button"
+            aria-expanded="false"
+            aria-controls="grid-edit-3-panel"
+          >
+            <span class="experiment-toggle__dot" aria-hidden="true">·</span>
+            <span>Grid Edit 3</span>
+            <span class="testing-page-toggle__arrow" aria-hidden="true">↓</span>
+          </button>
+        </p>
+
+        <div class="date-experiment" id="grid-edit-3-panel" hidden>
+          <section class="grid-text-workspace" aria-label="Grid edit 3 animation canvas">
+            <form class="physics-controls" id="grid-edit-3-controls">
+              <div class="physics-tablist" role="tablist" aria-label="Grid edit 3 controls">
+                <button class="physics-tab is-active" type="button" role="tab" aria-selected="true" data-tab-target="grid3-tab-type">Type</button>
+                <button class="physics-tab" type="button" role="tab" aria-selected="false" data-tab-target="grid3-tab-grid">Grid</button>
+                <button class="physics-tab" type="button" role="tab" aria-selected="false" data-tab-target="grid3-tab-motion">Motion</button>
+                <button class="physics-tab" type="button" role="tab" aria-selected="false" data-tab-target="grid3-tab-field">Field</button>
+                <button class="physics-tab" type="button" role="tab" aria-selected="false" data-tab-target="grid3-tab-effects">Effects</button>
+              </div>
+
+              <div class="physics-tab-panel is-active" id="grid3-tab-type" role="tabpanel">
+                <label class="physics-text-field">
+                  <span>Text</span>
+                  <input id="grid3-input" type="text" value="GRID EDIT 3" autocomplete="off" />
+                </label>
+
+                <label>
+                  <span>Font</span>
+                  <select id="grid3-font">
+                    <option value="Helvetica, Arial, sans-serif">Helvetica</option>
+                    <option value="Arial, Helvetica, sans-serif">Arial</option>
+                    <option value="Georgia, serif">Georgia</option>
+                    <option value="'Times New Roman', Times, serif">Times</option>
+                    <option value="'Courier New', Courier, monospace">Courier</option>
+                    <option value="Impact, Haettenschweiler, sans-serif">Impact</option>
+                    <option value="Verdana, Geneva, sans-serif">Verdana</option>
+                    <option value="'Trebuchet MS', Helvetica, sans-serif">Trebuchet</option>
+                  </select>
+                </label>
+
+                <label>
+                  <span>Weight</span>
+                  <input id="grid3-weight" type="range" min="0" max="900" step="100" value="0" />
+                </label>
+
+                <label>
+                  <span>Letter Space</span>
+                  <input id="grid3-letter-space" type="range" min="-10" max="48" value="0" />
+                </label>
+
+                <label>
+                  <span>Mode</span>
+                  <select id="grid3-render-mode">
+                    <option value="fill">Fill</option>
+                    <option value="stroke">Stroke</option>
+                    <option value="both">Fill + Stroke</option>
+                  </select>
+                </label>
+              </div>
+
+              <div class="physics-tab-panel" id="grid3-tab-grid" role="tabpanel">
+                <label>
+                  <span>Repeats X</span>
+                  <input id="grid3-repeat-x" type="range" min="0" max="36" value="0" />
+                </label>
+
+                <label>
+                  <span>Repeats Y</span>
+                  <input id="grid3-repeat-y" type="range" min="0" max="36" value="0" />
+                </label>
+
+                <label>
+                  <span>Margin X</span>
+                  <input id="grid3-margin-x" type="range" min="0" max="360" value="0" />
+                </label>
+
+                <label>
+                  <span>Margin Y</span>
+                  <input id="grid3-margin-y" type="range" min="0" max="360" value="0" />
+                </label>
+
+                <label>
+                  <span>Cell Padding</span>
+                  <input id="grid3-padding" type="range" min="0" max="140" value="0" />
+                </label>
+
+                <label>
+                  <span>Box Crop X</span>
+                  <input id="grid3-crop-x" type="range" min="0" max="45" value="0" />
+                </label>
+
+                <label>
+                  <span>Box Crop Y</span>
+                  <input id="grid3-crop-y" type="range" min="0" max="45" value="0" />
+                </label>
+
+                <label>
+                  <span>Canvas Zoom</span>
+                  <input id="grid3-zoom" type="range" min="0" max="240" value="0" />
+                </label>
+
+                <label class="testing-toggle">
+                  <input id="grid3-crop-to-box" type="checkbox" checked />
+                  <span>Crop To Box</span>
+                </label>
+
+                <label class="testing-toggle">
+                  <input id="grid3-show-boxes" type="checkbox" checked />
+                  <span>Show Boxes</span>
+                </label>
+              </div>
+
+              <div class="physics-tab-panel" id="grid3-tab-motion" role="tabpanel">
+                <label>
+                  <span>Speed</span>
+                  <input id="grid3-speed" type="range" min="0" max="100" value="0" />
+                </label>
+
+                <label>
+                  <span>Delay X</span>
+                  <input id="grid3-delay-x" type="range" min="-200" max="200" value="0" />
+                </label>
+
+                <label>
+                  <span>Delay Y</span>
+                  <input id="grid3-delay-y" type="range" min="-200" max="200" value="0" />
+                </label>
+
+                <label>
+                  <span>Wave Shape</span>
+                  <select id="grid3-wave-shape">
+                    <option value="sine">Sine Sway</option>
+                    <option value="triangle">Triangle Ramp</option>
+                    <option value="saw">Saw Ramp</option>
+                    <option value="reverse-saw">Reverse Saw</option>
+                  </select>
+                </label>
+
+                <label>
+                  <span>Ramp Curve</span>
+                  <select id="grid3-ramp-curve">
+                    <option value="linear">Linear</option>
+                    <option value="smooth">Smooth</option>
+                    <option value="ease-in">Ease In</option>
+                    <option value="ease-out">Ease Out</option>
+                    <option value="ease-in-out">Ease In Out</option>
+                  </select>
+                </label>
+
+                <label>
+                  <span>Position Warp</span>
+                  <input id="grid3-position" type="range" min="0" max="400" value="0" />
+                </label>
+
+                <label>
+                  <span>Scale Warp</span>
+                  <input id="grid3-scale" type="range" min="0" max="300" value="0" />
+                </label>
+
+                <label>
+                  <span>Rotation Warp</span>
+                  <input id="grid3-rotation" type="range" min="0" max="360" value="0" />
+                </label>
+
+                <label>
+                  <span>Skew Warp</span>
+                  <input id="grid3-skew" type="range" min="0" max="220" value="0" />
+                </label>
+              </div>
+
+              <div class="physics-tab-panel" id="grid3-tab-field" role="tabpanel">
+                <label>
+                  <span>Field Mode</span>
+                  <select id="grid3-field-mode">
+                    <option value="linear">Linear</option>
+                    <option value="radial">Radial</option>
+                    <option value="conic">Conic</option>
+                  </select>
+                </label>
+
+                <label>
+                  <span>Field Angle</span>
+                  <input id="grid3-field-angle" type="range" min="0" max="360" value="0" />
+                </label>
+
+                <label>
+                  <span>Field Scale</span>
+                  <input id="grid3-field-scale" type="range" min="0" max="240" value="0" />
+                </label>
+
+                <label>
+                  <span>Field Drift</span>
+                  <input id="grid3-field-drift" type="range" min="0" max="120" value="0" />
+                </label>
+
+                <label>
+                  <span>Wave Density</span>
+                  <input id="grid3-wave-density" type="range" min="0" max="16" value="0" />
+                </label>
+
+                <label>
+                  <span>Opacity</span>
+                  <input id="grid3-opacity" type="range" min="0" max="100" value="100" />
+                </label>
+              </div>
+
+              <div class="physics-tab-panel" id="grid3-tab-effects" role="tabpanel">
+                <label>
+                  <span>Time Slices</span>
+                  <input id="grid3-time-slices" type="range" min="0" max="36" value="0" />
+                </label>
+
+                <label>
+                  <span>Slice Delay</span>
+                  <input id="grid3-slice-delay" type="range" min="-200" max="200" value="0" />
+                </label>
+
+                <label>
+                  <span>Slice Direction</span>
+                  <select id="grid3-slice-direction">
+                    <option value="vertical">Vertical</option>
+                    <option value="horizontal">Horizontal</option>
+                    <option value="field">Field Angle</option>
+                  </select>
+                </label>
+
+                <label>
+                  <span>Inner Repeat X</span>
+                  <input id="grid3-inner-repeat-x" type="range" min="0" max="8" value="0" />
+                </label>
+
+                <label>
+                  <span>Inner Repeat Y</span>
+                  <input id="grid3-inner-repeat-y" type="range" min="0" max="8" value="0" />
+                </label>
+
+                <label>
+                  <span>Inner Gap</span>
+                  <input id="grid3-inner-gap" type="range" min="0" max="240" value="0" />
+                </label>
+
+                <label>
+                  <span>Opacity Random</span>
+                  <input id="grid3-opacity-random" type="range" min="0" max="100" value="0" />
+                </label>
+
+                <label>
+                  <span>Opacity Unit</span>
+                  <select id="grid3-opacity-unit">
+                    <option value="letter">Letters</option>
+                    <option value="word">Words</option>
+                  </select>
+                </label>
+
+                <label>
+                  <span>Random Gradient Size</span>
+                  <input id="grid3-random-gradient-size" type="range" min="0" max="240" value="0" />
+                </label>
+
+                <label>
+                  <span>Random Iterations</span>
+                  <input id="grid3-random-iterations" type="range" min="0" max="12" value="0" />
+                </label>
+
+                <label>
+                  <span>Text Color A</span>
+                  <input id="grid3-text-color-a" type="color" value="#f5f5f5" />
+                </label>
+
+                <label>
+                  <span>Text Color B</span>
+                  <input id="grid3-text-color-b" type="color" value="#f5f5f5" />
+                </label>
+
+                <label>
+                  <span>Background A</span>
+                  <input id="grid3-bg-color-a" type="color" value="#050505" />
+                </label>
+
+                <label>
+                  <span>Background B</span>
+                  <input id="grid3-bg-color-b" type="color" value="#050505" />
+                </label>
+              </div>
+            </form>
+
+            <div class="grid-text-stage">
+              <canvas id="grid-edit-3-canvas" aria-label="Grid edit 3 repeated text animation"></canvas>
+            </div>
+          </section>
+        </div>
+
+        <p class="line experiment-line">
+          <button
+            class="experiment-toggle"
+            type="button"
+            aria-expanded="false"
+            aria-controls="grid-edit-4-panel"
+          >
+            <span class="experiment-toggle__dot" aria-hidden="true">·</span>
+            <span>Grid Edit 4</span>
+            <span class="testing-page-toggle__arrow" aria-hidden="true">↓</span>
+          </button>
+        </p>
+
+        <div class="date-experiment" id="grid-edit-4-panel" hidden>
+          <section class="grid-text-workspace rhythm-grid-workspace" aria-label="Grid edit 4 rhythmic text system">
+            <form class="physics-controls rhythm-controls" id="grid-edit-4-controls">
+              <div class="rhythm-control-section">
+                <h3>Type</h3>
+
+                <label class="physics-text-field rhythm-wide">
+                  <span>Text</span>
+                  <input id="grid4-input" type="text" value="RHYTHM GRID" autocomplete="off" />
+                </label>
+
+                <label>
+                  <span>Font</span>
+                  <select id="grid4-font">
+                    <option value="Helvetica, Arial, sans-serif">Helvetica</option>
+                    <option value="Arial, Helvetica, sans-serif">Arial</option>
+                    <option value="Georgia, serif">Georgia</option>
+                    <option value="'Times New Roman', Times, serif">Times</option>
+                    <option value="'Courier New', Courier, monospace">Courier</option>
+                    <option value="Impact, Haettenschweiler, sans-serif">Impact</option>
+                    <option value="Verdana, Geneva, sans-serif">Verdana</option>
+                  </select>
+                </label>
+
+                <label>
+                  <span>Weight</span>
+                  <input id="grid4-weight" type="range" min="100" max="900" step="100" value="700" />
+                </label>
+
+                <label>
+                  <span>Letter Space</span>
+                  <input id="grid4-letter-space" type="range" min="-16" max="80" value="0" />
+                </label>
+
+                <label>
+                  <span>Mode</span>
+                  <select id="grid4-render-mode">
+                    <option value="fill">Fill</option>
+                    <option value="stroke">Stroke</option>
+                    <option value="both">Fill + Stroke</option>
+                  </select>
+                </label>
+              </div>
+
+              <div class="rhythm-control-section">
+                <h3>Grid</h3>
+
+                <label>
+                  <span>Repeats X</span>
+                  <input id="grid4-repeat-x" type="range" min="0" max="80" value="5" />
+                </label>
+
+                <label>
+                  <span>Repeats Y</span>
+                  <input id="grid4-repeat-y" type="range" min="0" max="80" value="3" />
+                </label>
+
+                <label>
+                  <span>Margin X</span>
+                  <input id="grid4-margin-x" type="range" min="0" max="420" value="0" />
+                </label>
+
+                <label>
+                  <span>Margin Y</span>
+                  <input id="grid4-margin-y" type="range" min="0" max="420" value="0" />
+                </label>
+
+                <label>
+                  <span>Cell Padding</span>
+                  <input id="grid4-padding" type="range" min="0" max="180" value="24" />
+                </label>
+
+                <label>
+                  <span>Crop X</span>
+                  <input id="grid4-crop-x" type="range" min="0" max="48" value="0" />
+                </label>
+
+                <label>
+                  <span>Crop Y</span>
+                  <input id="grid4-crop-y" type="range" min="0" max="48" value="0" />
+                </label>
+
+                <label>
+                  <span>Canvas Zoom</span>
+                  <input id="grid4-zoom" type="range" min="25" max="250" value="100" />
+                </label>
+
+                <label class="testing-toggle">
+                  <input id="grid4-crop-to-box" type="checkbox" checked />
+                  <span>Crop To Box</span>
+                </label>
+
+                <label class="testing-toggle">
+                  <input id="grid4-show-boxes" type="checkbox" />
+                  <span>Show Guides</span>
+                </label>
+              </div>
+
+              <div class="rhythm-control-section">
+                <h3>Rhythm</h3>
+
+                <label>
+                  <span>Tempo</span>
+                  <input id="grid4-tempo" type="range" min="0" max="100" value="38" />
+                </label>
+
+                <label>
+                  <span>Delay X</span>
+                  <input id="grid4-delay-x" type="range" min="-100" max="100" value="18" />
+                </label>
+
+                <label>
+                  <span>Delay Y</span>
+                  <input id="grid4-delay-y" type="range" min="-100" max="100" value="-8" />
+                </label>
+
+                <label>
+                  <span>Wave</span>
+                  <select id="grid4-wave-shape">
+                    <option value="return">Return Ramp</option>
+                    <option value="sine">Sine</option>
+                    <option value="triangle">Triangle</option>
+                    <option value="step">Step Pulse</option>
+                  </select>
+                </label>
+
+                <label>
+                  <span>Snap Steps</span>
+                  <input id="grid4-snap-steps" type="range" min="1" max="16" value="4" />
+                </label>
+
+                <label class="testing-toggle">
+                  <input id="grid4-loop-lock" type="checkbox" checked />
+                  <span>Loop Lock</span>
+                </label>
+              </div>
+
+              <div class="rhythm-control-section">
+                <h3>Motion</h3>
+
+                <label>
+                  <span>Position X</span>
+                  <input id="grid4-position-x" type="range" min="-300" max="300" value="100" />
+                </label>
+
+                <label>
+                  <span>Position Y</span>
+                  <input id="grid4-position-y" type="range" min="-300" max="300" value="0" />
+                </label>
+
+                <label>
+                  <span>Scale</span>
+                  <input id="grid4-scale" type="range" min="0" max="240" value="0" />
+                </label>
+
+                <label>
+                  <span>Rotation</span>
+                  <input id="grid4-rotation" type="range" min="-360" max="360" value="0" />
+                </label>
+
+                <label>
+                  <span>Skew X</span>
+                  <input id="grid4-skew-x" type="range" min="-200" max="200" value="0" />
+                </label>
+
+                <label>
+                  <span>Skew Y</span>
+                  <input id="grid4-skew-y" type="range" min="-200" max="200" value="0" />
+                </label>
+              </div>
+
+              <div class="rhythm-control-section">
+                <h3>Time</h3>
+
+                <label>
+                  <span>Time Slices</span>
+                  <input id="grid4-time-slices" type="range" min="0" max="48" value="0" />
+                </label>
+
+                <label>
+                  <span>Slice Phase</span>
+                  <input id="grid4-slice-phase" type="range" min="-100" max="100" value="25" />
+                </label>
+
+                <label>
+                  <span>Slice Axis</span>
+                  <select id="grid4-slice-axis">
+                    <option value="motion">Motion</option>
+                    <option value="x">X</option>
+                    <option value="y">Y</option>
+                  </select>
+                </label>
+
+                <label>
+                  <span>Inner Repeat X</span>
+                  <input id="grid4-inner-repeat-x" type="range" min="0" max="12" value="0" />
+                </label>
+
+                <label>
+                  <span>Inner Repeat Y</span>
+                  <input id="grid4-inner-repeat-y" type="range" min="0" max="12" value="0" />
+                </label>
+
+                <label>
+                  <span>Inner Gap</span>
+                  <input id="grid4-inner-gap" type="range" min="0" max="260" value="0" />
+                </label>
+              </div>
+
+              <div class="rhythm-control-section">
+                <h3>Ink</h3>
+
+                <label>
+                  <span>Opacity</span>
+                  <input id="grid4-opacity" type="range" min="0" max="100" value="100" />
+                </label>
+
+                <label>
+                  <span>Random Opacity</span>
+                  <input id="grid4-opacity-random" type="range" min="0" max="100" value="0" />
+                </label>
+
+                <label>
+                  <span>Opacity Unit</span>
+                  <select id="grid4-opacity-unit">
+                    <option value="letter">Letter</option>
+                    <option value="word">Word</option>
+                    <option value="cell">Cell</option>
+                  </select>
+                </label>
+
+                <label>
+                  <span>Text A</span>
+                  <input id="grid4-text-color-a" type="color" value="#f5f5f5" />
+                </label>
+
+                <label>
+                  <span>Text B</span>
+                  <input id="grid4-text-color-b" type="color" value="#7db8ff" />
+                </label>
+
+                <label>
+                  <span>Background A</span>
+                  <input id="grid4-bg-color-a" type="color" value="#050505" />
+                </label>
+
+                <label>
+                  <span>Background B</span>
+                  <input id="grid4-bg-color-b" type="color" value="#121216" />
+                </label>
+              </div>
+            </form>
+
+            <div class="grid-text-stage">
+              <canvas id="grid-edit-4-canvas" aria-label="Grid edit 4 rhythmic repeated text animation"></canvas>
+            </div>
+          </section>
+        </div>
+        </div>
+      </div>
+
+      <p class="line testing-title-line">
+        <button
+          class="testing-page-toggle"
+          type="button"
+          aria-expanded="false"
+          aria-controls="date-3-panel"
+        >
+          <span>3/7</span>
+          <span class="testing-page-toggle__arrow" aria-hidden="true">↓</span>
+        </button>
+      </p>
+
+      <div class="testing-panel" id="date-3-panel" hidden>
+        <div class="experiment-lines" data-experiment-group="date-3">
+        <p class="line experiment-line">
+          <button
+            class="experiment-toggle"
+            type="button"
+            aria-expanded="false"
+            aria-controls="grid-edit-5-panel"
+          >
+            <span class="experiment-toggle__dot" aria-hidden="true">·</span>
+            <span>Grid Edit 5</span>
+            <span class="testing-page-toggle__arrow" aria-hidden="true">↓</span>
+          </button>
+        </p>
+
+        <div class="date-experiment" id="grid-edit-5-panel" hidden>
+          <section class="grid-text-workspace" aria-label="Grid edit 5 loop graph text system">
+            <form class="physics-controls" id="grid-edit-5-controls">
+              <div class="physics-tablist" role="tablist" aria-label="Grid edit 5 controls">
+                <button class="physics-tab is-active" type="button" role="tab" aria-selected="true" data-tab-target="grid5-tab-type">Type</button>
+                <button class="physics-tab" type="button" role="tab" aria-selected="false" data-tab-target="grid5-tab-grid">Grid</button>
+                <button class="physics-tab" type="button" role="tab" aria-selected="false" data-tab-target="grid5-tab-wave">Wave</button>
+                <button class="physics-tab" type="button" role="tab" aria-selected="false" data-tab-target="grid5-tab-motion">Motion</button>
+                <button class="physics-tab" type="button" role="tab" aria-selected="false" data-tab-target="grid5-tab-slice">Slice</button>
+                <button class="physics-tab" type="button" role="tab" aria-selected="false" data-tab-target="grid5-tab-animate">Animate</button>
+              </div>
+
+              <div class="physics-tab-panel is-active" id="grid5-tab-type" role="tabpanel">
+                <label class="physics-text-field">
+                  <span>Text</span>
+                  <input id="grid5-input" type="text" value="GRID EDIT 5" autocomplete="off" />
+                </label>
+
+                <label>
+                  <span>Font</span>
+                  <select id="grid5-font">
+                    <option value="Helvetica, Arial, sans-serif">Helvetica</option>
+                    <option value="Arial, Helvetica, sans-serif">Arial</option>
+                    <option value="Georgia, serif">Georgia</option>
+                    <option value="'Times New Roman', Times, serif">Times</option>
+                    <option value="'Courier New', Courier, monospace">Courier</option>
+                    <option value="Impact, Haettenschweiler, sans-serif">Impact</option>
+                    <option value="Verdana, Geneva, sans-serif">Verdana</option>
+                    <option value="'Trebuchet MS', Helvetica, sans-serif">Trebuchet</option>
+                  </select>
+                </label>
+
+                <label>
+                  <span>Weight</span>
+                  <input id="grid5-weight" type="range" min="100" max="900" step="100" value="700" />
+                </label>
+
+                <label>
+                  <span>Letter Space</span>
+                  <input id="grid5-letter-space" type="range" min="-16" max="80" value="0" />
+                </label>
+
+                <label>
+                  <span>Mode</span>
+                  <select id="grid5-render-mode">
+                    <option value="fill">Fill</option>
+                    <option value="stroke">Stroke</option>
+                    <option value="both">Fill + Stroke</option>
+                  </select>
+                </label>
+
+                <label>
+                  <span>Opacity</span>
+                  <input id="grid5-opacity" type="range" min="0" max="100" value="100" />
+                </label>
+              </div>
+
+              <div class="physics-tab-panel" id="grid5-tab-grid" role="tabpanel">
+                <label>
+                  <span>Repeats X</span>
+                  <input id="grid5-repeat-x" type="range" min="0" max="80" value="5" />
+                </label>
+
+                <label>
+                  <span>Repeats Y</span>
+                  <input id="grid5-repeat-y" type="range" min="0" max="80" value="3" />
+                </label>
+
+                <label>
+                  <span>Margin X</span>
+                  <input id="grid5-margin-x" type="range" min="0" max="420" value="0" />
+                </label>
+
+                <label>
+                  <span>Margin Y</span>
+                  <input id="grid5-margin-y" type="range" min="0" max="420" value="0" />
+                </label>
+
+                <label>
+                  <span>Cell Padding</span>
+                  <input id="grid5-padding" type="range" min="0" max="180" value="10" />
+                </label>
+
+                <label>
+                  <span>Box Crop X</span>
+                  <input id="grid5-crop-x" type="range" min="0" max="48" value="0" />
+                </label>
+
+                <label>
+                  <span>Box Crop Y</span>
+                  <input id="grid5-crop-y" type="range" min="0" max="48" value="0" />
+                </label>
+
+                <label>
+                  <span>Canvas Zoom</span>
+                  <input id="grid5-zoom" type="range" min="25" max="250" value="100" />
+                </label>
+
+                <label class="testing-toggle">
+                  <input id="grid5-crop-to-box" type="checkbox" checked />
+                  <span>Crop To Box</span>
+                </label>
+
+                <label class="testing-toggle">
+                  <input id="grid5-show-boxes" type="checkbox" />
+                  <span>Show Boxes</span>
+                </label>
+              </div>
+
+              <div class="physics-tab-panel" id="grid5-tab-wave" role="tabpanel">
+                <div class="wave-editor">
+                  <canvas id="grid5-wave-graph" aria-label="Editable looping wave graph"></canvas>
+                </div>
+
+                <label>
+                  <span>Wave Mode</span>
+                  <select id="grid5-wave-mode">
+                    <option value="custom">Custom Graph</option>
+                    <option value="sine">Sine</option>
+                    <option value="return">Return Ramp</option>
+                    <option value="triangle">Triangle</option>
+                    <option value="step">Step</option>
+                  </select>
+                </label>
+
+                <label>
+                  <span>Tempo</span>
+                  <input id="grid5-tempo" type="range" min="0" max="100" value="38" />
+                </label>
+
+                <label>
+                  <span>Graph Smooth</span>
+                  <input id="grid5-wave-smooth" type="range" min="0" max="100" value="45" />
+                </label>
+
+                <label>
+                  <span>Point 0</span>
+                  <input id="grid5-wave-point-0" type="range" min="-100" max="100" value="0" />
+                </label>
+
+                <label>
+                  <span>Point 25</span>
+                  <input id="grid5-wave-point-1" type="range" min="-100" max="100" value="100" />
+                </label>
+
+                <label>
+                  <span>Point 50</span>
+                  <input id="grid5-wave-point-2" type="range" min="-100" max="100" value="0" />
+                </label>
+
+                <label>
+                  <span>Point 75</span>
+                  <input id="grid5-wave-point-3" type="range" min="-100" max="100" value="-100" />
+                </label>
+
+                <label>
+                  <span>Point 100</span>
+                  <input id="grid5-wave-point-4" type="range" min="-100" max="100" value="0" />
+                </label>
+
+                <label>
+                  <span>Phase X</span>
+                  <input id="grid5-phase-x" type="range" min="-400" max="400" value="0" />
+                </label>
+
+                <label>
+                  <span>Phase Y</span>
+                  <input id="grid5-phase-y" type="range" min="-400" max="400" value="0" />
+                </label>
+
+                <label>
+                  <span>Field Angle</span>
+                  <input id="grid5-field-angle" type="range" min="0" max="360" value="0" />
+                </label>
+
+                <label>
+                  <span>Field Phase</span>
+                  <input id="grid5-field-phase" type="range" min="-400" max="400" value="0" />
+                </label>
+              </div>
+
+              <div class="physics-tab-panel" id="grid5-tab-motion" role="tabpanel">
+                <label>
+                  <span>Position</span>
+                  <input id="grid5-position" type="range" min="0" max="500" value="0" />
+                </label>
+
+                <label>
+                  <span>Direction</span>
+                  <input id="grid5-direction" type="range" min="0" max="360" value="0" />
+                </label>
+
+                <label>
+                  <span>Snap Unit</span>
+                  <input id="grid5-position-snap-unit" type="range" min="25" max="200" step="25" value="25" />
+                </label>
+
+                <label class="testing-toggle">
+                  <input id="grid5-position-snap" type="checkbox" checked />
+                  <span>Snap Position</span>
+                </label>
+
+                <label>
+                  <span>Scale</span>
+                  <input id="grid5-scale" type="range" min="0" max="300" value="0" />
+                </label>
+
+                <label>
+                  <span>Rotation</span>
+                  <input id="grid5-rotation" type="range" min="-720" max="720" value="0" />
+                </label>
+
+                <label>
+                  <span>Skew X</span>
+                  <input id="grid5-skew-x" type="range" min="-240" max="240" value="0" />
+                </label>
+
+                <label>
+                  <span>Skew Y</span>
+                  <input id="grid5-skew-y" type="range" min="-240" max="240" value="0" />
+                </label>
+              </div>
+
+              <div class="physics-tab-panel" id="grid5-tab-slice" role="tabpanel">
+                <label>
+                  <span>Time Slices</span>
+                  <input id="grid5-time-slices" type="range" min="0" max="72" value="0" />
+                </label>
+
+                <label>
+                  <span>Slice Phase</span>
+                  <input id="grid5-slice-phase" type="range" min="-400" max="400" value="0" />
+                </label>
+
+                <label class="testing-toggle">
+                  <input id="grid5-slice-snap" type="checkbox" />
+                  <span>Snap Slice Phase</span>
+                </label>
+
+                <label>
+                  <span>Slice Axis</span>
+                  <select id="grid5-slice-axis">
+                    <option value="x">X</option>
+                    <option value="y">Y</option>
+                    <option value="motion">Motion</option>
+                    <option value="angle">Angle</option>
+                  </select>
+                </label>
+
+                <label>
+                  <span>Slice Angle</span>
+                  <input id="grid5-slice-angle" type="range" min="0" max="360" value="0" />
+                </label>
+
+                <label>
+                  <span>Inner Repeat X</span>
+                  <input id="grid5-inner-repeat-x" type="range" min="0" max="12" value="0" />
+                </label>
+
+                <label>
+                  <span>Inner Repeat Y</span>
+                  <input id="grid5-inner-repeat-y" type="range" min="0" max="12" value="0" />
+                </label>
+
+                <label>
+                  <span>Inner Gap</span>
+                  <input id="grid5-inner-gap" type="range" min="0" max="260" value="0" />
+                </label>
+              </div>
+
+              <div class="physics-tab-panel" id="grid5-tab-animate" role="tabpanel">
+                <label class="testing-toggle">
+                  <input id="grid5-animate-weight" type="checkbox" />
+                  <span>Animate Weight</span>
+                </label>
+
+                <label>
+                  <span>Weight Amount</span>
+                  <input id="grid5-weight-amount" type="range" min="0" max="800" value="0" />
+                </label>
+
+                <label class="testing-toggle">
+                  <input id="grid5-animate-letter" type="checkbox" />
+                  <span>Animate Letter Space</span>
+                </label>
+
+                <label>
+                  <span>Letter Amount</span>
+                  <input id="grid5-letter-amount" type="range" min="-80" max="160" value="0" />
+                </label>
+
+                <label class="testing-toggle">
+                  <input id="grid5-animate-opacity" type="checkbox" />
+                  <span>Animate Opacity</span>
+                </label>
+
+                <label>
+                  <span>Opacity Amount</span>
+                  <input id="grid5-opacity-amount" type="range" min="0" max="100" value="0" />
+                </label>
+
+                <label>
+                  <span>Random Opacity</span>
+                  <input id="grid5-opacity-random" type="range" min="0" max="100" value="0" />
+                </label>
+
+                <label>
+                  <span>Opacity Unit</span>
+                  <select id="grid5-opacity-unit">
+                    <option value="letter">Letters</option>
+                    <option value="word">Words</option>
+                    <option value="cell">Cells</option>
+                  </select>
+                </label>
+              </div>
+            </form>
+
+            <div class="grid-text-stage">
+              <canvas id="grid-edit-5-canvas" aria-label="Grid edit 5 looped graph text animation"></canvas>
+            </div>
+          </section>
+        </div>
+
+        <p class="line experiment-line">
+          <button
+            class="experiment-toggle"
+            type="button"
+            aria-expanded="false"
+            aria-controls="grid-edit-6-panel"
+          >
+            <span class="experiment-toggle__dot" aria-hidden="true">&middot;</span>
+            <span>Grid Edit 6</span>
+            <span class="testing-page-toggle__arrow" aria-hidden="true">↓</span>
+          </button>
+        </p>
+
+        <div class="date-experiment" id="grid-edit-6-panel" hidden>
+          <section class="grid-text-workspace" aria-label="Grid edit 6 refined value graph text system">
+            <form class="physics-controls" id="grid-edit-6-controls">
+              <div class="preset-bar" aria-label="Grid edit 6 presets">
+                <label class="preset-field">
+                  <span>Preset</span>
+                  <input id="grid6-preset-name" type="text" placeholder="New preset" autocomplete="off" />
+                </label>
+
+                <label class="preset-field">
+                  <span>Saved</span>
+                  <select id="grid6-preset-select">
+                    <option value="">Saved Presets</option>
+                  </select>
+                </label>
+
+                <button class="preset-button" id="grid6-save-preset" type="button">Save</button>
+                <button class="preset-button" id="grid6-load-preset" type="button">Load</button>
+                <button class="preset-button" id="grid6-delete-preset" type="button">Delete</button>
+                <button class="preset-button preset-button--wide" id="grid6-reset-text-only" type="button">Text Only</button>
+                <span class="preset-status" id="grid6-preset-status" aria-live="polite"></span>
+              </div>
+
+              <div class="physics-tablist physics-tablist--wide" role="tablist" aria-label="Grid edit 6 controls">
+                <button class="physics-tab is-active" type="button" role="tab" aria-selected="true" data-tab-target="grid6-tab-type">Type</button>
+                <button class="physics-tab" type="button" role="tab" aria-selected="false" data-tab-target="grid6-tab-grid">Grid</button>
+                <button class="physics-tab" type="button" role="tab" aria-selected="false" data-tab-target="grid6-tab-graph">Graph</button>
+                <button class="physics-tab" type="button" role="tab" aria-selected="false" data-tab-target="grid6-tab-motion">Motion</button>
+                <button class="physics-tab" type="button" role="tab" aria-selected="false" data-tab-target="grid6-tab-slice">Slice</button>
+                <button class="physics-tab" type="button" role="tab" aria-selected="false" data-tab-target="grid6-tab-warp">Warp</button>
+                <button class="physics-tab" type="button" role="tab" aria-selected="false" data-tab-target="grid6-tab-animate">Animate</button>
+              </div>
+
+              <div class="physics-tab-panel is-active" id="grid6-tab-type" role="tabpanel">
+                <label class="physics-text-field">
+                  <span>Text</span>
+                  <input id="grid6-input" type="text" value="GRID EDIT 6" autocomplete="off" />
+                </label>
+
+                <label>
+                  <span>Font</span>
+                  <select id="grid6-font">
+                    <option value="Helvetica, Arial, sans-serif">Helvetica</option>
+                    <option value="Arial, Helvetica, sans-serif">Arial</option>
+                    <option value="Georgia, serif">Georgia</option>
+                    <option value="'Times New Roman', Times, serif">Times</option>
+                    <option value="'Courier New', Courier, monospace">Courier</option>
+                    <option value="Impact, Haettenschweiler, sans-serif">Impact</option>
+                    <option value="Verdana, Geneva, sans-serif">Verdana</option>
+                    <option value="'Trebuchet MS', Helvetica, sans-serif">Trebuchet</option>
+                  </select>
+                </label>
+
+                <label>
+                  <span>Weight</span>
+                  <input id="grid6-weight" type="range" min="100" max="900" step="100" value="700" />
+                </label>
+
+                <label>
+                  <span>Letter Space</span>
+                  <input id="grid6-letter-space" type="range" min="-24" max="120" value="0" />
+                </label>
+
+                <label>
+                  <span>Mode</span>
+                  <select id="grid6-render-mode">
+                    <option value="fill">Fill</option>
+                    <option value="stroke">Stroke</option>
+                    <option value="both">Fill + Stroke</option>
+                  </select>
+                </label>
+
+                <label>
+                  <span>Opacity</span>
+                  <input id="grid6-opacity" type="range" min="0" max="100" value="100" />
+                </label>
+              </div>
+
+              <div class="physics-tab-panel" id="grid6-tab-grid" role="tabpanel">
+                <label>
+                  <span>Repeats X</span>
+                  <input id="grid6-repeat-x" type="range" min="0" max="140" value="5" />
+                </label>
+
+                <label>
+                  <span>Repeats Y</span>
+                  <input id="grid6-repeat-y" type="range" min="0" max="140" value="3" />
+                </label>
+
+                <label>
+                  <span>Margin X</span>
+                  <input id="grid6-margin-x" type="range" min="0" max="520" value="0" />
+                </label>
+
+                <label>
+                  <span>Margin Y</span>
+                  <input id="grid6-margin-y" type="range" min="0" max="520" value="0" />
+                </label>
+
+                <label>
+                  <span>Cell Padding</span>
+                  <input id="grid6-padding" type="range" min="0" max="220" value="8" />
+                </label>
+
+                <label>
+                  <span>Box Crop X</span>
+                  <input id="grid6-crop-x" type="range" min="0" max="48" value="0" />
+                </label>
+
+                <label>
+                  <span>Box Crop Y</span>
+                  <input id="grid6-crop-y" type="range" min="0" max="48" value="0" />
+                </label>
+
+                <label>
+                  <span>Canvas Zoom</span>
+                  <input id="grid6-zoom" type="range" min="20" max="300" value="100" />
+                </label>
+
+                <label class="testing-toggle">
+                  <input id="grid6-crop-to-box" type="checkbox" checked />
+                  <span>Crop To Box</span>
+                </label>
+
+                <label class="testing-toggle">
+                  <input id="grid6-show-boxes" type="checkbox" />
+                  <span>Show Boxes</span>
+                </label>
+              </div>
+
+              <div class="physics-tab-panel" id="grid6-tab-graph" role="tabpanel">
+                <div class="wave-editor wave-editor--value">
+                  <canvas id="grid6-wave-graph" aria-label="Editable value graph for grid edit 6"></canvas>
+                </div>
+
+                <label>
+                  <span>Graph Mode</span>
+                  <select id="grid6-wave-mode">
+                    <option value="custom">Custom Value</option>
+                    <option value="sine">Sine</option>
+                    <option value="return">Return Ramp</option>
+                    <option value="triangle">Triangle</option>
+                    <option value="step">Step</option>
+                  </select>
+                </label>
+
+                <label>
+                  <span>Tempo</span>
+                  <input id="grid6-tempo" type="range" min="0" max="100" value="38" />
+                </label>
+
+                <label>
+                  <span>Graph Smooth</span>
+                  <input id="grid6-wave-smooth" type="range" min="0" max="100" value="30" />
+                </label>
+
+                <label>
+                  <span>Value 0</span>
+                  <input id="grid6-wave-point-0" type="range" min="-100" max="100" value="0" />
+                </label>
+
+                <label>
+                  <span>Value 25</span>
+                  <input id="grid6-wave-point-1" type="range" min="-100" max="100" value="100" />
+                </label>
+
+                <label>
+                  <span>Value 50</span>
+                  <input id="grid6-wave-point-2" type="range" min="-100" max="100" value="0" />
+                </label>
+
+                <label>
+                  <span>Value 75</span>
+                  <input id="grid6-wave-point-3" type="range" min="-100" max="100" value="-100" />
+                </label>
+
+                <label>
+                  <span>Value 100</span>
+                  <input id="grid6-wave-point-4" type="range" min="-100" max="100" value="0" />
+                </label>
+
+                <label>
+                  <span>Delay X</span>
+                  <input id="grid6-phase-x" type="range" min="-400" max="400" value="0" />
+                </label>
+
+                <label>
+                  <span>Delay Y</span>
+                  <input id="grid6-phase-y" type="range" min="-400" max="400" value="0" />
+                </label>
+
+                <label>
+                  <span>Field Angle</span>
+                  <input id="grid6-field-angle" type="range" min="0" max="360" value="0" />
+                </label>
+
+                <label>
+                  <span>Field Delay</span>
+                  <input id="grid6-field-phase" type="range" min="-400" max="400" value="0" />
+                </label>
+              </div>
+
+              <div class="physics-tab-panel" id="grid6-tab-motion" role="tabpanel">
+                <label>
+                  <span>Position</span>
+                  <input id="grid6-position" type="range" min="0" max="700" value="0" />
+                </label>
+
+                <label>
+                  <span>Direction</span>
+                  <input id="grid6-direction" type="range" min="0" max="360" value="0" />
+                </label>
+
+                <label>
+                  <span>Snap Unit</span>
+                  <input id="grid6-position-snap-unit" type="range" min="25" max="250" step="25" value="25" />
+                </label>
+
+                <label class="testing-toggle">
+                  <input id="grid6-position-snap" type="checkbox" checked />
+                  <span>Snap Position</span>
+                </label>
+
+                <label>
+                  <span>Scale Base</span>
+                  <input id="grid6-scale" type="range" min="10" max="300" value="100" />
+                </label>
+
+                <label>
+                  <span>Scale Mode</span>
+                  <select id="grid6-scale-mode">
+                    <option value="static">Static</option>
+                    <option value="grow">Grow</option>
+                    <option value="shrink">Shrink</option>
+                  </select>
+                </label>
+
+                <label>
+                  <span>Scale Amount</span>
+                  <input id="grid6-scale-amount" type="range" min="0" max="300" value="0" />
+                </label>
+
+                <label>
+                  <span>Rotation</span>
+                  <input id="grid6-rotation" type="range" min="-720" max="720" value="0" />
+                </label>
+
+                <label>
+                  <span>Skew X</span>
+                  <input id="grid6-skew-x" type="range" min="-240" max="240" value="0" />
+                </label>
+
+                <label>
+                  <span>Skew Y</span>
+                  <input id="grid6-skew-y" type="range" min="-240" max="240" value="0" />
+                </label>
+              </div>
+
+              <div class="physics-tab-panel" id="grid6-tab-slice" role="tabpanel">
+                <label>
+                  <span>Time Slices</span>
+                  <input id="grid6-time-slices" type="range" min="0" max="96" value="0" />
+                </label>
+
+                <label>
+                  <span>Slice Phase</span>
+                  <input id="grid6-slice-phase" type="range" min="-400" max="400" value="0" />
+                </label>
+
+                <label class="testing-toggle">
+                  <input id="grid6-slice-snap" type="checkbox" />
+                  <span>Snap Slice Phase</span>
+                </label>
+
+                <label>
+                  <span>Slice Axis</span>
+                  <select id="grid6-slice-axis">
+                    <option value="x">X</option>
+                    <option value="y">Y</option>
+                    <option value="motion">Motion</option>
+                    <option value="angle">Angle</option>
+                  </select>
+                </label>
+
+                <label>
+                  <span>Slice Angle</span>
+                  <input id="grid6-slice-angle" type="range" min="0" max="360" value="0" />
+                </label>
+
+                <label>
+                  <span>Inner Repeat X</span>
+                  <input id="grid6-inner-repeat-x" type="range" min="0" max="18" value="0" />
+                </label>
+
+                <label>
+                  <span>Inner Repeat Y</span>
+                  <input id="grid6-inner-repeat-y" type="range" min="0" max="18" value="0" />
+                </label>
+
+                <label>
+                  <span>Inner Gap</span>
+                  <input id="grid6-inner-gap" type="range" min="0" max="320" value="0" />
+                </label>
+              </div>
+
+              <div class="physics-tab-panel" id="grid6-tab-warp" role="tabpanel">
+                <label>
+                  <span>Stretch X</span>
+                  <input id="grid6-stretch-x" type="range" min="10" max="320" value="100" />
+                </label>
+
+                <label>
+                  <span>Stretch Y</span>
+                  <input id="grid6-stretch-y" type="range" min="10" max="320" value="100" />
+                </label>
+
+                <label>
+                  <span>Bend</span>
+                  <input id="grid6-bend" type="range" min="-240" max="240" value="0" />
+                </label>
+
+                <label>
+                  <span>Wave Warp</span>
+                  <input id="grid6-wave-warp" type="range" min="0" max="240" value="0" />
+                </label>
+
+                <label>
+                  <span>Warp Frequency</span>
+                  <input id="grid6-warp-frequency" type="range" min="1" max="16" value="4" />
+                </label>
+
+                <label>
+                  <span>Warp Angle</span>
+                  <input id="grid6-warp-angle" type="range" min="0" max="360" value="90" />
+                </label>
+
+                <label>
+                  <span>Perspective</span>
+                  <input id="grid6-perspective" type="range" min="-200" max="200" value="0" />
+                </label>
+              </div>
+
+              <div class="physics-tab-panel" id="grid6-tab-animate" role="tabpanel">
+                <label>
+                  <span>Weight Mode</span>
+                  <select id="grid6-weight-mode">
+                    <option value="static">Static</option>
+                    <option value="grow">Grow</option>
+                    <option value="shrink">Shrink</option>
+                  </select>
+                </label>
+
+                <label>
+                  <span>Weight Amount</span>
+                  <input id="grid6-weight-amount" type="range" min="0" max="800" value="0" />
+                </label>
+
+                <label>
+                  <span>Letter Mode</span>
+                  <select id="grid6-letter-mode">
+                    <option value="static">Static</option>
+                    <option value="grow">Grow</option>
+                    <option value="shrink">Shrink</option>
+                  </select>
+                </label>
+
+                <label>
+                  <span>Letter Amount</span>
+                  <input id="grid6-letter-amount" type="range" min="0" max="180" value="0" />
+                </label>
+
+                <label>
+                  <span>Opacity Mode</span>
+                  <select id="grid6-opacity-mode">
+                    <option value="static">Static</option>
+                    <option value="grow">Grow</option>
+                    <option value="shrink">Shrink</option>
+                  </select>
+                </label>
+
+                <label>
+                  <span>Opacity Amount</span>
+                  <input id="grid6-opacity-amount" type="range" min="0" max="100" value="0" />
+                </label>
+
+                <label>
+                  <span>Random Opacity</span>
+                  <input id="grid6-opacity-random" type="range" min="0" max="100" value="0" />
+                </label>
+
+                <label>
+                  <span>Opacity Unit</span>
+                  <select id="grid6-opacity-unit">
+                    <option value="letter">Letters</option>
+                    <option value="word">Words</option>
+                    <option value="cell">Cells</option>
+                  </select>
+                </label>
+              </div>
+            </form>
+
+            <div class="grid-text-stage">
+              <canvas id="grid-edit-6-canvas" aria-label="Grid edit 6 refined looped graph text animation"></canvas>
+            </div>
+          </section>
+        </div>
+
+        <p class="line experiment-line">
+          <button
+            class="experiment-toggle"
+            type="button"
+            aria-expanded="false"
+            aria-controls="type-identity-panel"
+          >
+            <span class="experiment-toggle__dot" aria-hidden="true">&middot;</span>
+            <span>Type Identity Engine</span>
+            <span class="testing-page-toggle__arrow" aria-hidden="true">↓</span>
+          </button>
+        </p>
+
+        <div class="date-experiment" id="type-identity-panel" hidden>
+          <section class="grid-text-workspace" aria-label="Generative typography identity engine">
+            <form class="physics-controls" id="type-identity-controls">
+              <div class="preset-bar" aria-label="Type identity engine scene presets">
+                <label class="preset-field">
+                  <span>Scene</span>
+                  <select id="typegen-preset">
+                    <option value="denseGrid">POWER Grid</option>
+                    <option value="variableStack">JUST YOU Stack</option>
+                    <option value="giantLetters">THE ONE Giant</option>
+                    <option value="spacedRepeat">WIN Repeat</option>
+                    <option value="arcGlyphs">Arc Glyphs</option>
+                    <option value="broadcastMix">Broadcast Mix</option>
+                  </select>
+                </label>
+
+                <button class="preset-button" id="typegen-apply-preset" type="button">Apply</button>
+                <button class="preset-button" id="typegen-randomize" type="button">Randomize</button>
+                <button class="preset-button preset-button--wide" id="typegen-reset" type="button">Reset Scene</button>
+              </div>
+
+              <div class="physics-tablist physics-tablist--wide" role="tablist" aria-label="Type identity engine controls">
+                <button class="physics-tab is-active" type="button" role="tab" aria-selected="true" data-tab-target="typegen-tab-type">Type</button>
+                <button class="physics-tab" type="button" role="tab" aria-selected="false" data-tab-target="typegen-tab-scene">Scene</button>
+                <button class="physics-tab" type="button" role="tab" aria-selected="false" data-tab-target="typegen-tab-distort">Distort</button>
+                <button class="physics-tab" type="button" role="tab" aria-selected="false" data-tab-target="typegen-tab-mask">Mask</button>
+                <button class="physics-tab" type="button" role="tab" aria-selected="false" data-tab-target="typegen-tab-motion">Motion</button>
+              </div>
+
+              <div class="physics-tab-panel is-active" id="typegen-tab-type" role="tabpanel">
+                <label class="physics-text-field">
+                  <span>Phrase</span>
+                  <input id="typegen-phrase" type="text" value="POWER" autocomplete="off" />
+                </label>
+
+                <label>
+                  <span>Layout</span>
+                  <select id="typegen-layout">
+                    <option value="denseGrid">Dense Grid</option>
+                    <option value="variableStack">Variable Stack</option>
+                    <option value="giantLetters">Giant Letters</option>
+                    <option value="spacedRepeat">Spaced Repeat</option>
+                    <option value="arcGlyphs">Arc Glyphs</option>
+                    <option value="broadcastMix">Broadcast Mix</option>
+                  </select>
+                </label>
+
+                <label>
+                  <span>Weight</span>
+                  <input id="typegen-weight" type="range" min="400" max="900" step="100" value="900" />
+                </label>
+
+                <label>
+                  <span>Type Scale</span>
+                  <input id="typegen-type-scale" type="range" min="20" max="220" value="82" />
+                </label>
+
+                <label>
+                  <span>Letter Space</span>
+                  <input id="typegen-letter-space" type="range" min="-30" max="120" value="-8" />
+                </label>
+              </div>
+
+              <div class="physics-tab-panel" id="typegen-tab-scene" role="tabpanel">
+                <label>
+                  <span>Density</span>
+                  <input id="typegen-density" type="range" min="2" max="32" value="14" />
+                </label>
+
+                <label>
+                  <span>Columns</span>
+                  <input id="typegen-columns" type="range" min="1" max="24" value="8" />
+                </label>
+
+                <label>
+                  <span>Rows</span>
+                  <input id="typegen-rows" type="range" min="1" max="24" value="8" />
+                </label>
+
+                <label>
+                  <span>Grid Gap</span>
+                  <input id="typegen-gap" type="range" min="-40" max="220" value="18" />
+                </label>
+
+                <label>
+                  <span>Seed</span>
+                  <input id="typegen-seed" type="range" min="1" max="999" value="318" />
+                </label>
+
+                <label>
+                  <span>Glyph Mix</span>
+                  <input id="typegen-glyph-mix" type="range" min="0" max="100" value="0" />
+                </label>
+              </div>
+
+              <div class="physics-tab-panel" id="typegen-tab-distort" role="tabpanel">
+                <label>
+                  <span>Stretch X</span>
+                  <input id="typegen-stretch-x" type="range" min="20" max="360" value="150" />
+                </label>
+
+                <label>
+                  <span>Stretch X Var</span>
+                  <input id="typegen-stretch-x-var" type="range" min="0" max="220" value="95" />
+                </label>
+
+                <label>
+                  <span>Stretch Y</span>
+                  <input id="typegen-stretch-y" type="range" min="20" max="360" value="105" />
+                </label>
+
+                <label>
+                  <span>Stretch Y Var</span>
+                  <input id="typegen-stretch-y-var" type="range" min="0" max="260" value="85" />
+                </label>
+
+                <label>
+                  <span>Rotation Var</span>
+                  <input id="typegen-rotation" type="range" min="0" max="45" value="6" />
+                </label>
+
+                <label>
+                  <span>Size Var</span>
+                  <input id="typegen-size-var" type="range" min="0" max="160" value="65" />
+                </label>
+              </div>
+
+              <div class="physics-tab-panel" id="typegen-tab-mask" role="tabpanel">
+                <label>
+                  <span>Slices</span>
+                  <input id="typegen-slices" type="range" min="0" max="32" value="10" />
+                </label>
+
+                <label>
+                  <span>Slice Angle</span>
+                  <input id="typegen-slice-angle" type="range" min="0" max="360" value="0" />
+                </label>
+
+                <label>
+                  <span>Slice Drift</span>
+                  <input id="typegen-slice-drift" type="range" min="0" max="160" value="38" />
+                </label>
+
+                <label>
+                  <span>Mask Blocks</span>
+                  <input id="typegen-mask-blocks" type="range" min="0" max="32" value="8" />
+                </label>
+
+                <label>
+                  <span>Mask Flicker</span>
+                  <input id="typegen-mask-flicker" type="range" min="0" max="100" value="28" />
+                </label>
+
+                <label class="testing-toggle">
+                  <input id="typegen-crop" type="checkbox" checked />
+                  <span>Crop Edges</span>
+                </label>
+              </div>
+
+              <div class="physics-tab-panel" id="typegen-tab-motion" role="tabpanel">
+                <label>
+                  <span>Speed</span>
+                  <input id="typegen-speed" type="range" min="0" max="100" value="32" />
+                </label>
+
+                <label>
+                  <span>Slide X</span>
+                  <input id="typegen-slide-x" type="range" min="-260" max="260" value="42" />
+                </label>
+
+                <label>
+                  <span>Slide Y</span>
+                  <input id="typegen-slide-y" type="range" min="-260" max="260" value="0" />
+                </label>
+
+                <label>
+                  <span>Pulse</span>
+                  <input id="typegen-pulse" type="range" min="0" max="100" value="18" />
+                </label>
+
+                <label>
+                  <span>Scan</span>
+                  <input id="typegen-scan" type="range" min="0" max="100" value="24" />
+                </label>
+
+                <label>
+                  <span>Tempo Drift</span>
+                  <input id="typegen-tempo-drift" type="range" min="0" max="100" value="18" />
+                </label>
+              </div>
+            </form>
+
+            <div class="grid-text-stage">
+              <canvas id="type-identity-canvas" aria-label="Generative typography identity engine canvas"></canvas>
+            </div>
+          </section>
+        </div>
+        </div>
+      </div>
+
+      <p class="line testing-title-line">
+        <button
+          class="testing-page-toggle"
+          type="button"
+          aria-expanded="false"
+          aria-controls="date-4-panel"
+        >
+          <span>4/7</span>
+          <span class="testing-page-toggle__arrow" aria-hidden="true">↓</span>
+        </button>
+      </p>
+
+      <div class="testing-panel" id="date-4-panel" hidden>
+        <div class="experiment-lines" data-experiment-group="date-4">
+        <p class="line experiment-line">
+          <button
+            class="experiment-toggle"
+            type="button"
+            aria-expanded="false"
+            aria-controls="orbit-type-panel"
+          >
+            <span class="experiment-toggle__dot" aria-hidden="true">&middot;</span>
+            <span>Orbit Type Circle</span>
+            <span class="testing-page-toggle__arrow" aria-hidden="true">↓</span>
+          </button>
+        </p>
+
+        <div class="date-experiment" id="orbit-type-panel" hidden>
+          <section class="grid-text-workspace" aria-label="Orbiting radial typography camera system">
+            <form class="physics-controls" id="orbit-type-controls">
+              <div class="preset-bar" aria-label="Orbit type presets">
+                <label class="preset-field">
+                  <span>Name</span>
+                  <input id="orbit-preset-name" type="text" placeholder="New preset" autocomplete="off" />
+                </label>
+
+                <label class="preset-field">
+                  <span>Saved</span>
+                  <select id="orbit-preset-select">
+                    <option value="">Saved presets</option>
+                  </select>
+                </label>
+
+                <button class="preset-button" id="orbit-save-preset" type="button">Save</button>
+                <button class="preset-button" id="orbit-load-preset" type="button">Load</button>
+                <button class="preset-button" id="orbit-delete-preset" type="button">Delete</button>
+                <button class="preset-button" id="orbit-randomize" type="button">Randomize</button>
+                <button class="preset-button" id="orbit-reset-design" type="button">Reset Design</button>
+                <button class="preset-button" id="orbit-reset-camera" type="button">Reset Camera</button>
+                <span class="preset-status" id="orbit-preset-status" aria-live="polite"></span>
+              </div>
+
+              <div class="physics-tablist physics-tablist--wide" role="tablist" aria-label="Orbit type controls">
+                <button class="physics-tab is-active" type="button" role="tab" aria-selected="true" data-tab-target="orbit-tab-type">Type</button>
+                <button class="physics-tab" type="button" role="tab" aria-selected="false" data-tab-target="orbit-tab-circle">Circle</button>
+                <button class="physics-tab" type="button" role="tab" aria-selected="false" data-tab-target="orbit-tab-variation">Variation</button>
+                <button class="physics-tab" type="button" role="tab" aria-selected="false" data-tab-target="orbit-tab-camera">Camera</button>
+                <button class="physics-tab" type="button" role="tab" aria-selected="false" data-tab-target="orbit-tab-motion">Motion</button>
+                <button class="physics-tab" type="button" role="tab" aria-selected="false" data-tab-target="orbit-tab-colour">Colour</button>
+              </div>
+
+              <div class="physics-tab-panel is-active" id="orbit-tab-type" role="tabpanel">
+                <label class="physics-text-field">
+                  <span>Text</span>
+                  <input id="orbit-text" type="text" value="ORBIT TYPE" autocomplete="off" />
+                </label>
+
+                <label>
+                  <span>Font</span>
+                  <select id="orbit-font">
+                    <option value="Helvetica, Arial, sans-serif">Helvetica</option>
+                    <option value="Arial Black, Helvetica, sans-serif">Arial Black</option>
+                    <option value="Georgia, serif">Georgia</option>
+                    <option value="Times New Roman, serif">Times</option>
+                    <option value="Courier New, monospace">Courier</option>
+                    <option value="Impact, Haettenschweiler, sans-serif">Impact</option>
+                  </select>
+                </label>
+
+                <label>
+                  <span>Weight</span>
+                  <input id="orbit-weight" type="range" min="100" max="900" step="100" value="700" />
+                </label>
+
+                <label>
+                  <span>Font Size</span>
+                  <input id="orbit-font-size" type="range" min="4" max="160" value="28" />
+                </label>
+
+                <label>
+                  <span>Letter Space</span>
+                  <input id="orbit-letter-space" type="range" min="-24" max="100" value="4" />
+                </label>
+              </div>
+
+              <div class="physics-tab-panel" id="orbit-tab-circle" role="tabpanel">
+                <label>
+                  <span>Circle Radius</span>
+                  <input id="orbit-radius" type="range" min="20" max="760" value="280" />
+                </label>
+
+                <label>
+                  <span>Text Rays</span>
+                  <input id="orbit-rays" type="range" min="8" max="960" value="180" />
+                </label>
+
+                <label>
+                  <span>Radial Copies</span>
+                  <input id="orbit-radial-copies" type="range" min="1" max="42" value="1" />
+                </label>
+
+                <label>
+                  <span>Inner Fill</span>
+                  <input id="orbit-inner-fill" type="range" min="0" max="100" value="72" />
+                </label>
+
+                <label>
+                  <span>Line Length</span>
+                  <input id="orbit-line-length" type="range" min="8" max="180" value="100" />
+                </label>
+
+                <label>
+                  <span>Edge Softness</span>
+                  <input id="orbit-edge-softness" type="range" min="0" max="100" value="32" />
+                </label>
+              </div>
+
+              <div class="physics-tab-panel" id="orbit-tab-variation" role="tabpanel">
+                <label>
+                  <span>Opacity</span>
+                  <input id="orbit-opacity" type="range" min="0" max="100" value="82" />
+                </label>
+
+                <label>
+                  <span>Opacity Random</span>
+                  <input id="orbit-opacity-random" type="range" min="0" max="100" value="48" />
+                </label>
+
+                <label>
+                  <span>Size Random</span>
+                  <input id="orbit-size-random" type="range" min="0" max="180" value="56" />
+                </label>
+
+                <label>
+                  <span>Weight Random</span>
+                  <input id="orbit-weight-random" type="range" min="0" max="800" step="100" value="300" />
+                </label>
+
+                <label>
+                  <span>Spacing Random</span>
+                  <input id="orbit-spacing-random" type="range" min="0" max="120" value="26" />
+                </label>
+
+                <label>
+                  <span>Length Random</span>
+                  <input id="orbit-length-random" type="range" min="0" max="100" value="38" />
+                </label>
+
+                <label>
+                  <span>Radius Jitter</span>
+                  <input id="orbit-radius-jitter" type="range" min="0" max="180" value="18" />
+                </label>
+
+                <label>
+                  <span>Degree Random</span>
+                  <input id="orbit-degree-random" type="range" min="0" max="100" value="42" />
+                </label>
+
+                <label>
+                  <span>Seed</span>
+                  <input id="orbit-seed" type="range" min="1" max="999" value="427" />
+                </label>
+              </div>
+
+              <div class="physics-tab-panel" id="orbit-tab-camera" role="tabpanel">
+                <label>
+                  <span>Orbit X</span>
+                  <input id="orbit-camera-x" type="range" min="-85" max="85" value="0" />
+                </label>
+
+                <label>
+                  <span>Orbit Y</span>
+                  <input id="orbit-camera-y" type="range" min="-180" max="180" value="0" />
+                </label>
+
+                <label>
+                  <span>Roll</span>
+                  <input id="orbit-camera-roll" type="range" min="-180" max="180" value="0" />
+                </label>
+
+                <label>
+                  <span>Zoom</span>
+                  <input id="orbit-zoom" type="range" min="20" max="480" value="110" />
+                </label>
+
+                <label>
+                  <span>Perspective</span>
+                  <input id="orbit-perspective" type="range" min="0" max="180" value="72" />
+                </label>
+
+              </div>
+
+              <div class="physics-tab-panel" id="orbit-tab-motion" role="tabpanel">
+                <label>
+                  <span>Auto Orbit</span>
+                  <input id="orbit-auto-orbit" type="range" min="-120" max="120" value="8" />
+                </label>
+
+                <label>
+                  <span>Spin</span>
+                  <input id="orbit-spin" type="range" min="-120" max="120" value="0" />
+                </label>
+
+                <label>
+                  <span>Pulse</span>
+                  <input id="orbit-pulse" type="range" min="0" max="100" value="12" />
+                </label>
+
+                <label>
+                  <span>Shimmer</span>
+                  <input id="orbit-shimmer" type="range" min="0" max="100" value="20" />
+                </label>
+
+                <label>
+                  <span>Drag Feel</span>
+                  <input id="orbit-drag-feel" type="range" min="10" max="120" value="54" />
+                </label>
+              </div>
+
+              <div class="physics-tab-panel" id="orbit-tab-colour" role="tabpanel">
+                <label>
+                  <span>Text Colour</span>
+                  <input id="orbit-text-color" type="color" value="#f5f5f5" />
+                </label>
+
+                <label>
+                  <span>Background</span>
+                  <input id="orbit-bg-color" type="color" value="#050505" />
+                </label>
+
+                <label>
+                  <span>Fade Centre</span>
+                  <input id="orbit-fade-centre" type="range" min="0" max="100" value="0" />
+                </label>
+
+              </div>
+            </form>
+
+            <div class="grid-text-stage orbit-type-stage">
+              <canvas id="orbit-type-canvas" aria-label="Orbiting radial typography canvas"></canvas>
+            </div>
+          </section>
+        </div>
+        </div>
+      </div>
+    </header>
+  </main>
+
+  <script src="script.js"></script>
+  <script src="testing.js?v=20260704d"></script>
+</body>
+</html>
