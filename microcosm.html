@@ -4,24 +4,277 @@
   <meta charset="UTF-8" />
   <title>Microcosm — Xavier Cox</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="preload" href="Content/TV Loading.mp4" as="video" type="video/mp4" />
+  <link rel="preload" href="Microcosm/Title.mp4" as="video" type="video/mp4" />
   <link rel="stylesheet" href="style.css?v=20260708a" />
+  <link rel="stylesheet" href="microcosm-secret.css?v=20260708x" />
   <link rel="icon" type="image/png" href="favicon.png" />
 </head>
-<body class="microcosm-page">
+<body class="microcosm-page microcosm-secret-page microcosm-hybrid-page is-advanced-interface">
   <div class="cursor-blur"></div>
   <div class="cursor-dot"></div>
 
-  <header class="project-nav">
-    <a href="index.html" class="reveal-right" data-delay="0" aria-label="Back">←</a>
+  <header class="project-nav microcosm-secret-nav microcosm-advanced-nav">
+    <a href="index.html" aria-label="Back">←</a>
     <a
-      href="microcosm-secret.html"
-      class="microcosm-interface-switch reveal-right"
-      data-delay="60"
-      aria-label="Open 3D Microcosm interface"
-    >3D interface</a>
+      class="microcosm-interface-switch microcosm-secret-interface-switch"
+      href="#simple"
+      aria-label="Open simple Microcosm interface with the F key"
+    >
+      <span class="microcosm-interface-keycap" aria-hidden="true">F</span>
+      <span>simple interface</span>
+    </a>
+    <div class="microcosm-zoom-hint" aria-hidden="true">
+      <svg class="microcosm-zoom-hint__icon" viewBox="0 0 24 24" focusable="false">
+        <rect x="7" y="3" width="10" height="18" rx="5"></rect>
+        <path d="M12 7v4"></path>
+        <path d="M12 16v2"></path>
+      </svg>
+      <span>Scroll to Zoom</span>
+    </div>
   </header>
 
-  <main class="project-hero">
+  <header class="project-nav microcosm-simple-nav" hidden>
+    <a href="index.html" class="reveal-right" data-delay="0" aria-label="Back">←</a>
+    <a
+      href="#advanced"
+      class="microcosm-interface-switch microcosm-advanced-interface-switch reveal-right"
+      data-delay="60"
+      aria-label="Open 3D Microcosm interface with the F key"
+    >
+      <span class="microcosm-interface-keycap" aria-hidden="true">F</span>
+      <span>3D interface</span>
+    </a>
+  </header>
+
+  <main class="microcosm-secret-space" aria-label="Microcosm 3D video study">
+    <div class="microcosm-secret-camera" id="microcosmSecretCamera">
+      <button
+        class="microcosm-secret-panel microcosm-secret-panel--title is-active"
+        type="button"
+        data-panel="title"
+        aria-label="Focus title video"
+      >
+        <video
+          class="microcosm-panel-loader"
+          src="Content/TV Loading.mp4"
+          autoplay
+          loop
+          muted
+          playsinline
+          webkit-playsinline
+          preload="auto"
+          aria-hidden="true"
+        ></video>
+        <video
+          class="microcosm-panel-video"
+          src="Microcosm/Title.mp4"
+          loop
+          playsinline
+          webkit-playsinline
+          preload="auto"
+        ></video>
+      </button>
+
+      <button
+        class="microcosm-secret-panel microcosm-secret-panel--one"
+        type="button"
+        data-panel="one"
+        aria-label="Focus video one"
+      >
+        <video
+          class="microcosm-panel-loader"
+          src="Content/TV Loading.mp4"
+          autoplay
+          loop
+          muted
+          playsinline
+          webkit-playsinline
+          preload="auto"
+          aria-hidden="true"
+        ></video>
+        <video
+          class="microcosm-panel-video"
+          src="Microcosm/1.mp4"
+          loop
+          muted
+          playsinline
+          webkit-playsinline
+          preload="auto"
+        ></video>
+      </button>
+
+      <button
+        class="microcosm-secret-panel microcosm-secret-panel--two"
+        type="button"
+        data-panel="two"
+        aria-label="Focus video two"
+      >
+        <video
+          class="microcosm-panel-loader"
+          src="Content/TV Loading.mp4"
+          autoplay
+          loop
+          muted
+          playsinline
+          webkit-playsinline
+          preload="auto"
+          aria-hidden="true"
+        ></video>
+        <video
+          class="microcosm-panel-video"
+          src="Microcosm/2.mp4"
+          loop
+          muted
+          playsinline
+          webkit-playsinline
+          preload="auto"
+        ></video>
+      </button>
+
+      <button
+        class="microcosm-secret-panel microcosm-secret-panel--three"
+        type="button"
+        data-panel="three"
+        aria-label="Focus video three"
+      >
+        <video
+          class="microcosm-panel-loader"
+          src="Content/TV Loading.mp4"
+          autoplay
+          loop
+          muted
+          playsinline
+          webkit-playsinline
+          preload="auto"
+          aria-hidden="true"
+        ></video>
+        <video
+          class="microcosm-panel-video"
+          src="Microcosm/3.mp4"
+          loop
+          muted
+          playsinline
+          webkit-playsinline
+          preload="auto"
+        ></video>
+      </button>
+
+      <button
+        class="microcosm-secret-panel microcosm-secret-panel--four"
+        type="button"
+        data-panel="four"
+        aria-label="Focus video four"
+      >
+        <video
+          class="microcosm-panel-loader"
+          src="Content/TV Loading.mp4"
+          autoplay
+          loop
+          muted
+          playsinline
+          webkit-playsinline
+          preload="auto"
+          aria-hidden="true"
+        ></video>
+        <video
+          class="microcosm-panel-video"
+          src="Microcosm/4.mp4"
+          loop
+          muted
+          playsinline
+          webkit-playsinline
+          preload="auto"
+        ></video>
+      </button>
+
+      <button
+        class="microcosm-secret-panel microcosm-secret-panel--five"
+        type="button"
+        data-panel="five"
+        aria-label="Focus video five"
+      >
+        <video
+          class="microcosm-panel-loader"
+          src="Content/TV Loading.mp4"
+          autoplay
+          loop
+          muted
+          playsinline
+          webkit-playsinline
+          preload="auto"
+          aria-hidden="true"
+        ></video>
+        <video
+          class="microcosm-panel-video"
+          src="Microcosm/5.mp4"
+          loop
+          muted
+          playsinline
+          webkit-playsinline
+          preload="auto"
+        ></video>
+      </button>
+
+      <button
+        class="microcosm-secret-panel microcosm-secret-panel--six"
+        type="button"
+        data-panel="six"
+        aria-label="Focus video six"
+      >
+        <video
+          class="microcosm-panel-loader"
+          src="Content/TV Loading.mp4"
+          autoplay
+          loop
+          muted
+          playsinline
+          webkit-playsinline
+          preload="auto"
+          aria-hidden="true"
+        ></video>
+        <video
+          class="microcosm-panel-video"
+          src="Microcosm/6.mp4"
+          loop
+          muted
+          playsinline
+          webkit-playsinline
+          preload="auto"
+        ></video>
+      </button>
+    </div>
+
+    <div class="microcosm-camera-hud" aria-hidden="true">
+      <div class="microcosm-camera-hud__bracket"></div>
+      <div class="microcosm-camera-hud__rail">
+        <div class="microcosm-camera-hud__fill" id="microZoomFill"></div>
+      </div>
+      <div class="microcosm-camera-hud__readout" id="microZoomReadout">24mm</div>
+    </div>
+
+    <div class="microcosm-dust-field" aria-hidden="true">
+      <span class="microcosm-dust microcosm-dust--one"></span>
+      <span class="microcosm-dust microcosm-dust--two"></span>
+      <span class="microcosm-dust microcosm-dust--three"></span>
+      <span class="microcosm-dust microcosm-dust--four"></span>
+      <span class="microcosm-dust microcosm-dust--five"></span>
+      <span class="microcosm-dust microcosm-dust--six"></span>
+      <span class="microcosm-dust microcosm-dust--seven"></span>
+      <span class="microcosm-dust microcosm-dust--eight"></span>
+      <span class="microcosm-dust microcosm-dust--nine"></span>
+      <span class="microcosm-dust microcosm-dust--ten"></span>
+      <span class="microcosm-dust microcosm-dust--eleven"></span>
+      <span class="microcosm-dust microcosm-dust--twelve"></span>
+    </div>
+
+    <div class="microcosm-camera-reticle" aria-hidden="true">
+      <span class="microcosm-camera-reticle__line microcosm-camera-reticle__line--x"></span>
+      <span class="microcosm-camera-reticle__line microcosm-camera-reticle__line--y"></span>
+    </div>
+  </main>
+
+  <main class="project-hero microcosm-simple-interface" hidden>
     <div class="video-hero video-hero--microcosm reveal" data-delay="120">
       <div class="microcosm-stage" id="microStage">
         <video
@@ -30,6 +283,7 @@
           autoplay
           muted
           playsinline
+          webkit-playsinline
           preload="metadata"
         ></video>
         <video
@@ -38,6 +292,7 @@
           autoplay
           muted
           playsinline
+          webkit-playsinline
           preload="metadata"
         ></video>
       </div>
@@ -93,15 +348,11 @@
           <button class="microcosm-scene-btn" type="button" data-scene="6" aria-label="Play scene 6">6</button>
         </div>
       </div>
-      <!-- <div class="project-text">
-        <p class="reveal" data-delay="320">
-          Microcosm presents a speculative microscope, framing a digital environment as a living system. The viewer drifts through forms that feel biological, unstable, and constantly in flux. Sound and visuals are generated together, designed to continuously react and influence one another.
-        </p>
-      </div> -->
     </div>
   </main>
 
   <script src="script.js"></script>
-  <script src="microcosm.js?v=20260422k"></script>
+  <script src="microcosm.js?v=20260708b"></script>
+  <script src="microcosm-secret.js?v=20260708v"></script>
 </body>
 </html>

@@ -1,5 +1,15 @@
 (function () {
   const page = document.body;
+  let hasStartedSimpleInterface = false;
+
+  function isSimpleInterfaceActive() {
+    return !page || !page.classList.contains("is-advanced-interface");
+  }
+
+  function startSimpleInterface() {
+  if (hasStartedSimpleInterface) return;
+  hasStartedSimpleInterface = true;
+
   const stage = document.getElementById("microStage");
   const videoShell = document.querySelector(".video-hero--microcosm");
   const titleBtn = document.getElementById("microTitleJump");
@@ -437,6 +447,7 @@
   });
 
   document.addEventListener("click", async (event) => {
+    if (!isSimpleInterfaceActive()) return;
     const target = event.target;
     if (!(target instanceof Element)) return;
     if (shouldIgnoreGlobalSoundClick(target)) return;
@@ -445,6 +456,8 @@
   });
 
   document.addEventListener("keydown", (event) => {
+    if (!isSimpleInterfaceActive()) return;
+
     const target = event.target;
     if (
       event.defaultPrevented ||
@@ -506,5 +519,31 @@
     primeScene(nextSceneIndex());
   }
 
+  document.addEventListener("microcosm:show-simple", () => {
+    if (!isSimpleInterfaceActive()) return;
+    void playVideoSafe(getActiveVideo());
+  });
+
+  document.addEventListener("microcosm:show-advanced", () => {
+    clearSoundHideTimer();
+    hideSoundControl();
+    isWide = false;
+    updateWideUI();
+
+    videos.forEach((video) => {
+      cancelVolumeFade(video);
+      video.pause();
+      video.volume = 0;
+      video.muted = true;
+    });
+  });
+
   void startInitialPlayback();
+  }
+
+  if (page?.classList.contains("is-advanced-interface")) {
+    document.addEventListener("microcosm:show-simple", startSimpleInterface);
+  } else {
+    startSimpleInterface();
+  }
 })();

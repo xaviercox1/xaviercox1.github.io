@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <title>Intrinsik 2026 - Xavier Cox</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="style.css?v=20260513a" />
+  <link rel="stylesheet" href="style.css?v=20260708b" />
   <link rel="icon" type="image/png" href="favicon.png" />
 </head>
 <body class="intrinsik-2026-page">
@@ -57,15 +57,15 @@
         <aside class="industrique-loop reveal" data-delay="300" aria-label="Lighting controls loop">
           <div class="industrique-video-shell">
             <video
-              class="industrique-video"
+              class="industrique-video is-active"
               autoplay
-              loop
               muted
               playsinline
+              webkit-playsinline
               preload="auto"
               poster="Content/Intrinsik%20Industrique/Web/intrinsik-controls-poster.jpg"
             >
-              <source src="Content/Intrinsik%20Industrique/Web/intrinsik-controls-loop.m4v" type="video/mp4" />
+              <source src="Content/Intrinsik%20Industrique/Web/intrinsik-controls-loop-web.m4v" type="video/mp4" />
             </video>
           </div>
         </aside>
@@ -76,6 +76,7 @@
             id="industriqueScreenVideoA"
             muted
             playsinline
+            webkit-playsinline
             preload="auto"
           ></video>
           <video
@@ -83,6 +84,7 @@
             id="industriqueScreenVideoB"
             muted
             playsinline
+            webkit-playsinline
             preload="metadata"
           ></video>
         </section>
@@ -218,7 +220,7 @@
   </main>
 
   <script src="script.js"></script>
-  <script src="intrinsik-2026.js?v=20260514b"></script>
+  <script src="intrinsik-2026.js?v=20260708c"></script>
   <script src="intrinsik.js"></script>
 </body>
 </html>

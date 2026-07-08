@@ -4,6 +4,10 @@
   const zoomFill = document.getElementById("microZoomFill");
   const zoomReadout = document.getElementById("microZoomReadout");
   const interfaceSwitch = document.querySelector(".microcosm-secret-interface-switch");
+  const advancedSwitch = document.querySelector(".microcosm-advanced-interface-switch");
+  const advancedNav = document.querySelector(".microcosm-advanced-nav");
+  const simpleNav = document.querySelector(".microcosm-simple-nav");
+  const simpleInterface = document.querySelector(".microcosm-simple-interface");
   const panelNodes = Array.from(document.querySelectorAll(".microcosm-secret-panel"));
 
   if (!page || !space || !panelNodes.length) return;
@@ -57,15 +61,20 @@
   let orientationPitch = 0;
   let pinchStartDistance = 0;
   let pinchStartZoomProgress = 0;
+  let interfaceSwitchHideTimer = 0;
 
   const minFocalLength = 24;
   const maxFocalLength = 70;
   const minPanelOnsetDelay = 1000;
   const maxPanelOnsetDelay = 2200;
-  const mediaReadyState = typeof HTMLMediaElement === "undefined" ? 2 : HTMLMediaElement.HAVE_CURRENT_DATA;
+  const mediaReadyState = typeof HTMLMediaElement === "undefined" ? 3 : HTMLMediaElement.HAVE_FUTURE_DATA;
   const exitCursorZone = 104;
   const interfaceCursorPadding = 30;
   const coarsePointerQuery = window.matchMedia?.("(any-pointer: coarse)");
+  const hasTouchInput = "ontouchstart" in window || navigator.maxTouchPoints > 0;
+  const loaderLoopEpoch = performance.now();
+  const isHybridPage = page.classList.contains("microcosm-hybrid-page");
+  const interfaceSwitchHideDelay = 5000;
 
   function clamp(value, min, max) {
     return Math.min(Math.max(value, min), max);
@@ -114,8 +123,15 @@
   }
 
   function updateExitCursorState() {
+    if (!isAdvancedInterfaceActive()) {
+      page.classList.remove("is-exit-cursor");
+      return;
+    }
+
     const isNearBackArrow = pointerX <= exitCursorZone && pointerY <= exitCursorZone;
-    const isNearInterfaceSwitch = isPointerNearElement(interfaceSwitch, interfaceCursorPadding);
+    const isNearInterfaceSwitch =
+      !page.classList.contains("has-hidden-interface-switch") &&
+      isPointerNearElement(interfaceSwitch, interfaceCursorPadding);
 
     page.classList.toggle(
       "is-exit-cursor",
@@ -133,6 +149,29 @@
 
   function isLookInputActive() {
     return pointerActive || orientationActive;
+  }
+
+  function isAdvancedInterfaceActive() {
+    return !isHybridPage || page.classList.contains("is-advanced-interface");
+  }
+
+  function clearInterfaceSwitchHideTimer() {
+    if (!interfaceSwitchHideTimer) return;
+    window.clearTimeout(interfaceSwitchHideTimer);
+    interfaceSwitchHideTimer = 0;
+  }
+
+  function scheduleInterfaceSwitchHide() {
+    clearInterfaceSwitchHideTimer();
+    page.classList.remove("has-hidden-interface-switch");
+
+    if (!isAdvancedInterfaceActive()) return;
+
+    interfaceSwitchHideTimer = window.setTimeout(() => {
+      interfaceSwitchHideTimer = 0;
+      page.classList.add("has-hidden-interface-switch");
+      updateExitCursorState();
+    }, interfaceSwitchHideDelay);
   }
 
   function getLookAngles() {
@@ -184,6 +223,8 @@
   }
 
   function handleDeviceOrientation(event) {
+    if (!isAdvancedInterfaceActive()) return;
+
     const deltas = getOrientationDeltas(event);
     if (!deltas) return;
 
@@ -205,7 +246,7 @@
   }
 
   async function tryEnableDeviceLook() {
-    if (orientationPermissionRequested || !coarsePointerQuery?.matches) return;
+    if (orientationPermissionRequested || !(coarsePointerQuery?.matches || hasTouchInput)) return;
     if (!("DeviceOrientationEvent" in window)) return;
 
     orientationPermissionRequested = true;
@@ -213,7 +254,10 @@
     try {
       if (typeof DeviceOrientationEvent.requestPermission === "function") {
         const permission = await DeviceOrientationEvent.requestPermission();
-        if (permission !== "granted") return;
+        if (permission !== "granted") {
+          orientationPermissionRequested = false;
+          return;
+        }
       }
 
       bindDeviceOrientation();
@@ -282,8 +326,11 @@
     if (!loader) return;
 
     loader.muted = true;
+    loader.defaultMuted = true;
     loader.playsInline = true;
     loader.preload = "auto";
+    loader.setAttribute("playsinline", "");
+    loader.setAttribute("webkit-playsinline", "");
 
     const playAttempt = loader.play();
     if (playAttempt && typeof playAttempt.catch === "function") {
@@ -293,6 +340,74 @@
     }
   }
 
+  function syncLoaderLoop(loader) {
+    if (!loader) return;
+
+    const sync = () => {
+      const duration = loader.duration;
+      if (!Number.isFinite(duration) || duration <= 0.4) return;
+
+      const phase = ((performance.now() - loaderLoopEpoch) / 1000) % duration;
+      if (Math.abs(loader.currentTime - phase) > 0.18) {
+        try {
+          loader.currentTime = phase;
+        } catch (_error) {
+          // The loader can still play normally if Safari rejects an early seek.
+        }
+      }
+    };
+
+    if (loader.readyState >= 1) {
+      sync();
+      return;
+    }
+
+    loader.addEventListener("loadedmetadata", sync, { once: true });
+  }
+
+  function bindSmoothLoop(video, options = {}) {
+    if (!video) return;
+
+    const start = options.start ?? 0;
+    const padding = options.padding ?? 0.08;
+    let didLoop = false;
+
+    const tick = () => {
+      const duration = video.duration;
+      if (Number.isFinite(duration) && duration > padding + start + 0.35) {
+        const loopAt = duration - padding;
+
+        if (!didLoop && video.currentTime >= loopAt) {
+          didLoop = true;
+          try {
+            video.currentTime = start;
+          } catch (_error) {}
+        } else if (didLoop && video.currentTime > start + 0.18 && video.currentTime < loopAt - 0.12) {
+          didLoop = false;
+        }
+      }
+
+      if (typeof video.requestVideoFrameCallback === "function") {
+        video.requestVideoFrameCallback(tick);
+      } else {
+        window.requestAnimationFrame(tick);
+      }
+    };
+
+    tick();
+  }
+
+  function prepareInlineVideo(video) {
+    if (!video) return;
+
+    video.defaultMuted = true;
+    video.muted = true;
+    video.playsInline = true;
+    video.preload = "auto";
+    video.setAttribute("playsinline", "");
+    video.setAttribute("webkit-playsinline", "");
+  }
+
   function waitForVideoReady(video) {
     if (!video || video.readyState >= mediaReadyState) {
       return Promise.resolve();
@@ -300,21 +415,23 @@
 
     return new Promise((resolve) => {
       let isResolved = false;
-      let fallbackTimer = 0;
 
       const finish = () => {
+        if (video.readyState < mediaReadyState) return;
         if (isResolved) return;
         isResolved = true;
-        window.clearTimeout(fallbackTimer);
         video.removeEventListener("loadeddata", finish);
         video.removeEventListener("canplay", finish);
+        video.removeEventListener("canplaythrough", finish);
+        video.removeEventListener("playing", finish);
         video.removeEventListener("error", finish);
         resolve();
       };
 
-      fallbackTimer = window.setTimeout(finish, 9000);
       video.addEventListener("loadeddata", finish);
       video.addEventListener("canplay", finish);
+      video.addEventListener("canplaythrough", finish);
+      video.addEventListener("playing", finish);
       video.addEventListener("error", finish);
 
       if (video.preload !== "auto") {
@@ -324,8 +441,33 @@
       try {
         video.load();
       } catch (_error) {
-        finish();
+        // Keep the loader visible if the real video cannot be loaded.
       }
+    });
+  }
+
+  function waitForVideoPlaying(video) {
+    if (!video || (!video.paused && video.readyState >= mediaReadyState)) {
+      return Promise.resolve();
+    }
+
+    return new Promise((resolve) => {
+      let isResolved = false;
+
+      const finish = () => {
+        if (isResolved) return;
+        if (video.paused || video.readyState < mediaReadyState) return;
+        isResolved = true;
+        video.removeEventListener("playing", finish);
+        video.removeEventListener("timeupdate", finish);
+        video.removeEventListener("canplay", finish);
+        resolve();
+      };
+
+      video.addEventListener("playing", finish);
+      video.addEventListener("timeupdate", finish);
+      video.addEventListener("canplay", finish);
+      finish();
     });
   }
 
@@ -342,16 +484,26 @@
       return;
     }
 
+    prepareInlineVideo(video);
     video.volume = 0;
-    video.muted = true;
-    video.playsInline = true;
 
     await waitForVideoReady(video);
+    await startMutedPlayback(video);
+    await waitForVideoPlaying(video);
     await sleep(getPanelOnsetDelay());
 
     panel.ready = true;
     panel.node.classList.add("is-video-ready");
     panel.node.classList.remove("is-video-loading");
+
+    if (!isAdvancedInterfaceActive()) {
+      video.volume = 0;
+      video.muted = true;
+      video.pause();
+      panel.loader?.pause();
+      return;
+    }
+
     setAudioTargets();
     video.volume = panel.targetVolume;
     video.muted = panel.id !== "title";
@@ -521,6 +673,21 @@
     }
   }
 
+  async function startMutedPlayback(video) {
+    if (!video) return false;
+
+    video.muted = true;
+    video.defaultMuted = true;
+    video.volume = 0;
+
+    try {
+      await video.play();
+      return true;
+    } catch (_error) {
+      return false;
+    }
+  }
+
   async function tryPlay(panel, audible = false) {
     const video = panel.video;
     if (!video || !panel.ready) return false;
@@ -567,7 +734,82 @@
     }
   }
 
+  function setElementHidden(element, isHidden) {
+    if (!element) return;
+    element.hidden = isHidden;
+  }
+
+  function updateInterfaceUrl(mode) {
+    if (!isHybridPage || !window.history?.replaceState) return;
+    window.history.replaceState(null, "", mode === "simple" ? "microcosm.html#simple" : "microcosm.html");
+  }
+
+  function pauseAdvancedPlayback() {
+    panels.forEach((panel) => {
+      panel.loader?.pause();
+
+      if (!panel.video) return;
+      panel.currentVolume = 0;
+      panel.targetVolume = 0;
+      panel.video.volume = 0;
+      panel.video.muted = true;
+      panel.video.pause();
+    });
+  }
+
+  function resumeAdvancedPlayback() {
+    panels.forEach((panel) => {
+      if (panel.ready) {
+        void startMutedPlayback(panel.video);
+      } else {
+        playLoaderVideo(panel.loader);
+      }
+    });
+
+    markLookState();
+    setAudioTargets();
+  }
+
+  function showSimpleInterface(updateUrl = true) {
+    if (!isHybridPage) {
+      window.location.href = "microcosm.html#simple";
+      return;
+    }
+
+    page.classList.remove("microcosm-secret-page", "is-advanced-interface", "is-exit-cursor");
+    page.classList.add("is-simple-interface");
+    setElementHidden(advancedNav, true);
+    setElementHidden(space, true);
+    setElementHidden(simpleNav, false);
+    setElementHidden(simpleInterface, false);
+    clearInterfaceSwitchHideTimer();
+    page.classList.remove("has-hidden-interface-switch");
+    pauseAdvancedPlayback();
+
+    if (updateUrl) updateInterfaceUrl("simple");
+    document.dispatchEvent(new CustomEvent("microcosm:show-simple"));
+  }
+
+  function showAdvancedInterface(updateUrl = true) {
+    if (!isHybridPage) return;
+
+    document.dispatchEvent(new CustomEvent("microcosm:show-advanced"));
+    page.classList.remove("is-simple-interface");
+    page.classList.add("microcosm-secret-page", "is-advanced-interface");
+    setElementHidden(simpleNav, true);
+    setElementHidden(simpleInterface, true);
+    setElementHidden(advancedNav, false);
+    setElementHidden(space, false);
+    resumeAdvancedPlayback();
+    scheduleInterfaceSwitchHide();
+    updateExitCursorState();
+
+    if (updateUrl) updateInterfaceUrl("advanced");
+  }
+
   function handlePointerMove(event) {
+    if (!isAdvancedInterfaceActive()) return;
+
     pointerX = event.clientX;
     pointerY = event.clientY;
     pointerActive = true;
@@ -576,6 +818,8 @@
   }
 
   function handlePanelEnter(panel) {
+    if (!isAdvancedInterfaceActive()) return;
+
     hoveredPanel = panel;
     pointerActive = true;
     markLookState();
@@ -590,6 +834,8 @@
   }
 
   function handlePanelLeave(panel) {
+    if (!isAdvancedInterfaceActive()) return;
+
     if (hoveredPanel === panel) {
       hoveredPanel = getPanelForPointerDirection();
     }
@@ -598,6 +844,8 @@
   }
 
   function handlePanelClick(panel) {
+    if (!isAdvancedInterfaceActive()) return;
+
     hoveredPanel = panel;
     void tryUnlockAudio(panel);
     markLookState();
@@ -612,7 +860,10 @@
   }
 
   function handleWheel(event) {
+    if (!isAdvancedInterfaceActive()) return;
+
     event.preventDefault();
+    page.classList.add("has-used-scroll-zoom");
 
     const currentTarget = getPanelForPointerDirection();
     if (currentTarget) {
@@ -627,6 +878,8 @@
   }
 
   function handleTouchStart(event) {
+    if (!isAdvancedInterfaceActive()) return;
+
     void tryEnableDeviceLook();
 
     if (event.touches.length !== 2) return;
@@ -640,6 +893,8 @@
   }
 
   function handleTouchMove(event) {
+    if (!isAdvancedInterfaceActive()) return;
+
     if (event.touches.length !== 2 || pinchStartDistance <= 0) return;
 
     event.preventDefault();
@@ -656,6 +911,8 @@
   }
 
   function handleTouchEnd(event) {
+    if (!isAdvancedInterfaceActive()) return;
+
     if (event.touches.length >= 2) return;
 
     pinchStartDistance = 0;
@@ -663,6 +920,18 @@
   }
 
   function animate() {
+    if (!isAdvancedInterfaceActive()) {
+      panels.forEach((panel) => {
+        if (!panel.video) return;
+        panel.currentVolume = 0;
+        panel.targetVolume = 0;
+        panel.video.volume = 0;
+        panel.video.muted = true;
+      });
+      requestAnimationFrame(animate);
+      return;
+    }
+
     const look = getLookAngles();
     const hasLookInput = isLookInputActive();
     const targetYaw = hasLookInput ? look.yaw : 0;
@@ -697,10 +966,11 @@
     const video = panel.video;
     if (video) {
       video.volume = 0;
-      video.muted = true;
-      video.playsInline = true;
+      prepareInlineVideo(video);
     }
 
+    syncLoaderLoop(panel.loader);
+    bindSmoothLoop(panel.loader, { padding: 0.08 });
     playLoaderVideo(panel.loader);
     void revealPanelWhenReady(panel);
 
@@ -716,10 +986,12 @@
 
   window.addEventListener("pointermove", handlePointerMove, { passive: true });
   window.addEventListener("pointerdown", () => {
+    if (!isAdvancedInterfaceActive()) return;
     void tryEnableDeviceLook();
     void tryUnlockAudio(getVisualTargetPanel());
   }, { passive: true });
   window.addEventListener("keydown", () => {
+    if (!isAdvancedInterfaceActive()) return;
     void tryUnlockAudio(getVisualTargetPanel());
   }, { once: true });
   window.addEventListener("keydown", (event) => {
@@ -739,15 +1011,36 @@
 
     if (event.key.toLowerCase() === "f") {
       event.preventDefault();
-      window.location.href = "microcosm.html";
+      if (isHybridPage && page.classList.contains("is-simple-interface")) {
+        showAdvancedInterface();
+      } else if (isHybridPage) {
+        showSimpleInterface();
+      } else {
+        window.location.href = "microcosm.html#simple";
+      }
     }
+  });
+  interfaceSwitch?.addEventListener("click", (event) => {
+    if (!isHybridPage) return;
+    event.preventDefault();
+    showSimpleInterface();
+  });
+  advancedSwitch?.addEventListener("click", (event) => {
+    event.preventDefault();
+    showAdvancedInterface();
   });
   space.addEventListener("wheel", handleWheel, { passive: false });
   space.addEventListener("touchstart", handleTouchStart, { passive: false });
   space.addEventListener("touchmove", handleTouchMove, { passive: false });
-  space.addEventListener("touchend", handleTouchEnd, { passive: true });
+  space.addEventListener("touchend", (event) => {
+    void tryEnableDeviceLook();
+    handleTouchEnd(event);
+  }, { passive: true });
   space.addEventListener("touchcancel", handleTouchEnd, { passive: true });
-  space.addEventListener("click", handleSceneClick);
+  space.addEventListener("click", (event) => {
+    void tryEnableDeviceLook();
+    handleSceneClick(event);
+  });
   window.addEventListener("orientationchange", () => {
     orientationNeutral = null;
   }, { passive: true });
@@ -755,6 +1048,7 @@
     orientationNeutral = null;
   });
   document.addEventListener("mouseleave", () => {
+    if (!isAdvancedInterfaceActive()) return;
     pointerActive = false;
     hoveredPanel = null;
     page.classList.remove("is-exit-cursor");
@@ -767,4 +1061,10 @@
   setAudioTargets();
   updateZoomHud();
   requestAnimationFrame(animate);
+
+  if (isHybridPage && window.location.hash.toLowerCase() === "#simple") {
+    showSimpleInterface(false);
+  } else {
+    scheduleInterfaceSwitchHide();
+  }
 })();
