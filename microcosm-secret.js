@@ -34,8 +34,8 @@
       angleYaw: Math.atan2(world.x, world.z) * 180 / Math.PI,
       anglePitch: Math.atan2(world.y, world.z) * 180 / Math.PI,
       ready: false,
-      currentVolume: node.classList.contains("microcosm-secret-panel--title") ? 0.72 : 0,
-      targetVolume: node.classList.contains("microcosm-secret-panel--title") ? 0.72 : 0,
+      currentVolume: 0,
+      targetVolume: 0,
       screenX: 0,
       screenY: 0,
       cameraDepth: 0,
@@ -47,7 +47,7 @@
   let pointerY = window.innerHeight / 2;
   let pointerActive = false;
   let hoveredPanel = null;
-  let audioAllowed = true;
+  let audioAllowed = false;
   let hasTriedUnlock = false;
   let cameraYaw = 0;
   let cameraPitch = 0;
@@ -506,8 +506,8 @@
 
     setAudioTargets();
     video.volume = panel.targetVolume;
-    video.muted = panel.id !== "title";
-    void tryPlay(panel, panel.id === "title");
+    video.muted = true;
+    void tryPlay(panel, false);
 
     if (panel.loader) {
       panel.loader.pause();
@@ -648,7 +648,7 @@
         return;
       }
 
-      if (!audiblePanel || page.classList.contains("has-negative-space")) {
+      if (!audioAllowed || !audiblePanel || page.classList.contains("has-negative-space")) {
         panel.targetVolume = 0;
       } else if (panel === audiblePanel) {
         panel.targetVolume = panel.id === "title" && !pointerActive ? 0.72 : 0.92;
@@ -732,6 +732,8 @@
     if (!audioAllowed) {
       await Promise.all(panels.map(ensureMutedPlayback));
     }
+
+    setAudioTargets();
   }
 
   function setElementHidden(element, isHidden) {
@@ -825,11 +827,8 @@
     markLookState();
     setAudioTargets();
 
-    if (!hasTriedUnlock) {
-      panels.forEach((candidate) => {
-        if (!candidate.video || !candidate.ready) return;
-        candidate.video.muted = candidate !== panel;
-      });
+    if (panel.video?.paused) {
+      void ensureMutedPlayback(panel);
     }
   }
 
