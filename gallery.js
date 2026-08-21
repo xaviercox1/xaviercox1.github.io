@@ -6,6 +6,7 @@
   const stageNav = document.getElementById("galleryStageNav");
   const stagePrev = document.getElementById("galleryStagePrev");
   const stageNext = document.getElementById("galleryStageNext");
+  const scenePicker = document.getElementById("galleryScenePicker");
   const audioBtn = document.getElementById("galleryAudio");
   const indexYear = document.getElementById("galleryIndexYear");
   const mobileGalleryQuery = window.matchMedia("(max-width: 760px)");
@@ -60,6 +61,48 @@
       ],
     },
   ];
+
+  const newWorks = [
+    {
+      src: "Content/New Portfolio/earth-tones.mp4",
+      thumb: "Content/New Portfolio/Thumbnails/earth-tones.png",
+      alt: "Earth Tones",
+      created: "2026-08-20T00:00:00+01:00",
+      hasAudio: true,
+    },
+    {
+      src: "Content/New Portfolio/deep-inside.mp4",
+      thumb: "Content/New Portfolio/Thumbnails/deep-inside.png",
+      alt: "Deep Inside",
+      created: "2026-08-20T00:00:00+01:00",
+      hasAudio: true,
+    },
+    {
+      src: "Content/New Portfolio/looped-drexcyia.mp4",
+      thumb: "Content/New Portfolio/Thumbnails/looped-drexcyia.png",
+      alt: "Looped Drexcyia",
+      created: "2026-08-20T00:00:00+01:00",
+      hasAudio: true,
+    },
+  ];
+
+  const audioReactiveWork = {
+    slug: "audio-reactive-piece",
+    alt: "Audio Reactive Piece",
+    created: "2026-08-20T00:00:00+01:00",
+    preview: {
+      src: "Content/New Portfolio/Audio Reactive/combination.mp4",
+      thumb: "Content/New Portfolio/Thumbnails/audio-reactive-combination.png",
+      alt: "Audio Reactive Piece — Combination",
+      hasAudio: true,
+    },
+    scenes: [
+      { src: "Content/New Portfolio/Audio Reactive/scene-1.mp4", alt: "Audio Reactive Piece — Scene 1", hasAudio: true },
+      { src: "Content/New Portfolio/Audio Reactive/scene-2.mp4", alt: "Audio Reactive Piece — Scene 2", hasAudio: true },
+      { src: "Content/New Portfolio/Audio Reactive/scene-3.mp4", alt: "Audio Reactive Piece — Scene 3", hasAudio: true },
+      { src: "Content/New Portfolio/Audio Reactive/scene-4.mp4", alt: "Audio Reactive Piece — Scene 4", hasAudio: true },
+    ],
+  };
 
   const knownWorks = [
     {
@@ -206,12 +249,16 @@
   }
 
   const preferredOrder = new Map([
-    ["intrinsik-live-performance", 0],
-    ["intrinsik-motion-graphics", 1],
-    ["joe-king", 2],
-    ["magma", 3],
-    ["tubular-bells", 4],
-    ["klf", 5],
+    ["earth-tones", 0],
+    ["audio-reactive-piece", 1],
+    ["deep-inside", 2],
+    ["looped-drexcyia", 3],
+    ["intrinsik-live-performance", 4],
+    ["intrinsik-motion-graphics", 5],
+    ["joe-king", 6],
+    ["magma", 7],
+    ["tubular-bells", 8],
+    ["klf", 9],
   ]);
 
   function sortByMixedOrder(a, b) {
@@ -273,13 +320,14 @@
       src: fullSource,
       fullSrc: fullSource,
       previewSrc: previewSource,
-      thumb: item.thumb || defaultThumb(item.src),
-      thumbFallback: item.thumb || defaultThumbFallback(item.src),
+      thumb: item.thumb || (item.previewAsVideo ? "" : defaultThumb(item.src)),
+      thumbFallback: item.thumb || (item.previewAsVideo ? "" : defaultThumbFallback(item.src)),
       alt: title,
       created: item.created || "",
       hasAudio: typeof item.hasAudio === "boolean" ? item.hasAudio : null,
       sourceOrder,
       type: "single",
+      previewAsVideo: Boolean(item.previewAsVideo),
     };
   }
 
@@ -308,8 +356,39 @@
     };
   }
 
+  function normalizeSceneGroup(group, sourceOrder) {
+    const preview = normalizeEntry(
+      { ...group.preview, created: group.created || "" },
+      sourceOrder
+    );
+    const scenes = group.scenes.map((item, idx) =>
+      normalizeEntry(
+        { ...item, created: item.created || group.created || "", previewAsVideo: true },
+        sourceOrder + (idx + 1) / 100
+      )
+    );
+
+    return {
+      key: `scene-group:${group.slug}`,
+      slug: group.slug,
+      src: `scene-group:${group.slug}`,
+      alt: group.alt,
+      created: group.created || "",
+      sourceOrder,
+      type: "scene-group",
+      activeScene: null,
+      preview,
+      scenes,
+    };
+  }
+
   function getDisplayedEntry(work) {
     if (!work) return null;
+    if (work.type === "scene-group") {
+      return Number.isInteger(work.activeScene)
+        ? work.scenes[work.activeScene] || work.preview
+        : work.preview;
+    }
     if (work.type !== "group") return work;
     if (!work.items.length) return null;
     const total = work.items.length;
@@ -356,14 +435,30 @@
   });
 
   const works = [
+    ...newWorks.map((item, idx) => normalizeEntry(item, -100 + idx)),
     ...Array.from(workMap.values()),
     ...groupedWorks.map((group, idx) => normalizeGroup(group, 2000 + idx)),
+    normalizeSceneGroup(audioReactiveWork, -90),
   ].sort(sortByMixedOrder);
 
   if (!works.length) return;
 
   index.innerHTML = works
     .map((item) => {
+      if (item.type === "scene-group") {
+        const thumb = encodeURI(item.preview.thumb);
+        return `
+          <button
+            type="button"
+            class="gallery-index-item"
+            data-work="${item.slug}"
+            aria-label="${item.alt} — combination video"
+          >
+            <img class="gallery-index-thumb" src="${thumb}" alt="" loading="lazy" decoding="async" />
+          </button>
+        `;
+      }
+
       if (item.type === "group") {
         const cluster = item.items
           .map((entry) => {
@@ -389,6 +484,15 @@
         `;
       }
 
+      if (item.previewAsVideo) {
+        const previewSrc = encodeURI(item.src);
+        return `
+          <button type="button" class="gallery-index-item" data-work="${item.slug}" aria-label="${item.alt}">
+            <video class="gallery-index-thumb gallery-index-video" src="${previewSrc}" muted playsinline preload="metadata" aria-hidden="true"></video>
+          </button>
+        `;
+      }
+
       const thumb = encodeURI(item.thumb);
       const thumbFallback = encodeURI(item.thumbFallback);
       return `
@@ -398,6 +502,13 @@
       `;
     })
     .join("");
+
+  index.querySelectorAll(".gallery-index-video").forEach((video) => {
+    video.addEventListener("loadedmetadata", () => {
+      const duration = Number.isFinite(video.duration) ? video.duration : 0;
+      video.currentTime = Math.min(0.5, Math.max(0, duration * 0.1));
+    });
+  });
 
   index
     .querySelectorAll(".gallery-index-thumb, .gallery-index-group-thumb")
@@ -460,11 +571,34 @@
     stageNav.hidden = !isGroup;
     stagePrev.disabled = !isGroup;
     stageNext.disabled = !isGroup;
+
+    if (scenePicker) {
+      const isSceneGroup = currentWork?.type === "scene-group";
+      scenePicker.hidden = !isSceneGroup;
+      scenePicker.querySelectorAll(".gallery-scene-cell").forEach((button) => {
+        const sceneIndex = Number(button.dataset.scene);
+        const isActive = isSceneGroup && currentWork.activeScene === sceneIndex;
+        button.classList.toggle("is-active", isActive);
+        button.setAttribute("aria-pressed", String(isActive));
+        button.setAttribute(
+          "aria-label",
+          isActive
+            ? `Return to combination from scene ${sceneIndex + 1}`
+            : `Play scene ${sceneIndex + 1}`
+        );
+      });
+    }
   }
 
   function loadStageThumb(entry) {
     stageThumb.alt = entry.alt;
-    stageThumb.src = encodeURI(entry.thumb);
+    if (entry.thumb) {
+      stageThumb.hidden = false;
+      stageThumb.src = encodeURI(entry.thumb);
+    } else {
+      stageThumb.hidden = true;
+      stageThumb.removeAttribute("src");
+    }
   }
 
   function playStageVideo() {
@@ -501,6 +635,9 @@
     if (currentWork.type === "group" && !Number.isInteger(currentWork.activeIndex)) {
       currentWork.activeIndex = 0;
     }
+    if (currentWork.type === "scene-group") {
+      currentWork.activeScene = null;
+    }
 
     syncSelectionState();
     renderCurrentWork();
@@ -514,6 +651,13 @@
     if (!currentWork || currentWork.type !== "group" || currentWork.items.length < 2) return;
     const count = currentWork.items.length;
     currentWork.activeIndex = (currentWork.activeIndex + direction + count) % count;
+    renderCurrentWork({ preserveMute: true });
+  }
+
+  function selectScene(sceneIndex) {
+    if (!currentWork || currentWork.type !== "scene-group") return;
+    if (!Number.isInteger(sceneIndex) || !currentWork.scenes[sceneIndex]) return;
+    currentWork.activeScene = currentWork.activeScene === sceneIndex ? null : sceneIndex;
     renderCurrentWork({ preserveMute: true });
   }
 
@@ -556,6 +700,12 @@
 
   stageNext?.addEventListener("click", () => {
     stepGroup(1);
+  });
+
+  scenePicker?.querySelectorAll(".gallery-scene-cell").forEach((button) => {
+    button.addEventListener("click", () => {
+      selectScene(Number(button.dataset.scene));
+    });
   });
 
   indexButtons.forEach((button) => {

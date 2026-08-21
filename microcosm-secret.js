@@ -129,8 +129,11 @@
     }
 
     const isNearBackArrow = pointerX <= exitCursorZone && pointerY <= exitCursorZone;
-    const isNearInterfaceSwitch =
+    const isInterfaceSwitchVisible =
       !page.classList.contains("has-hidden-interface-switch") &&
+      !page.classList.contains("has-unlocked-audio");
+    const isNearInterfaceSwitch =
+      isInterfaceSwitchVisible &&
       isPointerNearElement(interfaceSwitch, interfaceCursorPadding);
 
     page.classList.toggle(
@@ -658,6 +661,25 @@
     });
   }
 
+  function syncAudioHintState() {
+    page.classList.toggle("has-unlocked-audio", audioAllowed);
+    updateExitCursorState();
+  }
+
+  function getAudioUnlockPanel(panelToFavor) {
+    if (panelToFavor?.ready && panelToFavor.video) return panelToFavor;
+
+    const directedPanel = getPanelForPointerDirection();
+    if (directedPanel?.ready && directedPanel.video) return directedPanel;
+
+    return (
+      panels.find((panel) => panel.ready && panel.video) ||
+      panelToFavor ||
+      directedPanel ||
+      panels[0]
+    );
+  }
+
   async function ensureMutedPlayback(panel) {
     const video = panel.video;
     if (!video || !panel.ready) return false;
@@ -709,8 +731,15 @@
 
   async function tryUnlockAudio(panelToFavor) {
     hasTriedUnlock = true;
+
+    if (audioAllowed) {
+      syncAudioHintState();
+      setAudioTargets();
+      return;
+    }
+
     audioAllowed = false;
-    const favoredPanel = panelToFavor || getVisualTargetPanel();
+    const favoredPanel = getAudioUnlockPanel(panelToFavor || getVisualTargetPanel());
 
     await Promise.all(panels.map(async (panel) => {
       if (!panel.video || !panel.ready) return;
@@ -733,6 +762,7 @@
       await Promise.all(panels.map(ensureMutedPlayback));
     }
 
+    syncAudioHintState();
     setAudioTargets();
   }
 
@@ -855,7 +885,10 @@
     const directPanel = getPanelFromElement(event.target);
     if (directPanel) {
       handlePanelClick(directPanel);
+      return;
     }
+
+    void tryUnlockAudio(getVisualTargetPanel());
   }
 
   function handleWheel(event) {

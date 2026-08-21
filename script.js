@@ -837,6 +837,32 @@ if (cursorDot) {
   animateEye();
 })();
 
+// === Homepage logo: keep the still visible until the animated mark is ready ===
+(function () {
+  const shell = document.querySelector(".home-logo-shell");
+  const animatedLogo = shell?.querySelector(".home-logo--animated");
+  const animatedSource = animatedLogo?.dataset.src;
+  if (!shell || !animatedLogo || !animatedSource) return;
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+  function loadAnimatedLogo() {
+    animatedLogo.addEventListener(
+      "load",
+      () => {
+        shell.classList.add("is-animated-ready");
+      },
+      { once: true }
+    );
+    animatedLogo.src = animatedSource;
+  }
+
+  if (document.readyState === "complete") {
+    loadAnimatedLogo();
+  } else {
+    window.addEventListener("load", loadAnimatedLogo, { once: true });
+  }
+})();
+
 // === Sandpile simulation ===
 (function () {
   const canvas = document.getElementById("sandpile");
