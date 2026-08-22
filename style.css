@@ -1711,6 +1711,9 @@ a:hover {
   aspect-ratio: var(--stage-ratio);
   overflow: hidden;
   background: #000;
+  border: 0;
+  outline: 0;
+  box-shadow: none;
   margin: 0 auto;
 }
 
@@ -1723,6 +1726,9 @@ a:hover {
   object-fit: contain;
   display: block;
   background: #000;
+  border: 0;
+  outline: 0;
+  box-shadow: none;
 }
 
 .gallery-stage-thumb {
@@ -1785,8 +1791,10 @@ a:hover {
   grid-template-columns: repeat(2, 1fr);
   grid-template-rows: repeat(2, 1fr);
   gap: 2px;
-  padding: 2px;
-  border: 1px solid rgba(245, 245, 245, 0.26);
+  padding: 0;
+  border: 0;
+  outline: 0;
+  box-shadow: none;
 }
 
 .gallery-scene-picker[hidden] {

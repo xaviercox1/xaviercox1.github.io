@@ -69,6 +69,7 @@
       alt: "Earth Tones",
       created: "2026-08-20T00:00:00+01:00",
       hasAudio: true,
+      showStageThumb: false,
     },
     {
       src: "Content/New Portfolio/deep-inside.mp4",
@@ -328,6 +329,7 @@
       sourceOrder,
       type: "single",
       previewAsVideo: Boolean(item.previewAsVideo),
+      showStageThumb: item.showStageThumb !== false,
     };
   }
 
@@ -592,7 +594,7 @@
 
   function loadStageThumb(entry) {
     stageThumb.alt = entry.alt;
-    if (entry.thumb) {
+    if (entry.thumb && entry.showStageThumb !== false) {
       stageThumb.hidden = false;
       stageThumb.src = encodeURI(entry.thumb);
     } else {
