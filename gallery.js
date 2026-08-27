@@ -10,6 +10,7 @@
   const audioBtn = document.getElementById("galleryAudio");
   const indexYear = document.getElementById("galleryIndexYear");
   const mobileGalleryQuery = window.matchMedia("(max-width: 760px)");
+  const isIphoneDevice = /\biPhone\b|\biPod\b/.test(navigator.userAgent);
 
   if (!index || !stage || !stageThumb || !stageVideo || !audioBtn) return;
 
@@ -70,6 +71,7 @@
       created: "2026-08-20T00:00:00+01:00",
       hasAudio: true,
       showStageThumb: false,
+      desktopOnly: true,
     },
     {
       src: "Content/New Portfolio/deep-inside.mp4",
@@ -330,6 +332,7 @@
       type: "single",
       previewAsVideo: Boolean(item.previewAsVideo),
       showStageThumb: item.showStageThumb !== false,
+      desktopOnly: Boolean(item.desktopOnly),
     };
   }
 
@@ -441,7 +444,9 @@
     ...Array.from(workMap.values()),
     ...groupedWorks.map((group, idx) => normalizeGroup(group, 2000 + idx)),
     normalizeSceneGroup(audioReactiveWork, -90),
-  ].sort(sortByMixedOrder);
+  ]
+    .sort(sortByMixedOrder)
+    .filter((item) => !(item.desktopOnly && (mobileGalleryQuery.matches || isIphoneDevice)));
 
   if (!works.length) return;
 

@@ -231,8 +231,8 @@
     const deltas = getOrientationDeltas(event);
     if (!deltas) return;
 
-    orientationYaw = clamp(deltas.yaw * 1.15, -32, 32);
-    orientationPitch = clamp(deltas.pitch * 0.85, -21, 21);
+    orientationYaw = clamp(-deltas.yaw * 1.15, -32, 32);
+    orientationPitch = clamp(-deltas.pitch * 0.85, -21, 21);
     orientationActive = true;
     page.classList.add("has-device-look");
 
