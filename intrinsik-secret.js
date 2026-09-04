@@ -23,6 +23,14 @@
   const maxFov = 46;
   const pointer = { x: 0, y: 0, active: false };
   const deviceLook = { x: 0, y: 0, active: false, baseBeta: null, baseGamma: null };
+  const touchLook = {
+    x: 0,
+    y: 0,
+    active: false,
+    lastX: 0,
+    lastY: 0,
+    pointCount: 0,
+  };
   const cameraLook = { x: 0, y: 0 };
   const zoom = { target: 0.02, current: 0.02 };
   const clock = new THREE.Clock();
@@ -37,12 +45,20 @@
   let activeSourceIndex = 0;
   let screenSwapLocked = false;
   let orientationRequested = false;
+  let orientationListenerBound = false;
+  let latestOrientationSample = null;
   let pinchDistance = 0;
   let pinchZoomStart = 0;
   let sampleFrame = 0;
+  const touchHorizontalTravel = 2.1;
+  const touchVerticalTravel = 1.75;
 
   sampleCanvas.width = 24;
   sampleCanvas.height = 8;
+
+  function clamp(value, min, max) {
+    return Math.min(Math.max(value, min), max);
+  }
 
   let renderer;
   try {
@@ -502,8 +518,10 @@
   }
 
   function updateCamera() {
-    const sourceX = deviceLook.active ? deviceLook.x : pointer.x;
-    const sourceY = deviceLook.active ? deviceLook.y : pointer.y;
+    const baseX = deviceLook.active ? deviceLook.x : pointer.x;
+    const baseY = deviceLook.active ? deviceLook.y : pointer.y;
+    const sourceX = clamp(baseX + touchLook.x, -1, 1);
+    const sourceY = clamp(baseY + touchLook.y, -1, 1);
     const targetX = reducedMotion ? 0 : sourceX * 0.14;
     const targetY = reducedMotion ? 0 : sourceY * 0.085;
     cameraLook.x += (targetX - cameraLook.x) * 0.055;
@@ -538,9 +556,11 @@
   }
 
   function handlePointerMove(event) {
+    if (event.pointerType === "touch") return;
+
     pointer.active = true;
-    pointer.x = Math.max(-1, Math.min(1, event.clientX / Math.max(window.innerWidth, 1) * 2 - 1));
-    pointer.y = Math.max(-1, Math.min(1, 1 - event.clientY / Math.max(window.innerHeight, 1) * 2));
+    pointer.x = clamp(event.clientX / Math.max(window.innerWidth, 1) * 2 - 1, -1, 1);
+    pointer.y = clamp(1 - event.clientY / Math.max(window.innerHeight, 1) * 2, -1, 1);
     updateExitCursor(event.clientX, event.clientY);
   }
 
@@ -555,36 +575,125 @@
     return Math.hypot(dx, dy);
   }
 
-  function handleTouchStart(event) {
-    void requestOrientationPermission();
-    if (event.touches.length === 2) {
-      pinchDistance = getTouchDistance(event.touches);
+  function getTouchCenter(touches) {
+    const count = Math.min(touches.length, 2);
+    if (!count) return null;
+
+    let x = 0;
+    let y = 0;
+    for (let index = 0; index < count; index += 1) {
+      x += touches[index].clientX;
+      y += touches[index].clientY;
+    }
+
+    return { x: x / count, y: y / count };
+  }
+
+  function primeTouchGesture(touches) {
+    const center = getTouchCenter(touches);
+    if (!center) return;
+
+    touchLook.lastX = center.x;
+    touchLook.lastY = center.y;
+    touchLook.pointCount = touches.length;
+    touchLook.active = true;
+
+    if (touches.length === 2) {
+      pinchDistance = getTouchDistance(touches);
+      pinchZoomStart = zoom.target;
+    } else {
+      pinchDistance = 0;
       pinchZoomStart = zoom.target;
     }
   }
 
+  function commitOrientationToTouchLook() {
+    if (!deviceLook.active) return;
+
+    touchLook.x = clamp(touchLook.x + deviceLook.x, -1, 1);
+    touchLook.y = clamp(touchLook.y + deviceLook.y, -1, 1);
+    deviceLook.x = 0;
+    deviceLook.y = 0;
+
+    if (latestOrientationSample) {
+      deviceLook.baseBeta = latestOrientationSample.beta;
+      deviceLook.baseGamma = latestOrientationSample.gamma;
+    }
+  }
+
+  function handleTouchStart(event) {
+    void requestOrientationPermission();
+    pointer.active = false;
+    primeTouchGesture(event.touches);
+
+    if (event.touches.length >= 2) event.preventDefault();
+  }
+
   function handleTouchMove(event) {
-    if (event.touches.length !== 2 || !pinchDistance) return;
+    if (!event.touches.length) return;
+
     event.preventDefault();
-    const distance = getTouchDistance(event.touches);
-    zoom.target = Math.max(0, Math.min(1, pinchZoomStart + (distance - pinchDistance) / 260));
+
+    if (!touchLook.active || touchLook.pointCount !== event.touches.length) {
+      primeTouchGesture(event.touches);
+      return;
+    }
+
+    const center = getTouchCenter(event.touches);
+    if (!center) return;
+
+    const deltaX = center.x - touchLook.lastX;
+    const deltaY = center.y - touchLook.lastY;
+    touchLook.lastX = center.x;
+    touchLook.lastY = center.y;
+    touchLook.x = clamp(
+      touchLook.x + deltaX / Math.max(window.innerWidth, 320) * touchHorizontalTravel,
+      -1,
+      1
+    );
+    touchLook.y = clamp(
+      touchLook.y - deltaY / Math.max(window.innerHeight, 320) * touchVerticalTravel,
+      -1,
+      1
+    );
+
+    if (event.touches.length === 2 && pinchDistance > 0) {
+      const distance = getTouchDistance(event.touches);
+      zoom.target = clamp(pinchZoomStart + (distance - pinchDistance) / 260, 0, 1);
+    }
   }
 
   function handleTouchEnd(event) {
-    if (event.touches.length < 2) pinchDistance = 0;
+    if (event.touches.length) {
+      primeTouchGesture(event.touches);
+      return;
+    }
+
+    pinchDistance = 0;
+    pinchZoomStart = zoom.target;
+    touchLook.pointCount = 0;
+    touchLook.active = false;
+    commitOrientationToTouchLook();
   }
 
   function handleOrientation(event) {
     if (typeof event.beta !== "number" || typeof event.gamma !== "number") return;
+    latestOrientationSample = { beta: event.beta, gamma: event.gamma };
     if (deviceLook.baseBeta === null || deviceLook.baseGamma === null) {
       deviceLook.baseBeta = event.beta;
       deviceLook.baseGamma = event.gamma;
     }
-    const gammaDelta = Math.max(-24, Math.min(24, event.gamma - deviceLook.baseGamma));
-    const betaDelta = Math.max(-18, Math.min(18, event.beta - deviceLook.baseBeta));
+    const gammaDelta = clamp(event.gamma - deviceLook.baseGamma, -24, 24);
+    const betaDelta = clamp(event.beta - deviceLook.baseBeta, -18, 18);
     deviceLook.x = gammaDelta / 24;
     deviceLook.y = -betaDelta / 18;
     deviceLook.active = true;
+  }
+
+  function bindOrientation() {
+    if (orientationListenerBound) return;
+    orientationListenerBound = true;
+    window.addEventListener("deviceorientation", handleOrientation, { passive: true });
   }
 
   async function requestOrientationPermission() {
@@ -593,10 +702,14 @@
     try {
       if (typeof window.DeviceOrientationEvent.requestPermission === "function") {
         const permission = await window.DeviceOrientationEvent.requestPermission();
-        if (permission !== "granted") return;
+        if (permission !== "granted") {
+          orientationRequested = false;
+          return;
+        }
       }
-      window.addEventListener("deviceorientation", handleOrientation, { passive: true });
+      bindOrientation();
     } catch (_error) {
+      orientationRequested = false;
       deviceLook.active = false;
     }
   }
@@ -629,10 +742,23 @@
     page.classList.remove("is-exit-cursor");
   }, { passive: true });
   space.addEventListener("wheel", handleWheel, { passive: false });
-  space.addEventListener("touchstart", handleTouchStart, { passive: true });
+  space.addEventListener("touchstart", handleTouchStart, { passive: false });
   space.addEventListener("touchmove", handleTouchMove, { passive: false });
   space.addEventListener("touchend", handleTouchEnd, { passive: true });
+  space.addEventListener("touchcancel", handleTouchEnd, { passive: true });
   window.addEventListener("resize", handleResize, { passive: true });
+  window.addEventListener("orientationchange", () => {
+    deviceLook.baseBeta = null;
+    deviceLook.baseGamma = null;
+    deviceLook.x = 0;
+    deviceLook.y = 0;
+  }, { passive: true });
+  screen.orientation?.addEventListener?.("change", () => {
+    deviceLook.baseBeta = null;
+    deviceLook.baseGamma = null;
+    deviceLook.x = 0;
+    deviceLook.y = 0;
+  });
   document.addEventListener("visibilitychange", () => {
     const activeVideo = screenVideos[activeVideoIndex];
     if (document.hidden) activeVideo.pause();
@@ -643,7 +769,7 @@
   });
 
   if (typeof window.DeviceOrientationEvent !== "undefined" && typeof window.DeviceOrientationEvent.requestPermission !== "function") {
-    window.addEventListener("deviceorientation", handleOrientation, { passive: true });
+    bindOrientation();
   }
 
   render();

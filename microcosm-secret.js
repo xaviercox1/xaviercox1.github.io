@@ -57,10 +57,17 @@
   let orientationPermissionRequested = false;
   let orientationListenerBound = false;
   let orientationNeutral = null;
+  let latestOrientationSample = null;
   let orientationYaw = 0;
   let orientationPitch = 0;
   let pinchStartDistance = 0;
   let pinchStartZoomProgress = 0;
+  let touchLookYaw = 0;
+  let touchLookPitch = 0;
+  let touchLastX = 0;
+  let touchLastY = 0;
+  let touchPointCount = 0;
+  let touchGestureActive = false;
   let interfaceSwitchHideTimer = 0;
 
   const minFocalLength = 24;
@@ -75,6 +82,10 @@
   const loaderLoopEpoch = performance.now();
   const isHybridPage = page.classList.contains("microcosm-hybrid-page");
   const interfaceSwitchHideDelay = 5000;
+  const maxLookYaw = 32;
+  const maxLookPitch = 21;
+  const touchYawTravel = 52;
+  const touchPitchTravel = 40;
 
   function clamp(value, min, max) {
     return Math.min(Math.max(value, min), max);
@@ -145,13 +156,19 @@
   function getPointerLookAngles() {
     const pointerNormal = getPointerNormal();
     return {
-      yaw: pointerNormal.x * 32,
-      pitch: pointerNormal.y * 21,
+      yaw: pointerNormal.x * maxLookYaw,
+      pitch: pointerNormal.y * maxLookPitch,
     };
   }
 
   function isLookInputActive() {
-    return pointerActive || orientationActive;
+    return (
+      pointerActive ||
+      orientationActive ||
+      touchGestureActive ||
+      Math.abs(touchLookYaw) > 0.02 ||
+      Math.abs(touchLookPitch) > 0.02
+    );
   }
 
   function isAdvancedInterfaceActive() {
@@ -178,14 +195,22 @@
   }
 
   function getLookAngles() {
+    let baseYaw = 0;
+    let basePitch = 0;
+
     if (orientationActive) {
-      return {
-        yaw: orientationYaw,
-        pitch: orientationPitch,
-      };
+      baseYaw = orientationYaw;
+      basePitch = orientationPitch;
+    } else if (pointerActive) {
+      const pointerLook = getPointerLookAngles();
+      baseYaw = pointerLook.yaw;
+      basePitch = pointerLook.pitch;
     }
 
-    return getPointerLookAngles();
+    return {
+      yaw: clamp(baseYaw + touchLookYaw, -maxLookYaw, maxLookYaw),
+      pitch: clamp(basePitch + touchLookPitch, -maxLookPitch, maxLookPitch),
+    };
   }
 
   function getScreenAngle() {
@@ -228,11 +253,18 @@
   function handleDeviceOrientation(event) {
     if (!isAdvancedInterfaceActive()) return;
 
+    if (typeof event.beta === "number" && typeof event.gamma === "number") {
+      latestOrientationSample = {
+        beta: event.beta,
+        gamma: event.gamma,
+      };
+    }
+
     const deltas = getOrientationDeltas(event);
     if (!deltas) return;
 
-    orientationYaw = clamp(-deltas.yaw * 1.15, -32, 32);
-    orientationPitch = clamp(-deltas.pitch * 0.85, -21, 21);
+    orientationYaw = clamp(-deltas.yaw * 1.15, -maxLookYaw, maxLookYaw);
+    orientationPitch = clamp(-deltas.pitch * 0.85, -maxLookPitch, maxLookPitch);
     orientationActive = true;
     page.classList.add("has-device-look");
 
@@ -279,6 +311,54 @@
       second.clientX - first.clientX,
       second.clientY - first.clientY
     );
+  }
+
+  function getTouchCenter(touches) {
+    const count = Math.min(touches.length, 2);
+    if (!count) return null;
+
+    let x = 0;
+    let y = 0;
+    for (let index = 0; index < count; index += 1) {
+      x += touches[index].clientX;
+      y += touches[index].clientY;
+    }
+
+    return { x: x / count, y: y / count };
+  }
+
+  function primeTouchGesture(touches) {
+    const center = getTouchCenter(touches);
+    if (!center) return;
+
+    touchLastX = center.x;
+    touchLastY = center.y;
+    touchPointCount = touches.length;
+    touchGestureActive = true;
+
+    if (touches.length === 2) {
+      pinchStartDistance = getTouchDistance(touches);
+      pinchStartZoomProgress = zoomProgress;
+    } else {
+      pinchStartDistance = 0;
+      pinchStartZoomProgress = zoomProgress;
+    }
+  }
+
+  function commitOrientationToTouchLook() {
+    if (!orientationActive) return;
+
+    touchLookYaw = clamp(touchLookYaw + orientationYaw, -maxLookYaw, maxLookYaw);
+    touchLookPitch = clamp(touchLookPitch + orientationPitch, -maxLookPitch, maxLookPitch);
+    orientationYaw = 0;
+    orientationPitch = 0;
+
+    if (latestOrientationSample) {
+      orientationNeutral = {
+        beta: latestOrientationSample.beta,
+        gamma: latestOrientationSample.gamma,
+      };
+    }
   }
 
   function getPanelForPointerDirection() {
@@ -841,6 +921,7 @@
 
   function handlePointerMove(event) {
     if (!isAdvancedInterfaceActive()) return;
+    if (event.pointerType === "touch") return;
 
     pointerX = event.clientX;
     pointerY = event.clientY;
@@ -849,8 +930,9 @@
     setHoveredPanel(getPanelForPointerDirection());
   }
 
-  function handlePanelEnter(panel) {
+  function handlePanelEnter(panel, event) {
     if (!isAdvancedInterfaceActive()) return;
+    if (event?.pointerType === "touch") return;
 
     hoveredPanel = panel;
     pointerActive = true;
@@ -862,8 +944,9 @@
     }
   }
 
-  function handlePanelLeave(panel) {
+  function handlePanelLeave(panel, event) {
     if (!isAdvancedInterfaceActive()) return;
+    if (event?.pointerType === "touch") return;
 
     if (hoveredPanel === panel) {
       hoveredPanel = getPanelForPointerDirection();
@@ -913,31 +996,54 @@
     if (!isAdvancedInterfaceActive()) return;
 
     void tryEnableDeviceLook();
+    pointerActive = false;
+    primeTouchGesture(event.touches);
 
-    if (event.touches.length !== 2) return;
-
-    pinchStartDistance = getTouchDistance(event.touches);
-    pinchStartZoomProgress = zoomProgress;
-
-    if (pinchStartDistance > 0) {
-      event.preventDefault();
-    }
+    if (event.touches.length >= 2) event.preventDefault();
   }
 
   function handleTouchMove(event) {
     if (!isAdvancedInterfaceActive()) return;
-
-    if (event.touches.length !== 2 || pinchStartDistance <= 0) return;
+    if (!event.touches.length) return;
 
     event.preventDefault();
 
-    const nextDistance = getTouchDistance(event.touches);
-    if (nextDistance <= 0) return;
+    if (!touchGestureActive || touchPointCount !== event.touches.length) {
+      primeTouchGesture(event.touches);
+      return;
+    }
 
-    const pinchScale = nextDistance / pinchStartDistance;
-    const zoomDelta = Math.log(pinchScale) * 0.82;
+    const center = getTouchCenter(event.touches);
+    if (!center) return;
 
-    setZoomProgress(pinchStartZoomProgress + zoomDelta);
+    const deltaX = center.x - touchLastX;
+    const deltaY = center.y - touchLastY;
+    touchLastX = center.x;
+    touchLastY = center.y;
+
+    touchLookYaw = clamp(
+      touchLookYaw + deltaX / Math.max(window.innerWidth, 320) * touchYawTravel,
+      -maxLookYaw,
+      maxLookYaw
+    );
+    touchLookPitch = clamp(
+      touchLookPitch + deltaY / Math.max(window.innerHeight, 320) * touchPitchTravel,
+      -maxLookPitch,
+      maxLookPitch
+    );
+
+    if (event.touches.length === 2 && pinchStartDistance > 0) {
+      const nextDistance = getTouchDistance(event.touches);
+      if (nextDistance > 0) {
+        page.classList.add("has-used-scroll-zoom");
+        const pinchScale = nextDistance / pinchStartDistance;
+        const zoomDelta = Math.log(pinchScale) * 0.82;
+
+        setZoomProgress(pinchStartZoomProgress + zoomDelta);
+      }
+    }
+
+    setHoveredPanel(getPanelForPointerDirection());
     markLookState();
     setAudioTargets();
   }
@@ -945,10 +1051,16 @@
   function handleTouchEnd(event) {
     if (!isAdvancedInterfaceActive()) return;
 
-    if (event.touches.length >= 2) return;
+    if (event.touches.length) {
+      primeTouchGesture(event.touches);
+      return;
+    }
 
     pinchStartDistance = 0;
     pinchStartZoomProgress = zoomProgress;
+    touchPointCount = 0;
+    touchGestureActive = false;
+    commitOrientationToTouchLook();
   }
 
   function animate() {
@@ -1006,8 +1118,8 @@
     playLoaderVideo(panel.loader);
     void revealPanelWhenReady(panel);
 
-    panel.node.addEventListener("pointerenter", () => handlePanelEnter(panel));
-    panel.node.addEventListener("pointerleave", () => handlePanelLeave(panel));
+    panel.node.addEventListener("pointerenter", (event) => handlePanelEnter(panel, event));
+    panel.node.addEventListener("pointerleave", (event) => handlePanelLeave(panel, event));
     panel.node.addEventListener("click", (event) => {
       event.stopPropagation();
       handlePanelClick(panel);
