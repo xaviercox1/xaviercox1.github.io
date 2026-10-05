@@ -65,6 +65,13 @@
 
   const newWorks = [
     {
+      src: "Content/New Portfolio/earth-tones-raffys.mp4",
+      thumb: "Content/New Portfolio/Thumbnails/earth-tones-raffys.png",
+      alt: "Earth Tones — Raffy’s",
+      created: "2026-09-15T00:00:00+01:00",
+      hasAudio: true,
+    },
+    {
       src: "Content/New Portfolio/earth-tones.mp4",
       thumb: "Content/New Portfolio/Thumbnails/earth-tones.png",
       alt: "Earth Tones",
@@ -252,6 +259,7 @@
   }
 
   const preferredOrder = new Map([
+    ["earth-tones-raffys", -1],
     ["earth-tones", 0],
     ["audio-reactive-piece", 1],
     ["deep-inside", 2],
