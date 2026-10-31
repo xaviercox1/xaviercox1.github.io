@@ -13,7 +13,7 @@ window.portfolioWorks = [
   },
   {
     "title": "Intrinsik",
-    "src": "Content/Intrinsik Industrique/Videos/Industrique3.mp4",
+    "src": "Content/Intrinsik Industrique/Videos/Industrique3.mp4?v=20261031-h264",
     "thumb": "Content/GalleryRedesign/02-intrinsik.jpg",
     "year": "2026",
     "medium": "Live visuals",
