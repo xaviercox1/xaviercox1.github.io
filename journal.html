@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Xavier Cox</title>
+  <meta name="description" content="A visual journal of photographs, experiments and collected moments by Xavier Cox." />
+  <link rel="canonical" href="https://xaviercox.au/journal.html" />
+  <link rel="icon" href="favicon.png" />
+  <link rel="preload" href="Content/Fonts/RobotoFlex-Variable.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="stylesheet" href="assets/css/base.css?v=20261031-release" />
+  <link rel="stylesheet" href="assets/css/home.css?v=20261031-release" />
+  <link rel="stylesheet" href="assets/css/gallery.css?v=20261031-release" />
+  <link rel="stylesheet" href="assets/css/journal.css?v=20261031-release" />
+</head>
+<body class="blog-redesign-page is-blog-entering">
+  <div class="cursor-blur" aria-hidden="true"></div>
+  <div class="cursor-dot" aria-hidden="true"></div>
+  <nav class="workshop-nav" aria-label="Main navigation">
+    <a href="gallery.html" class="workshop-nav__item width-wave" data-width-wave data-wave-origin="left">GALLERY</a>
+    <span class="gallery-jeff-slot">
+      <button type="button" class="jeff-home gallery-jeff gallery-jeff--top" aria-label="Jeff — return to homepage">
+        <span class="jeff-home__motion" aria-hidden="true"><span class="jeff-home__square"></span></span>
+      </button>
+    </span>
+    <a href="index.html#about" class="workshop-nav__item width-wave" data-width-wave data-wave-origin="right">ABOUT</a>
+  </nav>
+  <button type="button" class="jeff-home gallery-jeff gallery-jeff--edge" aria-label="Jeff — return to homepage" aria-hidden="true" tabindex="-1" inert>
+    <span class="jeff-home__motion" aria-hidden="true"><span class="jeff-home__square"></span></span>
+  </button>
+  <main class="blog-main" id="blog-feed" aria-label="Journal entries"></main>
+  <button class="blog-layout-toggle" id="blog-layout-toggle" type="button" hidden aria-expanded="false" aria-controls="blog-controls">LAYOUT / EDIT</button>
+  <aside class="blog-controls" id="blog-controls" hidden aria-label="Journal layout and text controls">
+    <div class="blog-controls-heading"><h1>JOURNAL SETTINGS</h1><button id="blog-controls-close" type="button" aria-label="Hide journal settings">×</button></div>
+    <div id="blog-control-fields"></div>
+    <label class="blog-check"><input type="checkbox" id="blog-newest-first" checked /> Newest first</label>
+    <label class="blog-check"><input type="checkbox" id="blog-edit-text" /> Edit titles and text</label>
+    <p>Text is optional. Drafts save in this browser; export a copy to keep or send back.</p>
+    <div class="blog-controls-actions"><button id="blog-copy-settings" type="button">COPY LAYOUT</button><button id="blog-reset-settings" type="button">RESET LAYOUT</button></div>
+    <label class="blog-values-label" for="blog-settings-values">Layout values</label>
+    <textarea id="blog-settings-values" readonly spellcheck="false" aria-label="Journal layout JSON"></textarea>
+    <button id="blog-export-draft" type="button">EXPORT TEXT + LAYOUT</button>
+    <span id="blog-settings-status" role="status" aria-live="polite"></span>
+  </aside>
+  <dialog id="blog-viewer" class="blog-viewer" aria-label="Journal media viewer">
+    <button id="blog-viewer-close" class="blog-viewer-close" type="button" aria-label="Close entry">×</button>
+    <div id="blog-viewer-media" class="blog-viewer-media"></div>
+    <p id="blog-viewer-status" role="status"></p>
+  </dialog>
+  <script defer src="assets/js/journal-data.js?v=20261031-release"></script>
+  <script defer src="assets/js/cursor.js?v=20261031-release"></script>
+  <script defer src="assets/js/typography.js?v=20261031-release"></script>
+  <script defer src="assets/js/journal.js?v=20261031-release"></script>
+  <script defer src="assets/js/page-jeff.js?v=20261031-release"></script>
+</body>
+</html>

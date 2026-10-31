@@ -1,65 +1,58 @@
 <!DOCTYPE html>
-<html lang="en" class="gallery-doc">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Gallery — Xavier Cox</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="style.css?v=20260827b" />
-  <link rel="icon" type="image/png" href="favicon.png" />
+  <title>Xavier Cox</title>
+  <meta name="description" content="Selected moving image, motion design, photography and visual experiments by Xavier Cox." />
+  <link rel="canonical" href="https://xaviercox.au/gallery.html" />
+  <link rel="icon" href="favicon.png" />
+  <link rel="preload" href="Content/Fonts/RobotoFlex-Variable.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="stylesheet" href="assets/css/base.css?v=20261031-release" />
+  <link rel="stylesheet" href="assets/css/home.css?v=20261031-release" />
+  <link rel="stylesheet" href="assets/css/gallery.css?v=20261031-release" />
 </head>
-<body class="gallery-page">
-  <div class="cursor-blur"></div>
-  <div class="cursor-dot"></div>
-
-  <header class="project-nav project-nav--icon">
-    <a href="index.html" class="reveal-right" data-delay="0" aria-label="Back">←</a>
-  </header>
-
-  <main class="gallery-wrap">
-    <div class="gallery-shell">
-      <section class="gallery-stage reveal" data-delay="120" id="galleryStage" aria-label="Selected work">
-        <div class="gallery-stage-media">
-          <img class="gallery-stage-thumb" id="galleryStageThumb" alt="" decoding="async" />
-          <video class="gallery-stage-video" id="galleryStageVideo" muted playsinline loop preload="metadata"></video>
-        </div>
-        <div class="gallery-stage-nav" id="galleryStageNav" hidden aria-label="Selected group navigation">
-          <button class="gallery-stage-nav-btn" id="galleryStagePrev" type="button" aria-label="Previous video">←</button>
-          <button class="gallery-stage-nav-btn" id="galleryStageNext" type="button" aria-label="Next video">→</button>
-        </div>
-        <div class="gallery-scene-picker" id="galleryScenePicker" hidden aria-label="Audio reactive scenes">
-          <button class="gallery-scene-cell" type="button" data-scene="0" aria-label="Play scene 1"></button>
-          <button class="gallery-scene-cell" type="button" data-scene="1" aria-label="Play scene 2"></button>
-          <button class="gallery-scene-cell" type="button" data-scene="2" aria-label="Play scene 3"></button>
-          <button class="gallery-scene-cell" type="button" data-scene="3" aria-label="Play scene 4"></button>
-        </div>
-      </section>
-
-      <aside class="gallery-index reveal-right" data-delay="180" aria-label="Gallery index">
-        <div class="gallery-index-list" id="galleryIndex"></div>
-        <span class="gallery-index-active-year" id="galleryIndexYear" aria-hidden="true"></span>
-      </aside>
-
-      <button
-        class="gallery-audio-btn is-muted"
-        id="galleryAudio"
-        type="button"
-        aria-label="Unmute video"
-      >
-        <svg class="gallery-audio-icon gallery-audio-icon-muted" viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M11 6L7.4 9H4v6h3.4L11 18V6z"></path>
-          <line x1="16" y1="9" x2="21" y2="14"></line>
-          <line x1="21" y1="9" x2="16" y2="14"></line>
-        </svg>
-        <svg class="gallery-audio-icon gallery-audio-icon-unmuted" viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M11 6L7.4 9H4v6h3.4L11 18V6z"></path>
-          <path d="M15.5 9.5a4 4 0 0 1 0 5"></path>
-          <path d="M18.2 7.6a7 7 0 0 1 0 8.8"></path>
-        </svg>
+<body class="gallery-redesign-page">
+  <div class="cursor-blur" aria-hidden="true"></div>
+  <div class="cursor-dot" aria-hidden="true"></div>
+  <nav class="workshop-nav" aria-label="Gallery navigation">
+    <a href="journal.html" class="workshop-nav__item width-wave" data-width-wave data-wave-origin="left">JOURNAL</a>
+    <span class="gallery-jeff-slot">
+      <button type="button" class="jeff-home gallery-jeff gallery-jeff--top" aria-label="Jeff — return to homepage">
+        <span class="jeff-home__motion" aria-hidden="true"><span class="jeff-home__square"></span></span>
       </button>
-    </div>
+    </span>
+    <a href="index.html#about" class="workshop-nav__item width-wave" data-width-wave data-wave-origin="right">ABOUT</a>
+  </nav>
+  <button type="button" class="jeff-home gallery-jeff gallery-jeff--edge" aria-label="Jeff — return to homepage" aria-hidden="true" tabindex="-1" inert>
+    <span class="jeff-home__motion" aria-hidden="true"><span class="jeff-home__square"></span></span>
+  </button>
+  <main class="grid-main" aria-label="Selected work">
+    <div class="portfolio-grid" id="portfolio-grid"></div>
+    <noscript>Enable JavaScript to explore this gallery.</noscript>
   </main>
-
-  <script src="script.js"></script>
-  <script src="gallery.js?v=20261001a"></script>
+  <aside class="grid-controls" id="grid-controls" aria-label="Gallery layout controls" hidden>
+    <div class="grid-controls__heading"><h1>GRID SETTINGS</h1><button type="button" id="grid-controls-close" aria-label="Hide grid settings">×</button></div>
+    <p>Changes update live. Copy your values when it feels right.</p>
+    <div id="grid-fields"></div>
+    <label class="grid-checkbox"><input id="grid-titles" type="checkbox" /> Show titles</label>
+    <label class="grid-seed">Shuffle seed <input id="grid-seed" type="number" min="1" max="999999" step="1" /></label>
+    <div class="grid-controls__actions"><button id="grid-shuffle" type="button">RESHUFFLE</button><button id="grid-reset" type="button">RESET</button></div>
+    <label class="grid-values-label" for="grid-values">Your settings</label>
+    <textarea id="grid-values" readonly spellcheck="false" aria-label="Gallery settings JSON"></textarea>
+    <button id="grid-copy" type="button">COPY SETTINGS</button>
+    <span id="grid-copy-status" role="status" aria-live="polite"></span>
+  </aside>
+  <dialog class="grid-viewer" id="grid-viewer" aria-labelledby="grid-viewer-title">
+    <button class="grid-viewer__close" id="grid-viewer-close" type="button" aria-label="Close work">×</button>
+    <div class="grid-viewer__media" id="grid-viewer-media"></div>
+    <h2 id="grid-viewer-title"></h2>
+    <p id="grid-viewer-status" role="status"></p>
+  </dialog>
+  <script defer src="assets/js/gallery-data.js"></script>
+  <script defer src="assets/js/cursor.js?v=20261031-release"></script>
+  <script defer src="assets/js/typography.js?v=20261031-release"></script>
+  <script defer src="assets/js/gallery.js?v=20261031-release"></script>
+  <script defer src="assets/js/page-jeff.js?v=20261031-release"></script>
 </body>
 </html>

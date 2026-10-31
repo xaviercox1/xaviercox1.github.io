@@ -2,98 +2,140 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Xavier Cox</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="style.css?v=20260827a" />
+  <title>Xavier Cox</title>
+  <meta name="description" content="Xavier Cox is a visual artist based in London, working across motion design, visual art, music and immersive design." />
+  <link rel="canonical" href="https://xaviercox.au/" />
+  <link rel="preload" href="Content/Fonts/RobotoFlex-Variable.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="stylesheet" href="assets/css/base.css?v=20261031-release" />
+  <link rel="stylesheet" href="assets/css/home.css?v=20261031-release" />
   <link rel="icon" type="image/png" href="favicon.png" />
 </head>
-<body class="home-page">
-  <div class="cursor-blur"></div>
-  <div class="cursor-dot"></div>
+<body class="home-page home-redesign-page">
+  <div class="cursor-blur" aria-hidden="true"></div>
+  <div class="cursor-dot" aria-hidden="true"></div>
 
-  <div class="home-scene">
-    <main class="page">
-      <h1 class="intro-line reveal" data-delay="0">
-        <span class="home-logo-shell" role="img" aria-label="Xavier Cox">
-          <img
-            class="home-logo home-logo--still"
-            src="Content/Brand/xavier-cox-logo.png"
-            alt=""
-            decoding="async"
-          />
-          <img
-            class="home-logo home-logo--animated"
-            data-src="Content/Brand/xavier-cox-logo.gif"
-            alt=""
-            aria-hidden="true"
-          />
-        </span>
-      </h1>
-
-      <p class="quote-line reveal" data-delay="120">
-        <span class="hl">Ba. Design (Digital Media) — RMIT</span>
-      </p>
-
-      <p class="line reveal" data-delay="240">
-        <span class="hl">Archive:</span>
-      </p>
-
-      <p class="line reveal" data-delay="280">
-        <span class="hl">
-          <a href="intrinsik-2026.html">&lsquo;Intrinsik&rsquo; 2026</a>
-        </span>
-      </p>
-
-      <p class="line reveal" data-delay="340">
-        <span class="hl">
-          <a href="microcosm.html">‘Microcosm’ 2025</a>
-        </span>
-      </p>
-
-      <p class="line reveal" data-delay="420">
-        <span class="hl">
-          <a href="beneath-your-eyes.html">‘Beneath Your Eyes’ 2025</a>
-        </span>
-      </p>
-
-      <p class="line reveal" data-delay="500">
-        <span class="hl">
-          <a href="virtual-environment.html">‘Virtual Environment’ 2024</a>
-        </span>
-      </p>
-
-      <p class="line line-gallery reveal" data-delay="580">
-        <span class="hl">
-          <a href="gallery.html">Gallery</a>
-        </span>
-      </p>
-
-      <p class="line reveal" data-delay="660">
-        <span class="hl">
-          Contact:
-          <a href="mailto:xaviercoxdesign@gmail.com">xaviercoxdesign@gmail.com</a>
-          /
-          <a href="https://www.linkedin.com/in/xavier-cox1" target="_blank" rel="noreferrer">
-            linkedin
-          </a>
-          /
-          <a href="https://www.instagram.com/x.avierrrrrrrrr/" target="_blank" rel="noreferrer">
-            instagram
-          </a>
-        </span>
-      </p>
-    </main>
-
-    <div class="sim-wrapper">
-      <div class="eye-art" aria-hidden="true">
-        <div class="eye-plane">
-          <div class="eye-backdrop"></div>
-          <div class="eye-field"></div>
+  <main class="home-scene" aria-label="Jeff, the red square with animated eyes">
+    <div class="sim-wrapper" role="button" tabindex="0" aria-label="Jeff — click to open the showreel" data-phase="idle">
+      <div class="eye-art" data-workshop-eyes aria-hidden="true">
+        <div class="jeff-motion">
+          <div class="eye-plane">
+            <div class="showreel-media">
+              <video id="workshop-showreel" src="Content/ShowReel.mp4" data-src="Content/ShowReel.mp4" preload="auto" muted playsinline loop aria-hidden="true" tabindex="-1"></video>
+            </div>
+            <div class="eye-backdrop"></div>
+            <div class="eye-field"></div>
+            <svg class="showreel-loader" aria-hidden="true" focusable="false">
+              <defs>
+                <clipPath id="showreel-loader-wipe" clipPathUnits="userSpaceOnUse">
+                  <path class="showreel-loader__wipe" d="M 0 0" />
+                </clipPath>
+              </defs>
+              <path class="showreel-loader__stroke" fill="none" clip-path="url(#showreel-loader-wipe)" />
+            </svg>
+            <button class="showreel-surface" type="button" aria-label="Turn on video sound" hidden></button>
+            <div class="showreel-controls" aria-label="Video controls" hidden>
+              <div class="showreel-toolbar">
+                <button class="showreel-toggle" type="button" aria-label="Pause video" title="Pause">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path class="player-pause-icon" d="M8 5v14M16 5v14"/><path class="player-play-icon" d="m8 5 11 7-11 7Z"/></svg>
+                </button>
+                <div class="showreel-audio">
+                  <button class="showreel-mute" type="button" aria-label="Unmute video" title="Unmute">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4Z"/><path class="player-muted-icon" d="m17 9 5 6m0-6-5 6"/><path class="player-sound-icon" d="M17 8a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14"/></svg>
+                  </button>
+                  <div class="showreel-volume-wrap" inert>
+                    <input class="showreel-volume" type="range" min="0" max="100" step="1" value="50" aria-label="Video volume" />
+                  </div>
+                </div>
+                <button class="showreel-fullscreen" type="button" aria-label="Enter fullscreen" title="Fullscreen">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path class="player-expand-icon" d="M9 4H4v5m11-5h5v5M4 15v5h5m11-5v5h-5"/><path class="player-contract-icon" d="M4 9h5V4m11 5h-5V4M9 20v-5H4m11 5v-5h5"/></svg>
+                </button>
+              </div>
+              <input class="showreel-seek" type="range" min="0" max="1000" step="1" value="0" aria-label="Video position" />
+            </div>
+          </div>
         </div>
       </div>
+      <button class="showreel-play" type="button" hidden>PLAY VIDEO</button>
     </div>
-  </div>
+  </main>
 
-  <script src="script.js"></script>
+  <nav class="workshop-nav" aria-label="Main navigation" hidden inert>
+    <a href="journal.html" class="workshop-nav__item width-wave" data-width-wave data-wave-origin="left">JOURNAL</a>
+    <a class="workshop-nav__item width-wave" data-width-wave data-wave-origin="center" href="gallery.html">GALLERY</a>
+    <button class="workshop-nav__item width-wave" data-width-wave data-wave-origin="right" id="workshop-about-toggle" type="button" aria-expanded="false" aria-controls="workshop-about">ABOUT</button>
+  </nav>
+
+  <main class="about-view" id="workshop-about" aria-labelledby="about-name" hidden>
+    <div class="about-content">
+    <div class="about-photo" data-about-reveal>
+      <button class="jeff-home" id="jeff-home" type="button" aria-label="Return to homepage" hidden>
+        <span class="jeff-home__motion" aria-hidden="true">
+          <span class="jeff-home__square"></span>
+        </span>
+      </button>
+      <img class="about-portrait" src="Content/About/xavier-cox-portrait.webp" alt="Portrait of Xavier Cox" width="1440" height="2560" loading="lazy" decoding="async" />
+    </div>
+    <div class="about-copy" data-about-reveal>
+      <div class="about-name-line">
+        <h1 id="about-name" tabindex="-1">XAVIER COX</h1>
+        <span class="about-pronouns">HE/HIM</span>
+      </div>
+      <p class="about-education">Ba. Design (Digital Media) - RMIT</p>
+      <p>An aspiring visual artist, based in London, born in Naarm/Melbourne. Drawn to the intersection of visual art, music and immersive design. Experience across motion design, content and live events, I have developed a flexible creative practice shaped by curiosity and a willingness to keep learning. I am personable and motivated by work that brings people together and leaves a meaningful impression.</p>
+      <div class="about-email-row">
+        <button class="about-email width-wave" id="about-email-copy" data-width-wave data-email="xaviercoxdesign@gmail.com" type="button">xaviercoxdesign@gmail.com</button>
+        <span class="email-copy-status" id="email-copy-status" role="status" aria-live="polite" aria-atomic="false"></span>
+      </div>
+    </div>
+    </div>
+  </main>
+
+  <!-- Backlog: remove these template tags to restore Jeff's tuning panel. -->
+  <template id="jeff-controls-backlog">
+  <details class="eye-controls" open>
+    <summary>Jeff animation controls</summary>
+    <div class="eye-controls-body">
+      <div id="eye-control-fields"></div>
+      <p class="eye-controls-help">Hover Jeff to preview. Higher rotation speed follows the cursor faster. Values save in this browser.</p>
+      <div class="eye-controls-actions">
+        <button type="button" id="eye-controls-copy">Copy values</button>
+        <button type="button" id="eye-controls-reset">Reset</button>
+        <span id="eye-control-status" role="status"></span>
+      </div>
+      <textarea id="eye-control-values" aria-label="Animation values to send back" readonly spellcheck="false"></textarea>
+    </div>
+  </details>
+  </template>
+
+  <!-- Backlog: remove these template tags to restore transition tuning. -->
+  <template id="jeff-transition-controls-backlog">
+  <details class="eye-controls transition-controls" open>
+    <summary>Jeff transition controls</summary>
+    <div class="eye-controls-body">
+      <p id="transition-status" role="status">Ready — click Jeff.</p>
+      <div class="eye-controls-actions transition-playback">
+        <button type="button" id="transition-replay">Replay transition</button>
+        <button type="button" id="transition-reset-jeff">Reset Jeff</button>
+      </div>
+      <div id="transition-control-fields"></div>
+      <p class="eye-controls-help">One S-curve controls the whole animation. The handoff happens at 50% time, where the turn is fastest. Gaze stays live; ambient motion eases to flat. Changes apply on the next replay. The placeholder stays 16:9.</p>
+      <div class="eye-controls-actions">
+        <button type="button" id="transition-copy">Copy values</button>
+        <button type="button" id="transition-reset-values">Reset values</button>
+        <span id="transition-copy-status" role="status"></span>
+      </div>
+      <textarea id="transition-control-values" aria-label="Transition values to send back" readonly spellcheck="false"></textarea>
+    </div>
+  </details>
+  </template>
+
+  <script defer src="assets/js/cursor.js?v=20261031-release"></script>
+  <script defer src="assets/js/transition.js?v=20261031-release"></script>
+  <script defer src="assets/js/home.js?v=20261031-release"></script>
+  <script defer src="assets/js/navigation.js?v=20261031-release"></script>
+  <script defer src="assets/js/typography.js?v=20261031-release"></script>
+  <script defer src="assets/js/showreel.js?v=20261031-release"></script>
+  <script defer src="assets/js/player.js?v=20261031-release"></script>
 </body>
 </html>
