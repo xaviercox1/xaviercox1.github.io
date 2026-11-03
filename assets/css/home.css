@@ -33,6 +33,16 @@
 .showreel-play[hidden] { display: none; }
 .showreel-play:focus-visible { outline: 1px solid #f5f5f5; outline-offset: 4px; }
 
+/* Mobile playback is started by a tap and then owned by the native player.
+   The transparent cover must never intercept its controls or buffering UI. */
+.is-native-showreel.is-showreel .eye-backdrop { pointer-events: none; }
+.is-native-showreel .showreel-loader,
+.is-native-showreel .showreel-surface,
+.is-native-showreel .showreel-controls { display: none; }
+.is-native-showreel .showreel-media { background: #f00; }
+.is-native-showreel .showreel-media video { pointer-events: auto; }
+.is-native-showreel.has-native-player .eye-backdrop { opacity: 0; transition: opacity 2000ms ease; }
+
 .showreel-surface { position: absolute; inset: 0; z-index: 2; border: 0; padding: 0; background: none; pointer-events: auto; border-radius: var(--showreel-radius); }
 .showreel-surface[hidden], .showreel-controls[hidden] { display: none; }
 .showreel-surface:focus-visible { outline: 1px solid rgba(245,245,245,.7); outline-offset: -5px; }

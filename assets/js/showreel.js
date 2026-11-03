@@ -10,6 +10,83 @@
   const wipe = loader.querySelector('.showreel-loader__wipe');
   const playButton = target.querySelector('.showreel-play');
   const about = document.querySelector('#workshop-about');
+  // Touch-first devices use the journal's tap-to-load playback model. Decide
+  // once so rotating the phone cannot replace its player during playback.
+  const nativePlayer = matchMedia('(hover: none), (pointer: coarse), (max-width: 760px)').matches;
+  if (nativePlayer) {
+    plane.classList.add('is-native-showreel');
+    let active = false;
+    let requested = false;
+    let failed = false;
+    video.preload = 'none';
+    video.muted = false;
+    video.removeAttribute('muted');
+    video.setAttribute('aria-label', 'Xavier Cox showreel');
+
+    function syncNativeGeometry() {
+      plane.style.setProperty('--showreel-radius', `${parseFloat(getComputedStyle(cover).borderTopLeftRadius) || plane.offsetHeight * 0.035}px`);
+    }
+    function syncNativePlayer() {
+      const visible = active && about.hidden && !document.hidden;
+      if (!visible) video.pause();
+      plane.classList.toggle('is-showreel', active);
+      plane.classList.toggle('has-native-player', requested);
+      plane.dataset.showreelState = failed ? 'error' : requested ? 'native' : 'prompt';
+      playButton.hidden = !visible || (requested && !failed);
+      playButton.textContent = failed ? 'RETRY VIDEO' : 'PLAY VIDEO';
+      video.controls = requested;
+      video.tabIndex = visible && requested ? 0 : -1;
+      video.setAttribute('aria-hidden', String(!visible || !requested));
+      if (active) {
+        eyeArt.removeAttribute('aria-hidden');
+        target.setAttribute('role', 'group');
+        target.setAttribute('aria-label', 'Xavier Cox showreel');
+        target.removeAttribute('aria-busy');
+        target.removeAttribute('aria-disabled');
+        target.removeAttribute('tabindex');
+        syncNativeGeometry();
+      } else eyeArt.setAttribute('aria-hidden', 'true');
+    }
+    playButton.addEventListener('click', () => {
+      // Set the source and call play in this very tap, without awaiting a
+      // readiness event or Jeff's animation. iOS retains the user gesture.
+      requested = true;
+      failed = false;
+      video.src = video.dataset.src;
+      syncNativePlayer();
+      video.play().catch(() => {
+        // Native controls remain reachable even if playback is declined.
+        syncNativePlayer();
+      });
+    });
+    video.addEventListener('error', () => {
+      if (!requested || !video.getAttribute('src')) return;
+      failed = true;
+      syncNativePlayer();
+    });
+    window.addEventListener('jeffphasechange', event => {
+      if (event.detail.phase === 'complete') active = true;
+      else if (event.detail.phase === 'idle') active = false;
+      syncNativePlayer();
+    });
+    new MutationObserver(syncNativePlayer).observe(about, { attributes: true, attributeFilter: ['hidden'] });
+    new ResizeObserver(syncNativeGeometry).observe(plane);
+    document.addEventListener('visibilitychange', syncNativePlayer);
+    window.addEventListener('pagehide', () => video.pause());
+    window.jeffWorkshop.setShowreelSource = src => {
+      video.pause();
+      video.dataset.src = src;
+      video.removeAttribute('src');
+      video.load();
+      requested = failed = false;
+      syncNativePlayer();
+    };
+    window.jeffWorkshop.bufferShowreel = () => {}; // Native controls own buffering.
+    window.jeffWorkshop.refreshShowreelGeometry = syncNativeGeometry;
+    active = target.dataset.phase === 'complete';
+    syncNativePlayer();
+    return;
+  }
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
   const minimumLoadMs = 1200;
   const revealDurationMs = 2000;
@@ -261,9 +338,8 @@
     requestTick();
   };
   window.jeffWorkshop.refreshShowreelGeometry = syncGeometry;
-  // The HTML starts preloading immediately. Adopt that request without calling
-  // load() again; playback and the reveal still wait for Jeff's transition.
-  sourceUrl = video.src;
-  resetLoading();
+  // Desktop still preloads on page opening; mobile never requests the MP4
+  // until its play button is tapped.
+  loadSource(video.dataset.src);
   onPhase(target.dataset.phase);
 })();

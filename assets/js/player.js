@@ -1,6 +1,7 @@
 // Quiet controls for the showreel; the existing cover owns loading and buffering.
 (() => {
   const plane = document.querySelector('.eye-plane');
+  if (plane.classList.contains('is-native-showreel')) return;
   const video = plane.querySelector('video');
   const surface = plane.querySelector('.showreel-surface');
   const controls = plane.querySelector('.showreel-controls');
