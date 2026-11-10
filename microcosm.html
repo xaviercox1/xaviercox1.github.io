@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Microcosm — Xavier Cox</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="preload" href="Content/TV Loading.mp4" as="video" type="video/mp4" />
+  <link rel="preload" href="Microcosm/Title.mp4" as="video" type="video/mp4" />
+  <link rel="stylesheet" href="style.css?v=20260827a" />
+  <link rel="stylesheet" href="microcosm-secret.css?v=20260904a" />
+  <link rel="icon" type="image/png" href="favicon.png" />
+</head>
+<body class="microcosm-page microcosm-secret-page microcosm-hybrid-page is-advanced-interface">
+  <div class="cursor-blur"></div>
+  <div class="cursor-dot"></div>
+
+  <header class="project-nav microcosm-secret-nav microcosm-advanced-nav">
+    <a href="index.html#archive" aria-label="Back">←</a>
+    <a
+      class="microcosm-interface-switch microcosm-secret-interface-switch"
+      href="#simple"
+      aria-label="Open simple Microcosm interface with the F key"
+    >
+      <span class="microcosm-interface-keycap" aria-hidden="true">F</span>
+      <span>simple interface</span>
+    </a>
+    <div class="microcosm-audio-hint" aria-hidden="true">
+      <svg class="microcosm-audio-hint__icon" viewBox="0 0 24 24" focusable="false">
+        <path d="M11 6L7.4 9H4v6h3.4L11 18V6z"></path>
+        <path d="M15.5 9.5a4 4 0 0 1 0 5"></path>
+        <path d="M18.2 7.6a7 7 0 0 1 0 8.8"></path>
+      </svg>
+      <span>Click to Unmute</span>
+    </div>
+    <div class="microcosm-zoom-hint" aria-hidden="true">
+      <svg class="microcosm-zoom-hint__icon microcosm-zoom-hint__icon--desktop" viewBox="0 0 24 24" focusable="false">
+        <rect x="7" y="3" width="10" height="18" rx="5"></rect>
+        <path d="M12 7v4"></path>
+        <path d="M12 16v2"></path>
+      </svg>
+      <svg class="microcosm-zoom-hint__icon microcosm-zoom-hint__icon--touch" viewBox="0 0 24 24" focusable="false">
+        <path d="M9 9 4 4"></path>
+        <path d="M4 8V4h4"></path>
+        <path d="m15 15 5 5"></path>
+        <path d="M16 20h4v-4"></path>
+      </svg>
+      <span class="microcosm-zoom-hint__label microcosm-zoom-hint__label--desktop">Scroll to Zoom</span>
+      <span class="microcosm-zoom-hint__label microcosm-zoom-hint__label--touch">Pinch to Zoom</span>
+    </div>
+  </header>
+
+  <header class="project-nav microcosm-simple-nav" hidden>
+    <a href="index.html#archive" class="reveal-right" data-delay="0" aria-label="Back">←</a>
+    <a
+      href="#advanced"
+      class="microcosm-interface-switch microcosm-advanced-interface-switch reveal-right"
+      data-delay="60"
+      aria-label="Open 3D Microcosm interface with the F key"
+    >
+      <span class="microcosm-interface-keycap" aria-hidden="true">F</span>
+      <span>3D interface</span>
+    </a>
+  </header>
+
+  <main class="microcosm-secret-space" aria-label="Microcosm 3D video study">
+    <div class="microcosm-secret-camera" id="microcosmSecretCamera">
+      <button
+        class="microcosm-secret-panel microcosm-secret-panel--title is-active"
+        type="button"
+        data-panel="title"
+        aria-label="Focus title video"
+      >
+        <video
+          class="microcosm-panel-loader"
+          src="Content/TV Loading.mp4"
+          autoplay
+          loop
+          muted
+          playsinline
+          webkit-playsinline
+          preload="auto"
+          aria-hidden="true"
+        ></video>
+        <video
+          class="microcosm-panel-video"
+          src="Microcosm/Title.mp4"
+          loop
+          playsinline
+          webkit-playsinline
+          preload="auto"
+        ></video>
+      </button>
+
+      <button
+        class="microcosm-secret-panel microcosm-secret-panel--one"
+        type="button"
+        data-panel="one"
+        aria-label="Focus video one"
+      >
+        <video
+          class="microcosm-panel-loader"
+          src="Content/TV Loading.mp4"
+          autoplay
+          loop
+          muted
+          playsinline
+          webkit-playsinline
+          preload="auto"
+          aria-hidden="true"
+        ></video>
+        <video
+          class="microcosm-panel-video"
+          src="Microcosm/1.mp4"
+          loop
+          muted
+          playsinline
+          webkit-playsinline
+          preload="auto"
+        ></video>
+      </button>
+
+      <button
+        class="microcosm-secret-panel microcosm-secret-panel--two"
+        type="button"
+        data-panel="two"
+        aria-label="Focus video two"
+      >
+        <video
+          class="microcosm-panel-loader"
+          src="Content/TV Loading.mp4"
+          autoplay
+          loop
+          muted
+          playsinline
+          webkit-playsinline
+          preload="auto"
+          aria-hidden="true"
+        ></video>
+        <video
+          class="microcosm-panel-video"
+          src="Microcosm/2.mp4"
+          loop
+          muted
+          playsinline
+          webkit-playsinline
+          preload="auto"
+        ></video>
+      </button>
+
+      <button
+        class="microcosm-secret-panel microcosm-secret-panel--three"
+        type="button"
+        data-panel="three"
+        aria-label="Focus video three"
+      >
+        <video
+          class="microcosm-panel-loader"
+          src="Content/TV Loading.mp4"
+          autoplay
+          loop
+          muted
+          playsinline
+          webkit-playsinline
+          preload="auto"
+          aria-hidden="true"
+        ></video>
+        <video
+          class="microcosm-panel-video"
+          src="Microcosm/3.mp4"
+          loop
+          muted
+          playsinline
+          webkit-playsinline
+          preload="auto"
+        ></video>
+      </button>
+
+      <button
+        class="microcosm-secret-panel microcosm-secret-panel--four"
+        type="button"
+        data-panel="four"
+        aria-label="Focus video four"
+      >
+        <video
+          class="microcosm-panel-loader"
+          src="Content/TV Loading.mp4"
+          autoplay
+          loop
+          muted
+          playsinline
+          webkit-playsinline
+          preload="auto"
+          aria-hidden="true"
+        ></video>
+        <video
+          class="microcosm-panel-video"
+          src="Microcosm/4.mp4"
+          loop
+          muted
+          playsinline
+          webkit-playsinline
+          preload="auto"
+        ></video>
+      </button>
+
+      <button
+        class="microcosm-secret-panel microcosm-secret-panel--five"
+        type="button"
+        data-panel="five"
+        aria-label="Focus video five"
+      >
+        <video
+          class="microcosm-panel-loader"
+          src="Content/TV Loading.mp4"
+          autoplay
+          loop
+          muted
+          playsinline
+          webkit-playsinline
+          preload="auto"
+          aria-hidden="true"
+        ></video>
+        <video
+          class="microcosm-panel-video"
+          src="Microcosm/5.mp4"
+          loop
+          muted
+          playsinline
+          webkit-playsinline
+          preload="auto"
+        ></video>
+      </button>
+
+      <button
+        class="microcosm-secret-panel microcosm-secret-panel--six"
+        type="button"
+        data-panel="six"
+        aria-label="Focus video six"
+      >
+        <video
+          class="microcosm-panel-loader"
+          src="Content/TV Loading.mp4"
+          autoplay
+          loop
+          muted
+          playsinline
+          webkit-playsinline
+          preload="auto"
+          aria-hidden="true"
+        ></video>
+        <video
+          class="microcosm-panel-video"
+          src="Microcosm/6.mp4"
+          loop
+          muted
+          playsinline
+          webkit-playsinline
+          preload="auto"
+        ></video>
+      </button>
+    </div>
+
+    <div class="microcosm-camera-hud" aria-hidden="true">
+      <div class="microcosm-camera-hud__bracket"></div>
+      <div class="microcosm-camera-hud__rail">
+        <div class="microcosm-camera-hud__fill" id="microZoomFill"></div>
+      </div>
+      <div class="microcosm-camera-hud__readout" id="microZoomReadout">24mm</div>
+    </div>
+
+    <div class="microcosm-dust-field" aria-hidden="true">
+      <span class="microcosm-dust microcosm-dust--one"></span>
+      <span class="microcosm-dust microcosm-dust--two"></span>
+      <span class="microcosm-dust microcosm-dust--three"></span>
+      <span class="microcosm-dust microcosm-dust--four"></span>
+      <span class="microcosm-dust microcosm-dust--five"></span>
+      <span class="microcosm-dust microcosm-dust--six"></span>
+      <span class="microcosm-dust microcosm-dust--seven"></span>
+      <span class="microcosm-dust microcosm-dust--eight"></span>
+      <span class="microcosm-dust microcosm-dust--nine"></span>
+      <span class="microcosm-dust microcosm-dust--ten"></span>
+      <span class="microcosm-dust microcosm-dust--eleven"></span>
+      <span class="microcosm-dust microcosm-dust--twelve"></span>
+    </div>
+
+    <div class="microcosm-camera-reticle" aria-hidden="true">
+      <span class="microcosm-camera-reticle__line microcosm-camera-reticle__line--x"></span>
+      <span class="microcosm-camera-reticle__line microcosm-camera-reticle__line--y"></span>
+    </div>
+  </main>
+
+  <main class="project-hero microcosm-simple-interface" hidden>
+    <div class="video-hero video-hero--microcosm reveal" data-delay="120">
+      <div class="microcosm-stage" id="microStage">
+        <video
+          id="microVideoA"
+          class="project-video microcosm-video is-active"
+          autoplay
+          muted
+          playsinline
+          webkit-playsinline
+          preload="metadata"
+        ></video>
+        <video
+          id="microVideoB"
+          class="project-video microcosm-video"
+          autoplay
+          muted
+          playsinline
+          webkit-playsinline
+          preload="metadata"
+        ></video>
+      </div>
+      <button class="microcosm-audio-btn is-muted" id="microSound" type="button" aria-label="Enable sound">
+        <svg class="microcosm-audio-icon microcosm-audio-icon-muted" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M10 8L6.4 10.8H4v2.4h2.4L10 16V8z"></path>
+          <path d="M14.8 10.2l4.2 4.2"></path>
+          <path d="M19 10.2l-4.2 4.2"></path>
+        </svg>
+        <svg class="microcosm-audio-icon microcosm-audio-icon-unmuted" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M10 8L6.4 10.8H4v2.4h2.4L10 16V8z"></path>
+          <path d="M15.2 10.2c1.2 1.1 1.2 2.5 0 3.6"></path>
+          <path d="M17.5 8.6c2.2 2 2.2 4.8 0 6.8"></path>
+        </svg>
+      </button>
+      <button class="microcosm-wide-btn" id="microWide" type="button" aria-label="Toggle widescreen mode">
+        <svg class="microcosm-wide-icon microcosm-wide-icon-enter" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M8 4H4v4"></path>
+          <path d="M16 4h4v4"></path>
+          <path d="M4 16v4h4"></path>
+          <path d="M20 16v4h-4"></path>
+        </svg>
+        <svg class="microcosm-wide-icon microcosm-wide-icon-exit" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M9 4H4v5"></path>
+          <path d="M15 4h5v5"></path>
+          <path d="M4 15v5h5"></path>
+          <path d="M20 15v5h-5"></path>
+          <path d="M9 9L4 4"></path>
+          <path d="M15 9l5-5"></path>
+          <path d="M9 15l-5 5"></path>
+          <path d="M15 15l5 5"></path>
+        </svg>
+      </button>
+      <div class="microcosm-audio-hotspot" id="microSoundHotspot" aria-hidden="true"></div>
+    </div>
+
+    <div class="project-meta microcosm-meta">
+      <h1 class="reveal" data-delay="240">
+        <button id="microTitleJump" class="microcosm-title-jump" type="button" aria-label="Play title scene">
+          Microcosm
+        </button>
+      </h1>
+      <p class="project-subhead reveal" data-delay="180">
+        Ableton · TouchDesigner
+      </p>
+      <div class="microcosm-controls reveal" data-delay="260">
+        <div class="microcosm-scenes" aria-label="Microcosm scene navigation">
+          <button class="microcosm-scene-btn" type="button" data-scene="1" aria-label="Play scene 1">1</button>
+          <button class="microcosm-scene-btn" type="button" data-scene="2" aria-label="Play scene 2">2</button>
+          <button class="microcosm-scene-btn" type="button" data-scene="3" aria-label="Play scene 3">3</button>
+          <button class="microcosm-scene-btn" type="button" data-scene="4" aria-label="Play scene 4">4</button>
+          <button class="microcosm-scene-btn" type="button" data-scene="5" aria-label="Play scene 5">5</button>
+          <button class="microcosm-scene-btn" type="button" data-scene="6" aria-label="Play scene 6">6</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="script.js"></script>
+  <script src="microcosm.js?v=20260708b"></script>
+  <script src="microcosm-secret.js?v=20260904c"></script>
+</body>
+</html>

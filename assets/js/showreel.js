@@ -10,80 +10,75 @@
   const wipe = loader.querySelector('.showreel-loader__wipe');
   const playButton = target.querySelector('.showreel-play');
   const about = document.querySelector('#workshop-about');
-  // Touch-first devices use the journal's tap-to-load playback model. Decide
-  // once so rotating the phone cannot replace its player during playback.
+  // Decide the player mode once so orientation changes never replace a player.
   const nativePlayer = matchMedia('(hover: none), (pointer: coarse), (max-width: 760px)').matches;
   if (nativePlayer) {
     plane.classList.add('is-native-showreel');
     let active = false;
-    let requested = false;
-    let failed = false;
     video.preload = 'none';
-    video.muted = false;
-    video.removeAttribute('muted');
+    video.muted = true;
+    video.controls = true;
     video.setAttribute('aria-label', 'Xavier Cox showreel');
+    // iPhone uses its own play affordance and controls, without a custom box.
+    playButton.hidden = true;
 
     function syncNativeGeometry() {
       plane.style.setProperty('--showreel-radius', `${parseFloat(getComputedStyle(cover).borderTopLeftRadius) || plane.offsetHeight * 0.035}px`);
     }
+    function prepareNativeSource() {
+      if (video.getAttribute('src')) return;
+      video.preload = 'metadata';
+      video.src = video.dataset.src;
+      // Muted inline autoplay is supported on iPhone. If declined (for example
+      // in Low Power Mode), the native controls remain available to start it.
+      video.play().catch(() => {});
+    }
     function syncNativePlayer() {
-      const visible = active && about.hidden && !document.hidden;
+      const archiveOpen = document.body.classList.contains('is-archive-open');
+      const visible = active && about.hidden && !document.hidden && !archiveOpen;
       if (!visible) video.pause();
       plane.classList.toggle('is-showreel', active);
-      plane.classList.toggle('has-native-player', requested);
-      plane.dataset.showreelState = failed ? 'error' : requested ? 'native' : 'prompt';
-      playButton.hidden = !visible || (requested && !failed);
-      playButton.textContent = failed ? 'RETRY VIDEO' : 'PLAY VIDEO';
-      video.controls = requested;
-      video.tabIndex = visible && requested ? 0 : -1;
-      video.setAttribute('aria-hidden', String(!visible || !requested));
+      plane.classList.toggle('has-native-player', active && Boolean(video.getAttribute('src')));
+      plane.dataset.showreelState = 'native';
+      video.tabIndex = visible ? 0 : -1;
+      video.setAttribute('aria-hidden', String(!visible));
       if (active) {
         eyeArt.removeAttribute('aria-hidden');
         target.setAttribute('role', 'group');
-        target.setAttribute('aria-label', 'Xavier Cox showreel');
+        target.setAttribute('aria-label', archiveOpen ? 'Xavier Cox project archive' : 'Xavier Cox showreel');
         target.removeAttribute('aria-busy');
         target.removeAttribute('aria-disabled');
         target.removeAttribute('tabindex');
         syncNativeGeometry();
       } else eyeArt.setAttribute('aria-hidden', 'true');
     }
-    playButton.addEventListener('click', () => {
-      // Set the source and call play in this very tap, without awaiting a
-      // readiness event or Jeff's animation. iOS retains the user gesture.
-      requested = true;
-      failed = false;
-      video.src = video.dataset.src;
-      syncNativePlayer();
-      video.play().catch(() => {
-        // Native controls remain reachable even if playback is declined.
-        syncNativePlayer();
-      });
-    });
-    video.addEventListener('error', () => {
-      if (!requested || !video.getAttribute('src')) return;
-      failed = true;
-      syncNativePlayer();
-    });
     window.addEventListener('jeffphasechange', event => {
-      if (event.detail.phase === 'complete') active = true;
-      else if (event.detail.phase === 'idle') active = false;
+      if (event.detail.phase === 'complete') {
+        active = true;
+        if (location.hash !== '#archive') prepareNativeSource();
+      } else if (event.detail.phase === 'idle') active = false;
       syncNativePlayer();
     });
     new MutationObserver(syncNativePlayer).observe(about, { attributes: true, attributeFilter: ['hidden'] });
     new ResizeObserver(syncNativeGeometry).observe(plane);
     document.addEventListener('visibilitychange', syncNativePlayer);
+    window.addEventListener('archivechange', () => {
+      if (active && !document.body.classList.contains('is-archive-open')) prepareNativeSource();
+      syncNativePlayer();
+    });
     window.addEventListener('pagehide', () => video.pause());
     window.jeffWorkshop.setShowreelSource = src => {
       video.pause();
       video.dataset.src = src;
       video.removeAttribute('src');
       video.load();
-      requested = failed = false;
+      if (active) prepareNativeSource();
       syncNativePlayer();
     };
     window.jeffWorkshop.bufferShowreel = () => {}; // Native controls own buffering.
     window.jeffWorkshop.refreshShowreelGeometry = syncNativeGeometry;
     active = target.dataset.phase === 'complete';
+    if (active && location.hash !== '#archive') prepareNativeSource();
     syncNativePlayer();
     return;
   }
@@ -105,7 +100,7 @@
 
   video.muted = true;
   video.volume = 0.5;
-  const homeVisible = () => active && about.hidden && !document.hidden;
+  const homeVisible = () => active && about.hidden && !document.hidden && !document.body.classList.contains('is-archive-open');
 
   function setStage(next) {
     stage = next;
@@ -115,10 +110,10 @@
     if (active) {
       target.setAttribute('role', 'group');
       eyeArt.removeAttribute('aria-hidden');
-      target.setAttribute('aria-label', next === 'ready' || next === 'revealing' ? 'Xavier Cox showreel' : next === 'error' ? 'Showreel could not load' : 'Loading showreel');
+      target.setAttribute('aria-label', document.body.classList.contains('is-archive-open') ? 'Xavier Cox project archive' : next === 'ready' || next === 'revealing' ? 'Xavier Cox showreel' : next === 'error' ? 'Showreel could not load' : 'Loading showreel');
       target.setAttribute('aria-busy', String(next !== 'ready' && next !== 'revealing' && next !== 'error'));
     }
-    window.dispatchEvent(new CustomEvent('showreelstatechange', { detail: { stage, active } }));
+    window.dispatchEvent(new CustomEvent('showreelstatechange', { detail: { stage, active: active && !document.body.classList.contains('is-archive-open') } }));
   }
 
   function updateWipe() {
@@ -321,6 +316,10 @@
   });
   new MutationObserver(syncPlayback).observe(about, { attributes: true, attributeFilter: ['hidden'] });
   document.addEventListener('visibilitychange', syncPlayback);
+  window.addEventListener('archivechange', () => {
+    setStage(stage);
+    syncPlayback();
+  });
   window.addEventListener('jeffphasechange', event => onPhase(event.detail.phase));
   window.jeffWorkshop.setShowreelSource = src => {
     video.dataset.src = src;

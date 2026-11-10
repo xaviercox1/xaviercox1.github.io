@@ -8,18 +8,20 @@
   <link rel="canonical" href="https://xaviercox.au/" />
   <link rel="preload" href="Content/Fonts/RobotoFlex-Variable.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="stylesheet" href="assets/css/base.css?v=20261031-publish" />
-  <link rel="stylesheet" href="assets/css/home.css?v=20261103-native-video" />
+  <link rel="stylesheet" href="assets/css/home.css?v=20261110-archive-qa" />
   <link rel="icon" type="image/png" href="favicon.png" />
 </head>
 <body class="home-page home-redesign-page">
   <div class="cursor-blur" aria-hidden="true"></div>
   <div class="cursor-dot" aria-hidden="true"></div>
 
-  <main class="home-scene" aria-label="Jeff, the red square with animated eyes">
+  <main class="home-scene" aria-label="Xavier Cox portfolio">
     <div class="sim-wrapper" role="button" tabindex="0" aria-label="Jeff — click to open the showreel" data-phase="idle">
       <div class="eye-art" data-workshop-eyes aria-hidden="true">
         <div class="jeff-motion">
           <div class="eye-plane">
+            <div class="showreel-card">
+            <div class="showreel-front">
             <div class="showreel-media">
               <video id="workshop-showreel" data-src="Content/ShowReel.mp4?v=20261103-faststart" preload="none" muted playsinline loop aria-hidden="true" tabindex="-1"></video>
             </div>
@@ -53,10 +55,22 @@
               </div>
               <input class="showreel-seek" type="range" min="0" max="1000" step="1" value="0" aria-label="Video position" />
             </div>
+            <button class="showreel-play" type="button" hidden>PLAY VIDEO</button>
+            </div>
+            <section class="archive-face" id="workshop-archive" aria-labelledby="archive-title" aria-hidden="true" inert>
+              <h1 id="archive-title" tabindex="-1">Archive:</h1>
+              <nav class="archive-list" aria-label="Previous projects">
+                <a href="intrinsik-2026.html">‘Intrinsik’ 2026</a>
+                <a href="microcosm.html">‘Microcosm’ 2025</a>
+                <a href="beneath-your-eyes.html">‘Beneath Your Eyes’ 2025</a>
+                <a href="virtual-environment.html">‘Virtual Environment’ 2024</a>
+              </nav>
+              <p class="archive-contact">Contact: <a href="mailto:xaviercoxdesign@gmail.com">xaviercoxdesign@gmail.com</a> / <a href="https://www.linkedin.com/in/xavier-cox1" target="_blank" rel="noreferrer">linkedin</a> / <a href="https://www.instagram.com/x.avierrrrrrrrr/" target="_blank" rel="noreferrer">instagram</a></p>
+            </section>
+            </div>
           </div>
         </div>
       </div>
-      <button class="showreel-play" type="button" hidden>PLAY VIDEO</button>
     </div>
   </main>
 
@@ -132,10 +146,12 @@
 
   <script defer src="assets/js/cursor.js?v=20261031-publish"></script>
   <script defer src="assets/js/transition.js?v=20261031-publish"></script>
-  <script defer src="assets/js/home.js?v=20261031-publish"></script>
+  <script defer src="assets/js/home.js?v=20261110-archive-tuning"></script>
   <script defer src="assets/js/navigation.js?v=20261031-publish"></script>
   <script defer src="assets/js/typography.js?v=20261031-publish"></script>
-  <script defer src="assets/js/showreel.js?v=20261103-native-video"></script>
+  <script defer src="assets/js/showreel.js?v=20261110-archive-tuning"></script>
   <script defer src="assets/js/player.js?v=20261103-native-video"></script>
+  <script defer src="assets/js/archive-settings.js?v=20261110-approved-archive-v3"></script>
+  <script defer src="assets/js/archive.js?v=20261110-archive-tuning"></script>
 </body>
 </html>

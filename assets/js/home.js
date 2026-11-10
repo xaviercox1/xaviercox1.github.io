@@ -537,7 +537,10 @@
 
   function placeholderSize(options) {
     // A 1920 × 1080 canvas, scaled down to fit the viewport with breathing room.
-    const width = Math.min(1920, innerWidth * options.placeholderWidthPercent / 100, innerHeight * 0.8 * 16 / 9);
+    const archiveSettings = window.archiveSettings?.settings;
+    const widthPercent = archiveSettings?.cardWidthPercent ?? options.placeholderWidthPercent;
+    const heightPercent = archiveSettings?.cardMaxHeightPercent ?? 80;
+    const width = Math.min(1920, innerWidth * widthPercent / 100, innerHeight * heightPercent / 100 * 16 / 9);
     return { width, height: width * 9 / 16 };
   }
 
@@ -608,7 +611,7 @@
     const ny = pointerIsActive && rect.height ? clamp((pointerY - rect.top - rect.height * trackingCenterYRatio) / (rect.height * 0.85), -1, 1) : 0;
     const target = ambientRotation(now, nx, ny);
     const progress = clamp((now - state.completedAt) / 700, 0, 1);
-    const strength = reducedMotion.matches ? 0 : 0.2 * progress * progress * (3 - 2 * progress);
+    const strength = reducedMotion.matches ? 0 : (window.archiveSettings?.settings.motionStrengthPercent ?? 20) / 100 * progress * progress * (3 - 2 * progress);
     const blend = reducedMotion.matches ? 1 : 1 - Math.exp(-backdropRotationFollowSpeed * settings.jeffRotationSpeed * deltaSeconds);
     const rotation = state.placeholderRotation;
     for (const axis of ['x', 'y', 'z']) rotation[axis] = lerp(rotation[axis], target[axis] * strength, blend);
@@ -696,7 +699,7 @@
     eyePlane.style.top = `${centerY}px`;
     eyePlane.style.opacity = opacity;
     eyePlane.style.transform = `translate(-50%, -50%) translate3d(${x}px, ${y}px, ${z}px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) rotateZ(${rotateZ}deg)`;
-    eyeBackdrop.style.borderRadius = `${Math.min(width, height) * lerp(0.07, 0.035, shape)}px`;
+    eyeBackdrop.style.borderRadius = `${Math.min(width, height) * lerp(0.07, (window.archiveSettings?.settings.cornerRadiusPercent ?? 3.5) / 100, shape)}px`;
     // Read-only preview diagnostics also make the shared midpoint explicit.
     jeffTarget.dataset.timeline = time.toFixed(5);
     jeffTarget.dataset.progress = progress.toFixed(5);
@@ -732,7 +735,7 @@
     eyePlane.style.opacity = '1';
     eyePlane.style.transform = 'translate(-50%, -50%) translate3d(0px, 0px, 0px) rotateX(0deg) rotateY(0deg) rotateZ(0deg)';
     eyeBackdrop.style.backgroundImage = 'none';
-    eyeBackdrop.style.borderRadius = `${size.height * 0.035}px`;
+    eyeBackdrop.style.borderRadius = `${size.height * (window.archiveSettings?.settings.cornerRadiusPercent ?? 3.5) / 100}px`;
     eyeField.style.opacity = '0';
     clickTransition = {
       start: now - options.animationDurationMs, lastFrame: now, options,
@@ -766,7 +769,7 @@
       eyePlane.style.height = `${size.height}px`;
       eyePlane.style.left = `${eyeArt.offsetWidth / 2}px`;
       eyePlane.style.top = `${eyeArt.offsetHeight / 2}px`;
-      eyeBackdrop.style.borderRadius = `${size.height * 0.035}px`;
+      eyeBackdrop.style.borderRadius = `${size.height * (window.archiveSettings?.settings.cornerRadiusPercent ?? 3.5) / 100}px`;
     }
   });
 

@@ -24,7 +24,8 @@ class PageReferences(HTMLParser):
 
     def handle_starttag(self, tag, attributes):
         for name, value in attributes:
-            if value and name in {'src', 'href', 'poster', 'data-src'}:
+            if value and name in {'src', 'href', 'poster', 'data-src',
+                                  'data-preview-src', 'data-full-src', 'data-fallback'}:
                 self.references.append(value)
 
 
