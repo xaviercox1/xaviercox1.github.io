@@ -21,6 +21,16 @@
     underlineOpacityPercent: 59,
     textAlign: 'left',
     showContact: true,
+    drawingEnabled: true,
+    drawingColor: '#ffffff',
+    drawingWidthPx: 1.5,
+    drawingOpacityPercent: 65,
+    drawingFps: 10,
+    drawingWigglePx: 2.5,
+    drawingPasses: 2,
+    drawingSpacingPx: 6,
+    drawingLifetimeSeconds: 0,
+    drawingMaxPoints: 2000,
   };
   const settings = { ...defaults };
   window.archiveSettings = { settings, defaults };
@@ -47,6 +57,16 @@
     ['Colour & details', 'textColor', 'Text colour', 'color'],
     ['Colour & details', 'underlineOpacityPercent', 'Underline opacity', '%', 0, 100, 1],
     ['Colour & details', 'showContact', 'Show contact line', 'checkbox'],
+    ['Drawing', 'drawingEnabled', 'Enable mouse drawing', 'checkbox'],
+    ['Drawing', 'drawingColor', 'Stroke colour', 'color'],
+    ['Drawing', 'drawingWidthPx', 'Stroke width', 'px', .5, 8, .5],
+    ['Drawing', 'drawingOpacityPercent', 'Stroke opacity', '%', 5, 100, 1],
+    ['Drawing', 'drawingFps', 'Wiggle frame rate', 'fps', 1, 30, 1],
+    ['Drawing', 'drawingWigglePx', 'Wiggle amount', 'px', 0, 12, .5],
+    ['Drawing', 'drawingPasses', 'Sketch passes', 'passes', 1, 4, 1],
+    ['Drawing', 'drawingSpacingPx', 'Sketch point spacing', 'px', 2, 24, 1],
+    ['Drawing', 'drawingLifetimeSeconds', 'Trail lifetime (0 keeps drawing)', 'seconds', 0, 60, 1],
+    ['Drawing', 'drawingMaxPoints', 'Maximum drawing points', 'points', 200, 4000, 100],
   ];
 
   if (editing) {
@@ -81,6 +101,7 @@
       '--archive-contact-display': settings.showContact ? 'block' : 'none',
     };
     Object.entries(properties).forEach(([key, value]) => style.setProperty(key, value));
+    window.dispatchEvent(new Event('archivedrawingchange'));
     // Reuse Jeff's sizing and geometry updates, retaining the 16:9 video ratio.
     window.dispatchEvent(new Event('resize'));
   }
@@ -90,7 +111,7 @@
   const panel = document.createElement('details');
   panel.className = 'eye-controls archive-controls';
   panel.open = true;
-  panel.innerHTML = `<summary>Archive settings</summary><div class="eye-controls-body"><p class="eye-controls-help">Changes preview live and save in this browser's edit mode. Card width is capped by maximum height to keep 16:9. Copy the values to share your choices.</p><div class="eye-controls-actions archive-preview-actions"><button type="button" data-preview>Preview flip</button></div><div class="archive-settings-fields"></div><div class="eye-controls-actions"><button type="button" data-copy>Copy values</button><button type="button" data-reset>Reset defaults</button><span role="status"></span></div><textarea aria-label="Archive settings to copy" readonly spellcheck="false"></textarea></div>`;
+  panel.innerHTML = `<summary>Archive settings</summary><div class="eye-controls-body"><p class="eye-controls-help">Changes preview live and save in this browser's edit mode. Move your mouse over the archive to draw. Zero trail lifetime keeps strokes until cleared; the point limit removes the oldest marks. Copy the values to share your choices.</p><div class="eye-controls-actions archive-preview-actions"><button type="button" data-preview>Preview flip</button><button type="button" data-clear-drawing>Clear drawing</button></div><div class="archive-settings-fields"></div><div class="eye-controls-actions"><button type="button" data-copy>Copy values</button><button type="button" data-reset>Reset defaults</button><span role="status"></span></div><textarea aria-label="Archive settings to copy" readonly spellcheck="false"></textarea></div>`;
   document.body.append(panel);
   const container = panel.querySelector('.archive-settings-fields');
   const output = panel.querySelector('textarea');
@@ -175,6 +196,10 @@
     syncControls.forEach(sync => sync());
     save();
     status.textContent = 'Defaults restored.';
+  });
+  panel.querySelector('[data-clear-drawing]').addEventListener('click', () => {
+    window.dispatchEvent(new Event('archiveclear'));
+    status.textContent = 'Drawing cleared.';
   });
   panel.querySelector('[data-copy]').addEventListener('click', async () => {
     try {

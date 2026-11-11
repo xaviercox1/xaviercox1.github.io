@@ -2,14 +2,39 @@
 window.portfolioWorks = [
   {
     "title": "Solace",
-    "src": "Content/New Portfolio/solace.mp4",
-    "thumb": "Content/GalleryRedesign/01-solace.jpg",
+    "src": "Content/New Portfolio/solace-v2.mp4",
+    "thumb": "Content/GalleryRedesign/01-solace-v2.jpg",
     "year": "2026",
     "medium": "Motion graphics",
-    "description": "Earth Tones — Solace Bar.",
+    "description": "Earth Tones · Solace Bar.",
     "youtube": null,
     "width": 1080,
-    "height": 1440
+    "height": 1440,
+    "featured": true
+  },
+  {
+    "title": "Earth Tones",
+    "src": "Content/New Portfolio/earth-tones.mp4",
+    "thumb": "Content/GalleryRedesign/07-earth-tones.jpg",
+    "year": "2026",
+    "medium": "Moving image",
+    "description": "",
+    "youtube": null,
+    "width": 1440,
+    "height": 1920,
+    "featured": true
+  },
+  {
+    "title": "Earth Tones · Raffy’s",
+    "src": "Content/New Portfolio/earth-tones-raffys.mp4",
+    "thumb": "Content/GalleryRedesign/06-earth-tones-raffy-s.jpg",
+    "year": "2026",
+    "medium": "Moving image",
+    "description": "",
+    "youtube": null,
+    "width": 1080,
+    "height": 1440,
+    "featured": true
   },
   {
     "title": "Intrinsik",
@@ -43,28 +68,6 @@ window.portfolioWorks = [
     "youtube": "PXYMk3mMaYY"
   },
   {
-    "title": "Earth Tones — Raffy’s",
-    "src": "Content/New Portfolio/earth-tones-raffys.mp4",
-    "thumb": "Content/GalleryRedesign/06-earth-tones-raffy-s.jpg",
-    "year": "2026",
-    "medium": "Moving image",
-    "description": "",
-    "youtube": null,
-    "width": 1080,
-    "height": 1440
-  },
-  {
-    "title": "Earth Tones",
-    "src": "Content/New Portfolio/earth-tones.mp4",
-    "thumb": "Content/GalleryRedesign/07-earth-tones.jpg",
-    "year": "2026",
-    "medium": "Moving image",
-    "description": "",
-    "youtube": null,
-    "width": 1440,
-    "height": 1920
-  },
-  {
     "title": "Deep Inside",
     "src": "Content/New Portfolio/deep-inside.mp4",
     "thumb": "Content/GalleryRedesign/08-deep-inside.jpg",
@@ -87,7 +90,7 @@ window.portfolioWorks = [
     "height": 1920
   },
   {
-    "title": "Intrinsik — Sensor Systems",
+    "title": "Intrinsik · Sensor Systems",
     "src": "Content/Intrinsik/Sensor Systems.mp4",
     "thumb": "Content/GalleryRedesign/10-intrinsik-sensor-systems.jpg",
     "year": "2026",
@@ -98,7 +101,7 @@ window.portfolioWorks = [
     "height": 3840
   },
   {
-    "title": "Intrinsik — Toobris",
+    "title": "Intrinsik · Toobris",
     "src": "Content/Intrinsik/Toobris.mp4",
     "thumb": "Content/GalleryRedesign/11-intrinsik-toobris.jpg",
     "year": "2026",
@@ -109,7 +112,7 @@ window.portfolioWorks = [
     "height": 3840
   },
   {
-    "title": "Intrinsik — Lilac Extended",
+    "title": "Intrinsik · Lilac Extended",
     "src": "Content/Intrinsik/lilac extended.mp4",
     "thumb": "Content/GalleryRedesign/12-intrinsik-lilac-extended.jpg",
     "year": "2026",
@@ -120,7 +123,7 @@ window.portfolioWorks = [
     "height": 3840
   },
   {
-    "title": "Intrinsik — Live 1",
+    "title": "Intrinsik · Live 1",
     "src": "landscape-promo.mp4",
     "thumb": "Content/GalleryRedesign/13-intrinsik-live-1.jpg",
     "year": "2026",
@@ -131,7 +134,7 @@ window.portfolioWorks = [
     "height": 1080
   },
   {
-    "title": "Intrinsik — Live 2",
+    "title": "Intrinsik · Live 2",
     "src": "landscape-promo2.mp4",
     "thumb": "Content/GalleryRedesign/14-intrinsik-live-2.jpg",
     "year": "2026",
@@ -178,17 +181,6 @@ window.portfolioWorks = [
     "title": "Sunreactor",
     "src": "Content/Sunreactor.mp4",
     "thumb": "Content/GalleryRedesign/18-sunreactor.jpg",
-    "year": "2025",
-    "medium": "Moving image",
-    "description": "",
-    "youtube": null,
-    "width": 950,
-    "height": 1080
-  },
-  {
-    "title": "Creature",
-    "src": "Content/Creature.mp4",
-    "thumb": "Content/GalleryRedesign/19-creature.jpg",
     "year": "2025",
     "medium": "Moving image",
     "description": "",
@@ -274,7 +266,7 @@ window.portfolioWorks = [
     "height": 1080
   },
   {
-    "title": "Microcosm — Study 1",
+    "title": "Microcosm · Study 1",
     "src": "Microcosm/1.mp4",
     "thumb": "Content/GalleryRedesign/28-microcosm-study-1.jpg",
     "year": "2025",
@@ -285,7 +277,7 @@ window.portfolioWorks = [
     "height": 1080
   },
   {
-    "title": "Microcosm — Study 2",
+    "title": "Microcosm · Study 2",
     "src": "Microcosm/2.mp4",
     "thumb": "Content/GalleryRedesign/29-microcosm-study-2.jpg",
     "year": "2025",
@@ -296,7 +288,7 @@ window.portfolioWorks = [
     "height": 1080
   },
   {
-    "title": "Microcosm — Study 3",
+    "title": "Microcosm · Study 3",
     "src": "Microcosm/3.mp4",
     "thumb": "Content/GalleryRedesign/30-microcosm-study-3.jpg",
     "year": "2025",
@@ -307,7 +299,7 @@ window.portfolioWorks = [
     "height": 1080
   },
   {
-    "title": "Microcosm — Study 4",
+    "title": "Microcosm · Study 4",
     "src": "Microcosm/4.mp4",
     "thumb": "Content/GalleryRedesign/31-microcosm-study-4.jpg",
     "year": "2025",
@@ -318,7 +310,7 @@ window.portfolioWorks = [
     "height": 1080
   },
   {
-    "title": "Microcosm — Study 5",
+    "title": "Microcosm · Study 5",
     "src": "Microcosm/5.mp4",
     "thumb": "Content/GalleryRedesign/32-microcosm-study-5.jpg",
     "year": "2025",
@@ -329,7 +321,7 @@ window.portfolioWorks = [
     "height": 1080
   },
   {
-    "title": "Microcosm — Study 6",
+    "title": "Microcosm · Study 6",
     "src": "Microcosm/6.mp4",
     "thumb": "Content/GalleryRedesign/33-microcosm-study-6.jpg",
     "year": "2025",
@@ -340,7 +332,7 @@ window.portfolioWorks = [
     "height": 1080
   },
   {
-    "title": "Intrinsik — Industrique 1",
+    "title": "Intrinsik · Industrique 1",
     "src": "",
     "thumb": "Content/GalleryRedesign/34-intrinsik-industrique-1.jpg",
     "year": "2026",
@@ -352,7 +344,7 @@ window.portfolioWorks = [
     "image": "Content/Intrinsik Industrique/Web/photo-01-dscf3062.jpg"
   },
   {
-    "title": "Intrinsik — Industrique 2",
+    "title": "Intrinsik · Industrique 2",
     "src": "",
     "thumb": "Content/GalleryRedesign/35-intrinsik-industrique-2.jpg",
     "year": "2026",
@@ -364,7 +356,7 @@ window.portfolioWorks = [
     "image": "Content/Intrinsik Industrique/Web/photo-03-dscf3101.jpg"
   },
   {
-    "title": "Intrinsik — Industrique 3",
+    "title": "Intrinsik · Industrique 3",
     "src": "",
     "thumb": "Content/GalleryRedesign/36-intrinsik-industrique-3.jpg",
     "year": "2026",

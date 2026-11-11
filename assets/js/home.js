@@ -566,9 +566,9 @@
     eyeArt.classList.add('is-revealed');
     jeffTarget.setAttribute('role', 'button');
     jeffTarget.setAttribute('tabindex', '0');
-    jeffTarget.setAttribute('aria-label', 'Jeff — click to open the showreel');
+    jeffTarget.setAttribute('aria-label', 'Jeff · click to open the showreel');
     jeffTarget.removeAttribute('aria-disabled');
-    setTransitionPhase('idle', 'Ready — click Jeff.');
+    setTransitionPhase('idle', 'Ready · click Jeff.');
   }
 
   function startJeffTransition() {
@@ -703,7 +703,7 @@
     // Read-only preview diagnostics also make the shared midpoint explicit.
     jeffTarget.dataset.timeline = time.toFixed(5);
     jeffTarget.dataset.progress = progress.toFixed(5);
-    if (elapsed < calmTime) setTransitionPhase('settling', 'Jeff is calming — gaze and motion stay live.');
+    if (elapsed < calmTime) setTransitionPhase('settling', 'Jeff is calming · gaze and motion stay live.');
     else if (!incoming) setTransitionPhase('turning', 'Turning through the S-curve.');
     else setTransitionPhase('entering', 'Easing from the midpoint to flat.');
 
@@ -715,7 +715,7 @@
       jeffTarget.removeAttribute('tabindex');
       jeffTarget.removeAttribute('aria-disabled');
       jeffTarget.setAttribute('aria-label', 'Showreel placeholder, 1920 by 1080');
-      setTransitionPhase('complete', 'Complete — showreel is ready.');
+      setTransitionPhase('complete', 'Complete · showreel is ready.');
     }
   }
 
@@ -747,7 +747,7 @@
     jeffTarget.removeAttribute('tabindex');
     jeffTarget.removeAttribute('aria-disabled');
     jeffTarget.setAttribute('aria-label', 'Showreel placeholder, 1920 by 1080');
-    setTransitionPhase('complete', 'Complete — showreel is ready.');
+    setTransitionPhase('complete', 'Complete · showreel is ready.');
   }
 
   jeffTarget.addEventListener('click', startJeffTransition);

@@ -82,11 +82,14 @@
     const columnWidth = (width - gap * (columns - 1)) / columns;
     const heights = Array(columns).fill(0);
     const random = seededRandom(settings.seed);
-    const order = [...entries];
+    const featured = entries.filter(entry => entry.work.featured);
+    const order = entries.filter(entry => !entry.work.featured);
     for (let i = order.length - 1; i > 0; i--) {
       const j = Math.floor(random() * (i + 1));
       [order[i],order[j]] = [order[j],order[i]];
     }
+    // Earth Tones stays at the top, including after reshuffles and resizes.
+    order.unshift(...featured);
     // Match the DOM/tab order to the visual reading order after shuffling.
     order.forEach(entry => grid.append(entry.tile));
     order.forEach(entry => {
