@@ -15,31 +15,45 @@
     lineHeight: 1.2,
     rowGapPx: 9.2,
     paddingPx: 44,
-    contactGapPx: 25.6,
+    contactGapPx: 27.6,
     backgroundColor: '#ff2600',
     textColor: '#ffffff',
     underlineOpacityPercent: 59,
     textAlign: 'left',
     showContact: true,
-    textDepthPx: 3,
-    textShadowOpacityPercent: 22,
-    textShadowBlurPx: 1.5,
-    textShadowOffsetPx: 1,
+    textDepthPx: 23,
+    textShadowOpacityPercent: 26,
+    textShadowBlurPx: .75,
+    lightEnabled: true,
+    lightDepthPx: 920,
+    lightFollowAmountPercent: 100,
+    lightSmoothingMs: 170,
+    lightOffsetXPx: 0,
+    lightOffsetYPx: 0,
+    lightShowIndicator: false,
     drawingEnabled: true,
     drawingColor: '#000000',
-    drawingWidthPx: 8,
+    drawingWidthPx: 2,
     drawingOpacityPercent: 100,
-    drawingFps: 10,
-    drawingWigglePx: 2.5,
+    drawingFps: 8,
+    drawingWigglePx: 11.5,
+    drawingWiggleHz: 5,
+    drawingBendLengthPx: 80,
+    drawingComplexity: 2.9,
     drawingPasses: 1,
-    drawingSpacingPx: 2,
+    drawingSpacingPx: 16,
     drawingLifetimeSeconds: 6,
     drawingMaxPoints: 4000,
+    drawingOverspillPx: 500,
+    drawingShadowEnabled: true,
+    drawingShadowDepthPx: 8,
+    drawingShadowOpacityPercent: 26,
+    drawingShadowBlurPx: .75,
   };
   const settings = { ...defaults };
   window.archiveSettings = { settings, defaults };
   const editing = new URLSearchParams(location.search).get('edit') === '1';
-  const storageKey = 'xavier-archive-settings-v4';
+  const storageKey = 'xavier-archive-settings-v8';
   const fields = [
     ['Flip', 'flipDurationMs', 'Flip duration', 'ms', 100, 4000, 50],
     ['Flip', 'flipEasing', 'Flip easing', { 'cubic-bezier(.65, 0, .25, 1)': 'Smooth', 'cubic-bezier(.2, .8, .2, 1)': 'Quick start', 'ease-in-out': 'Gentle', 'linear': 'Linear' }],
@@ -60,7 +74,13 @@
     ['Text depth & shadow', 'textDepthPx', 'Text lift from canvas', 'px', 0, 12, .5],
     ['Text depth & shadow', 'textShadowOpacityPercent', 'Text shadow opacity', '%', 0, 60, 1],
     ['Text depth & shadow', 'textShadowBlurPx', 'Text shadow softness', 'px', 0, 6, .25],
-    ['Text depth & shadow', 'textShadowOffsetPx', 'Text shadow offset', 'px', 0, 4, .25],
+    ['Lighting', 'lightEnabled', 'Mouse-follow lighting', 'checkbox'],
+    ['Lighting', 'lightFollowAmountPercent', 'Mouse follow amount', '%', 0, 200, 1],
+    ['Lighting', 'lightSmoothingMs', 'Light follow smoothing', 'ms', 0, 1500, 10],
+    ['Lighting', 'lightOffsetXPx', 'Light horizontal offset from mouse', 'px', -500, 500, 1],
+    ['Lighting', 'lightOffsetYPx', 'Light vertical offset from mouse', 'px', -500, 500, 1],
+    ['Lighting', 'lightDepthPx', 'Light depth towards viewer', 'px', 50, 2000, 10],
+    ['Lighting', 'lightShowIndicator', 'Show light position in edit mode', 'checkbox'],
     ['Colour & details', 'backgroundColor', 'Archive colour', 'color'],
     ['Colour & details', 'textColor', 'Text colour', 'color'],
     ['Colour & details', 'underlineOpacityPercent', 'Underline opacity', '%', 0, 100, 1],
@@ -69,12 +89,20 @@
     ['Drawing', 'drawingColor', 'Stroke colour', 'color'],
     ['Drawing', 'drawingWidthPx', 'Stroke width', 'px', .5, 8, .5],
     ['Drawing', 'drawingOpacityPercent', 'Stroke opacity', '%', 5, 100, 1],
-    ['Drawing', 'drawingFps', 'Wiggle frame rate', 'fps', 1, 30, 1],
-    ['Drawing', 'drawingWigglePx', 'Wiggle size', 'px', 0, 24, .5],
+    ['Drawing', 'drawingWigglePx', 'Wiggle amount', 'px', 0, 24, .5],
+    ['Drawing', 'drawingWiggleHz', 'Wiggle frequency', 'Hz', 0, 8, .1],
+    ['Drawing', 'drawingBendLengthPx', 'Wiggle bend length', 'px', 4, 320, 4],
+    ['Drawing', 'drawingComplexity', 'Wiggle complexity', 'detail', 0, 6, .1],
+    ['Drawing', 'drawingFps', 'Drawing frame rate', 'fps', 1, 30, 1],
     ['Drawing', 'drawingPasses', 'Sketch passes', 'passes', 1, 4, 1],
     ['Drawing', 'drawingSpacingPx', 'Sketch point spacing', 'px', 2, 24, 1],
     ['Drawing', 'drawingLifetimeSeconds', 'Trail lifetime (0 keeps drawing)', 'seconds', 0, 60, 1],
     ['Drawing', 'drawingMaxPoints', 'Maximum drawing points', 'points', 200, 4000, 100],
+    ['Drawing', 'drawingOverspillPx', 'Stroke overspill and fade', 'px', 0, 120, 1],
+    ['Stroke shadow', 'drawingShadowEnabled', 'Stroke shadow', 'checkbox'],
+    ['Stroke shadow', 'drawingShadowDepthPx', 'Stroke lift from canvas', 'px', 0, 40, .5],
+    ['Stroke shadow', 'drawingShadowOpacityPercent', 'Stroke shadow opacity', '%', 0, 100, 1],
+    ['Stroke shadow', 'drawingShadowBlurPx', 'Stroke shadow softness', 'px', 0, 12, .25],
   ];
 
   if (editing) {
@@ -85,7 +113,7 @@
         if (typeof type === 'object' && Object.hasOwn(type, value)) settings[key] = typeof defaults[key] === 'number' ? Number(value) : value;
         else if (type === 'color' && /^#[0-9a-f]{6}$/i.test(value)) settings[key] = value;
         else if (type === 'checkbox' && typeof value === 'boolean') settings[key] = value;
-        else if (typeof value === 'number' && Number.isFinite(value) && typeof min === 'number') settings[key] = Math.min(max, Math.max(min, value));
+        else if (typeof value === 'number' && Number.isFinite(value) && typeof min === 'number') settings[key] = value;
       });
     } catch { /* Saved experiments are optional. */ }
   }
@@ -108,10 +136,12 @@
       '--archive-align': settings.textAlign,
       '--archive-contact-display': settings.showContact ? 'block' : 'none',
       '--archive-text-depth': `${settings.textDepthPx}px`,
-      '--archive-text-shadow': `0 ${settings.textShadowOffsetPx}px ${settings.textShadowBlurPx}px rgba(0, 0, 0, ${settings.textShadowOpacityPercent / 100})`,
+      '--archive-drawing-padding': `${Math.max(128, Math.max(0, settings.drawingOverspillPx) + Math.abs(settings.drawingWigglePx) + Math.abs(settings.drawingWidthPx) / 2 + 16)}px`,
+      '--archive-stroke-depth': `${settings.drawingShadowEnabled ? settings.drawingShadowDepthPx : 0}px`,
     };
     Object.entries(properties).forEach(([key, value]) => style.setProperty(key, value));
     window.dispatchEvent(new Event('archivedrawingchange'));
+    window.dispatchEvent(new Event('archivelightchange'));
     // Reuse Jeff's sizing and geometry updates, retaining the 16:9 video ratio.
     window.dispatchEvent(new Event('resize'));
   }
@@ -121,7 +151,7 @@
   const panel = document.createElement('details');
   panel.className = 'eye-controls archive-controls';
   panel.open = true;
-  panel.innerHTML = `<summary>Archive settings</summary><div class="eye-controls-body"><p class="eye-controls-help">Changes preview live and save in this browser's edit mode. Move your mouse over the archive to draw. Wiggle size controls how far the stroke moves; frame rate controls how often it changes. Text lift adds a little depth above the canvas. Zero trail lifetime keeps strokes until cleared; the point limit removes the oldest marks. Copy the values to share your choices.</p><div class="eye-controls-actions archive-preview-actions"><button type="button" data-preview>Preview flip</button><button type="button" data-clear-drawing>Clear drawing</button><button type="button" data-settings-section="drawing" aria-controls="archive-settings-drawing">Drawing controls</button><button type="button" data-settings-section="text-depth-shadow" aria-controls="archive-settings-text-depth-shadow">Text depth &amp; shadow</button></div><div class="archive-settings-fields"></div><div class="eye-controls-actions"><button type="button" data-copy>Copy values</button><button type="button" data-reset>Reset defaults</button><span role="status"></span></div><textarea aria-label="Archive settings to copy" readonly spellcheck="false"></textarea></div>`;
+  panel.innerHTML = `<summary>Archive settings</summary><div class="eye-controls-body"><p class="eye-controls-help">Changes preview live and save in this browser's edit mode. Sliders are guides; value boxes accept numbers beyond their ranges. Move your mouse over the archive to draw. Wiggle amount controls how far the stroke moves. Lower wiggle frequency makes slower, drawn-out shakes; longer bend length makes broader curves along the line. Complexity adds fine, irregular detail; zero keeps broad, simple bends. Drawing frame rate controls the stepped animation look. Text lift adds depth above the canvas. The light follows your mouse. Lighting controls adjust follow amount, smoothing, cursor offsets and depth. Zero smoothing follows immediately; zero offsets place the light at the cursor. Zero trail lifetime keeps strokes until cleared; the point limit removes the oldest marks. Copy the values to share your choices.</p><div class="eye-controls-actions archive-preview-actions"><button type="button" data-preview>Preview flip</button><button type="button" data-clear-drawing>Clear drawing</button><button type="button" data-settings-section="drawing" aria-controls="archive-settings-drawing">Drawing controls</button><button type="button" data-settings-section="text-depth-shadow" aria-controls="archive-settings-text-depth-shadow">Text depth &amp; shadow</button><button type="button" data-settings-section="lighting" aria-controls="archive-settings-lighting">Lighting controls</button><button type="button" data-settings-section="stroke-shadow" aria-controls="archive-settings-stroke-shadow">Stroke shadow</button></div><div class="archive-settings-fields"></div><div class="eye-controls-actions"><button type="button" data-copy>Copy values</button><button type="button" data-reset>Reset defaults</button><span role="status"></span></div><textarea aria-label="Archive settings to copy" readonly spellcheck="false"></textarea></div>`;
   document.body.append(panel);
   const container = panel.querySelector('.archive-settings-fields');
   const output = panel.querySelector('textarea');
@@ -178,14 +208,16 @@
     } else {
       input = document.createElement('input');
       input.type = 'range';
+      Object.assign(input, { min, max, step, value: settings[key] });
       const number = document.createElement('input');
       number.type = 'number';
+      number.step = 'any';
+      number.value = settings[key];
       number.setAttribute('aria-label', `${title}, exact value`);
       [input, number].forEach(control => {
-        Object.assign(control, { min, max, step, value: settings[key] });
         control.addEventListener('input', () => {
           if (!Number.isFinite(control.valueAsNumber)) return;
-          settings[key] = Math.min(max, Math.max(min, control.valueAsNumber));
+          settings[key] = control.valueAsNumber;
           (control === input ? number : input).value = settings[key];
           save();
         });

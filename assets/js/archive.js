@@ -6,7 +6,7 @@
   const front = card.querySelector('.showreel-front');
   const archive = card.querySelector('.archive-face');
   const content = archive.querySelector('.archive-content');
-  const heading = archive.querySelector('h1');
+  const heading = content.querySelector('h1');
   const settings = window.archiveSettings.settings;
   const about = document.querySelector('#workshop-about');
   const video = plane.querySelector('video');
