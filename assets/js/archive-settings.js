@@ -10,7 +10,7 @@
     cardWidthPercent: 49,
     cardMaxHeightPercent: 80,
     cornerRadiusPercent: 3.5,
-    motionStrengthPercent: 20,
+    motionStrengthPercent: 30,
     fontSizePx: 12,
     lineHeight: 1.2,
     rowGapPx: 9.2,
@@ -21,21 +21,25 @@
     underlineOpacityPercent: 59,
     textAlign: 'left',
     showContact: true,
+    textDepthPx: 3,
+    textShadowOpacityPercent: 22,
+    textShadowBlurPx: 1.5,
+    textShadowOffsetPx: 1,
     drawingEnabled: true,
-    drawingColor: '#ffffff',
-    drawingWidthPx: 1.5,
-    drawingOpacityPercent: 65,
+    drawingColor: '#000000',
+    drawingWidthPx: 8,
+    drawingOpacityPercent: 100,
     drawingFps: 10,
     drawingWigglePx: 2.5,
-    drawingPasses: 2,
-    drawingSpacingPx: 6,
-    drawingLifetimeSeconds: 0,
-    drawingMaxPoints: 2000,
+    drawingPasses: 1,
+    drawingSpacingPx: 2,
+    drawingLifetimeSeconds: 6,
+    drawingMaxPoints: 4000,
   };
   const settings = { ...defaults };
   window.archiveSettings = { settings, defaults };
   const editing = new URLSearchParams(location.search).get('edit') === '1';
-  const storageKey = 'xavier-archive-settings-v3';
+  const storageKey = 'xavier-archive-settings-v4';
   const fields = [
     ['Flip', 'flipDurationMs', 'Flip duration', 'ms', 100, 4000, 50],
     ['Flip', 'flipEasing', 'Flip easing', { 'cubic-bezier(.65, 0, .25, 1)': 'Smooth', 'cubic-bezier(.2, .8, .2, 1)': 'Quick start', 'ease-in-out': 'Gentle', 'linear': 'Linear' }],
@@ -53,6 +57,10 @@
     ['Typography & spacing', 'paddingPx', 'Inner padding', 'px', 8, 100, 1],
     ['Typography & spacing', 'contactGapPx', 'Space above contact', 'px', 0, 80, .2],
     ['Typography & spacing', 'textAlign', 'Text alignment', { left: 'Left', center: 'Centre', right: 'Right' }],
+    ['Text depth & shadow', 'textDepthPx', 'Text lift from canvas', 'px', 0, 12, .5],
+    ['Text depth & shadow', 'textShadowOpacityPercent', 'Text shadow opacity', '%', 0, 60, 1],
+    ['Text depth & shadow', 'textShadowBlurPx', 'Text shadow softness', 'px', 0, 6, .25],
+    ['Text depth & shadow', 'textShadowOffsetPx', 'Text shadow offset', 'px', 0, 4, .25],
     ['Colour & details', 'backgroundColor', 'Archive colour', 'color'],
     ['Colour & details', 'textColor', 'Text colour', 'color'],
     ['Colour & details', 'underlineOpacityPercent', 'Underline opacity', '%', 0, 100, 1],
@@ -62,7 +70,7 @@
     ['Drawing', 'drawingWidthPx', 'Stroke width', 'px', .5, 8, .5],
     ['Drawing', 'drawingOpacityPercent', 'Stroke opacity', '%', 5, 100, 1],
     ['Drawing', 'drawingFps', 'Wiggle frame rate', 'fps', 1, 30, 1],
-    ['Drawing', 'drawingWigglePx', 'Wiggle amount', 'px', 0, 12, .5],
+    ['Drawing', 'drawingWigglePx', 'Wiggle size', 'px', 0, 24, .5],
     ['Drawing', 'drawingPasses', 'Sketch passes', 'passes', 1, 4, 1],
     ['Drawing', 'drawingSpacingPx', 'Sketch point spacing', 'px', 2, 24, 1],
     ['Drawing', 'drawingLifetimeSeconds', 'Trail lifetime (0 keeps drawing)', 'seconds', 0, 60, 1],
@@ -99,6 +107,8 @@
       '--archive-underline-opacity': settings.underlineOpacityPercent / 100,
       '--archive-align': settings.textAlign,
       '--archive-contact-display': settings.showContact ? 'block' : 'none',
+      '--archive-text-depth': `${settings.textDepthPx}px`,
+      '--archive-text-shadow': `0 ${settings.textShadowOffsetPx}px ${settings.textShadowBlurPx}px rgba(0, 0, 0, ${settings.textShadowOpacityPercent / 100})`,
     };
     Object.entries(properties).forEach(([key, value]) => style.setProperty(key, value));
     window.dispatchEvent(new Event('archivedrawingchange'));
@@ -111,7 +121,7 @@
   const panel = document.createElement('details');
   panel.className = 'eye-controls archive-controls';
   panel.open = true;
-  panel.innerHTML = `<summary>Archive settings</summary><div class="eye-controls-body"><p class="eye-controls-help">Changes preview live and save in this browser's edit mode. Move your mouse over the archive to draw. Zero trail lifetime keeps strokes until cleared; the point limit removes the oldest marks. Copy the values to share your choices.</p><div class="eye-controls-actions archive-preview-actions"><button type="button" data-preview>Preview flip</button><button type="button" data-clear-drawing>Clear drawing</button></div><div class="archive-settings-fields"></div><div class="eye-controls-actions"><button type="button" data-copy>Copy values</button><button type="button" data-reset>Reset defaults</button><span role="status"></span></div><textarea aria-label="Archive settings to copy" readonly spellcheck="false"></textarea></div>`;
+  panel.innerHTML = `<summary>Archive settings</summary><div class="eye-controls-body"><p class="eye-controls-help">Changes preview live and save in this browser's edit mode. Move your mouse over the archive to draw. Wiggle size controls how far the stroke moves; frame rate controls how often it changes. Text lift adds a little depth above the canvas. Zero trail lifetime keeps strokes until cleared; the point limit removes the oldest marks. Copy the values to share your choices.</p><div class="eye-controls-actions archive-preview-actions"><button type="button" data-preview>Preview flip</button><button type="button" data-clear-drawing>Clear drawing</button><button type="button" data-settings-section="drawing" aria-controls="archive-settings-drawing">Drawing controls</button><button type="button" data-settings-section="text-depth-shadow" aria-controls="archive-settings-text-depth-shadow">Text depth &amp; shadow</button></div><div class="archive-settings-fields"></div><div class="eye-controls-actions"><button type="button" data-copy>Copy values</button><button type="button" data-reset>Reset defaults</button><span role="status"></span></div><textarea aria-label="Archive settings to copy" readonly spellcheck="false"></textarea></div>`;
   document.body.append(panel);
   const container = panel.querySelector('.archive-settings-fields');
   const output = panel.querySelector('textarea');
@@ -131,6 +141,7 @@
     if (section !== groupName) {
       groupName = section;
       group = document.createElement('fieldset');
+      group.id = `archive-settings-${section.toLowerCase().replace(/[^a-z]+/g, '-')}`;
       const legend = document.createElement('legend');
       legend.textContent = section;
       group.append(legend);
@@ -186,6 +197,13 @@
     input.id = label.htmlFor;
     row.insertBefore(input, row.children[1] || null);
     group.append(row);
+  });
+  panel.querySelectorAll('[data-settings-section]').forEach(button => {
+    button.addEventListener('click', () => {
+      const section = panel.querySelector(`#archive-settings-${button.dataset.settingsSection}`);
+      section.scrollIntoView({ block: 'start' });
+      section.querySelector('input').focus({ preventScroll: true });
+    });
   });
   panel.querySelector('[data-preview]').addEventListener('click', () => {
     if (document.querySelector('.sim-wrapper').dataset.phase !== 'complete') window.jeffWorkshop.openHome();

@@ -350,24 +350,33 @@
 .sim-wrapper[data-phase="complete"] .archive-face { visibility: visible; }
 .archive-face {
   transform: var(--archive-back, rotateX(180deg)) translateZ(.1px);
+  transform-style: preserve-3d;
   background: var(--archive-background, #cf0a02);
   color: var(--archive-text, #f5f5f5);
-  padding: var(--archive-padding, 24px);
   font-size: var(--archive-font-size, 15px);
   line-height: var(--archive-line-height, 1.4);
   text-align: var(--archive-align, left);
+  pointer-events: auto;
+}
+/* The face stays unflattened; only the lifted text layer scrolls on small cards. */
+.archive-content {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: var(--archive-padding, 24px);
+  transform: translateZ(var(--archive-text-depth, 3px));
+  backface-visibility: hidden;
+  text-shadow: var(--archive-text-shadow, 0 1px 1.5px rgba(0,0,0,.22));
   overflow-y: auto;
   overscroll-behavior: contain;
   scrollbar-width: thin;
   scrollbar-color: rgba(245,245,245,.5) transparent;
-  pointer-events: auto;
   touch-action: pan-y;
 }
 .archive-face[inert] { pointer-events: none; }
-.archive-drawing { position: absolute; inset: 0; pointer-events: none; overflow: hidden; border-radius: inherit; }
+.archive-drawing { position: absolute; inset: 0; pointer-events: none; overflow: hidden; border-radius: inherit; backface-visibility: hidden; }
 .archive-drawing canvas { display: block; width: 100%; height: 100%; }
 .archive-drawing__corner { position: absolute; width: 0; height: 0; }
-.archive-face > :not(.archive-drawing) { position: relative; z-index: 1; }
 .archive-face, .archive-face * { user-select: text; -webkit-user-select: text; }
 .archive-face::selection, .archive-face *::selection { background: #000; color: #fff; text-shadow: none; }
 .archive-face::-moz-selection, .archive-face *::-moz-selection { background: #000; color: #fff; text-shadow: none; }
@@ -378,11 +387,11 @@
 .archive-face a:hover { border-color: currentColor; }
 .archive-contact { display: var(--archive-contact-display, block); margin: var(--archive-contact-gap, 21.6px) 0 0; overflow-wrap: anywhere; }
 @media (max-width: 760px) {
-  .archive-face { padding: min(var(--archive-padding, 44px), 16px); }
+  .archive-content { padding: min(var(--archive-padding, 44px), 16px); }
 }
 .archive-face a:focus-visible { outline: 1px solid currentColor; outline-offset: 4px; }
 .archive-controls { left: auto; right: 24px; z-index: 30; max-height: calc(100dvh - 48px); }
-.archive-controls fieldset { border: 0; padding: 0; margin: 0 0 18px; min-width: 0; }
+.archive-controls fieldset { border: 0; padding: 0; margin: 0 0 18px; min-width: 0; scroll-margin-top: 12px; }
 .archive-controls legend { padding: 0 0 12px; color: #f5f5f5; font-weight: 600; }
 .archive-preview-actions { margin-bottom: 18px; }
 .archive-controls select { grid-column: 1 / -1; width: 100%; padding: 5px; background: #000; color: #f5f5f5; font: inherit; border: 1px solid rgba(245,245,245,.3); }

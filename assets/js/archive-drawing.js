@@ -153,7 +153,7 @@
   });
   archive.addEventListener('pointerleave', () => { lastPoint = null; });
   archive.addEventListener('pointercancel', () => { lastPoint = null; });
-  archive.addEventListener('scroll', () => { lastPoint = null; }, { passive: true });
+  archive.querySelector('.archive-content').addEventListener('scroll', () => { lastPoint = null; }, { passive: true });
   window.addEventListener('blur', stop);
   window.addEventListener('focus', sync);
   document.addEventListener('visibilitychange', sync);

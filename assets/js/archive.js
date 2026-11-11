@@ -5,6 +5,7 @@
   const card = plane.querySelector('.showreel-card');
   const front = card.querySelector('.showreel-front');
   const archive = card.querySelector('.archive-face');
+  const content = archive.querySelector('.archive-content');
   const heading = archive.querySelector('h1');
   const settings = window.archiveSettings.settings;
   const about = document.querySelector('#workshop-about');
@@ -48,7 +49,7 @@
     front.inert = archive.inert = true;
     front.setAttribute('aria-hidden', 'true');
     archive.setAttribute('aria-hidden', 'true');
-    if (next) archive.scrollTop = 0;
+    if (next) content.scrollTop = 0;
     target.setAttribute('aria-label', next ? 'Xavier Cox project archive' : 'Xavier Cox showreel');
     if (immediate) document.body.classList.add('is-archive-instant');
     document.body.classList.add('is-archive-flipping');
@@ -78,7 +79,7 @@
     if (!available() || event.ctrlKey || ignoreInput(event.target) || Math.abs(event.deltaX) > Math.abs(event.deltaY)) return;
     // A short reverse face scrolls normally on compact screens. Only an upward
     // gesture at its top turns it back over.
-    if (open && !turning && archive.contains(event.target) && (event.deltaY > 0 || archive.scrollTop > 1)) return;
+    if (open && !turning && archive.contains(event.target) && (event.deltaY > 0 || content.scrollTop > 1)) return;
     event.preventDefault();
     const now = performance.now();
     const delta = event.deltaY * (event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? innerHeight : 1);
@@ -94,7 +95,7 @@
 
   window.addEventListener('touchstart', event => {
     touchStart = available() && !ignoreInput(event.target) && event.touches.length === 1
-      ? { x: event.touches[0].clientX, y: event.touches[0].clientY, scrollTop: archive.scrollTop }
+      ? { x: event.touches[0].clientX, y: event.touches[0].clientY, scrollTop: content.scrollTop }
       : null;
   }, { passive: true });
   window.addEventListener('touchmove', event => {
@@ -119,7 +120,7 @@
     if (event.key === ' ' && event.target.closest('button, a, video')) return;
     const down = ['ArrowDown', 'PageDown'].includes(event.key) || (event.key === ' ' && !event.shiftKey);
     const up = ['ArrowUp', 'PageUp', 'Escape'].includes(event.key) || (event.key === ' ' && event.shiftKey);
-    if ((!open && down) || (open && up && (event.key === 'Escape' || archive.scrollTop <= 1))) {
+    if ((!open && down) || (open && up && (event.key === 'Escape' || content.scrollTop <= 1))) {
       event.preventDefault();
       turn(!open, true);
     }
