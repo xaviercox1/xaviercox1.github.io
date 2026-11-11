@@ -32,7 +32,7 @@
     lightOffsetYPx: 0,
     lightShowIndicator: false,
     drawingEnabled: true,
-    drawingColor: '#000000',
+    drawingColor: '#ffffff',
     drawingWidthPx: 2,
     drawingOpacityPercent: 100,
     drawingFps: 8,
@@ -46,14 +46,26 @@
     drawingMaxPoints: 4000,
     drawingOverspillPx: 500,
     drawingShadowEnabled: true,
-    drawingShadowDepthPx: 8,
-    drawingShadowOpacityPercent: 26,
-    drawingShadowBlurPx: .75,
+    drawingShadowDepthPx: 33,
+    drawingShadowOpacityPercent: 27,
+    drawingShadowBlurPx: 1.75,
+    drawingShapesEnabled: false,
+    drawingShapeClosePx: 24,
+    drawingShapeMinSizePx: 24,
+    drawingShapeOpacityPercent: 100,
+    drawingShapeLifetimeSeconds: 12,
+    drawingMaxShapes: 20,
+    drawingHeaderFadeEnabled: true,
+    drawingHeaderSolidPx: 40,
+    drawingHeaderFadePx: 120,
+    drawingFooterFadeEnabled: true,
+    drawingFooterSolidPx: 40,
+    drawingFooterFadePx: 120,
   };
   const settings = { ...defaults };
   window.archiveSettings = { settings, defaults };
   const editing = new URLSearchParams(location.search).get('edit') === '1';
-  const storageKey = 'xavier-archive-settings-v8';
+  const storageKey = 'xavier-archive-settings-v9';
   const fields = [
     ['Flip', 'flipDurationMs', 'Flip duration', 'ms', 100, 4000, 50],
     ['Flip', 'flipEasing', 'Flip easing', { 'cubic-bezier(.65, 0, .25, 1)': 'Smooth', 'cubic-bezier(.2, .8, .2, 1)': 'Quick start', 'ease-in-out': 'Gentle', 'linear': 'Linear' }],
@@ -103,6 +115,18 @@
     ['Stroke shadow', 'drawingShadowDepthPx', 'Stroke lift from canvas', 'px', 0, 40, .5],
     ['Stroke shadow', 'drawingShadowOpacityPercent', 'Stroke shadow opacity', '%', 0, 100, 1],
     ['Stroke shadow', 'drawingShadowBlurPx', 'Stroke shadow softness', 'px', 0, 12, .25],
+    ['Closed shapes', 'drawingShapesEnabled', 'Fill closed loops', 'checkbox'],
+    ['Closed shapes', 'drawingShapeClosePx', 'Loop closing distance', 'px', 2, 80, 1],
+    ['Closed shapes', 'drawingShapeMinSizePx', 'Minimum loop size', 'px', 4, 120, 1],
+    ['Closed shapes', 'drawingShapeOpacityPercent', 'Shape fill opacity', '%', 0, 100, 1],
+    ['Closed shapes', 'drawingShapeLifetimeSeconds', 'Shape lifetime (0 keeps shapes)', 'seconds', 0, 60, 1],
+    ['Closed shapes', 'drawingMaxShapes', 'Maximum shapes', 'shapes', 1, 100, 1],
+    ['Page edge fades', 'drawingHeaderFadeEnabled', 'Protect Journal / Gallery / About', 'checkbox'],
+    ['Page edge fades', 'drawingHeaderSolidPx', 'Solid black area at page top', 'px', 0, 160, 1],
+    ['Page edge fades', 'drawingHeaderFadePx', 'Page top fade distance', 'px', 0, 320, 1],
+    ['Page edge fades', 'drawingFooterFadeEnabled', 'Fade ink at page bottom', 'checkbox'],
+    ['Page edge fades', 'drawingFooterSolidPx', 'Solid black area at page bottom', 'px', 0, 160, 1],
+    ['Page edge fades', 'drawingFooterFadePx', 'Page bottom fade distance', 'px', 0, 320, 1],
   ];
 
   if (editing) {
@@ -137,6 +161,12 @@
       '--archive-contact-display': settings.showContact ? 'block' : 'none',
       '--archive-text-depth': `${settings.textDepthPx}px`,
       '--archive-drawing-padding': `${Math.max(128, Math.max(0, settings.drawingOverspillPx) + Math.abs(settings.drawingWigglePx) + Math.abs(settings.drawingWidthPx) / 2 + 16)}px`,
+      '--archive-header-solid': `${Math.max(0, settings.drawingHeaderSolidPx)}px`,
+      '--archive-header-fade': `${Math.max(0, settings.drawingHeaderFadePx)}px`,
+      '--archive-header-display': settings.drawingHeaderFadeEnabled ? 'block' : 'none',
+      '--archive-footer-solid': `${Math.max(0, settings.drawingFooterSolidPx)}px`,
+      '--archive-footer-fade': `${Math.max(0, settings.drawingFooterFadePx)}px`,
+      '--archive-footer-display': settings.drawingFooterFadeEnabled ? 'block' : 'none',
       '--archive-stroke-depth': `${settings.drawingShadowEnabled ? settings.drawingShadowDepthPx : 0}px`,
     };
     Object.entries(properties).forEach(([key, value]) => style.setProperty(key, value));
@@ -151,7 +181,7 @@
   const panel = document.createElement('details');
   panel.className = 'eye-controls archive-controls';
   panel.open = true;
-  panel.innerHTML = `<summary>Archive settings</summary><div class="eye-controls-body"><p class="eye-controls-help">Changes preview live and save in this browser's edit mode. Sliders are guides; value boxes accept numbers beyond their ranges. Move your mouse over the archive to draw. Wiggle amount controls how far the stroke moves. Lower wiggle frequency makes slower, drawn-out shakes; longer bend length makes broader curves along the line. Complexity adds fine, irregular detail; zero keeps broad, simple bends. Drawing frame rate controls the stepped animation look. Text lift adds depth above the canvas. The light follows your mouse. Lighting controls adjust follow amount, smoothing, cursor offsets and depth. Zero smoothing follows immediately; zero offsets place the light at the cursor. Zero trail lifetime keeps strokes until cleared; the point limit removes the oldest marks. Copy the values to share your choices.</p><div class="eye-controls-actions archive-preview-actions"><button type="button" data-preview>Preview flip</button><button type="button" data-clear-drawing>Clear drawing</button><button type="button" data-settings-section="drawing" aria-controls="archive-settings-drawing">Drawing controls</button><button type="button" data-settings-section="text-depth-shadow" aria-controls="archive-settings-text-depth-shadow">Text depth &amp; shadow</button><button type="button" data-settings-section="lighting" aria-controls="archive-settings-lighting">Lighting controls</button><button type="button" data-settings-section="stroke-shadow" aria-controls="archive-settings-stroke-shadow">Stroke shadow</button></div><div class="archive-settings-fields"></div><div class="eye-controls-actions"><button type="button" data-copy>Copy values</button><button type="button" data-reset>Reset defaults</button><span role="status"></span></div><textarea aria-label="Archive settings to copy" readonly spellcheck="false"></textarea></div>`;
+  panel.innerHTML = `<summary>Archive settings</summary><div class="eye-controls-body"><p class="eye-controls-help">Changes preview live and save in this browser's edit mode. Sliders are guides; value boxes accept numbers beyond their ranges. Move your mouse over the archive to draw. Wiggle amount controls how far the stroke moves. Lower wiggle frequency makes slower, drawn-out shakes; longer bend length makes broader curves along the line. Complexity adds fine, irregular detail; zero keeps broad, simple bends. Drawing frame rate controls the stepped animation look. Text lift adds depth above the canvas. The light follows your mouse. Lighting controls adjust follow amount, smoothing, cursor offsets and depth. Zero smoothing follows immediately; zero offsets place the light at the cursor. Zero trail lifetime keeps strokes until cleared; the point limit removes the oldest marks. Copy the values to share your choices.</p><div class="eye-controls-actions archive-preview-actions"><button type="button" data-preview>Preview flip</button><button type="button" data-clear-drawing>Clear drawing</button><button type="button" data-settings-section="drawing" aria-controls="archive-settings-drawing">Drawing controls</button><button type="button" data-settings-section="text-depth-shadow" aria-controls="archive-settings-text-depth-shadow">Text depth &amp; shadow</button><button type="button" data-settings-section="lighting" aria-controls="archive-settings-lighting">Lighting controls</button><button type="button" data-settings-section="stroke-shadow" aria-controls="archive-settings-stroke-shadow">Stroke shadow</button><button type="button" data-settings-section="closed-shapes" aria-controls="archive-settings-closed-shapes">Closed shapes</button><button type="button" data-settings-section="page-edge-fades" aria-controls="archive-settings-page-edge-fades">Page edge fades</button></div><div class="archive-settings-fields"></div><div class="eye-controls-actions"><button type="button" data-copy>Copy values</button><button type="button" data-reset>Reset defaults</button><span role="status"></span></div><textarea aria-label="Archive settings to copy" readonly spellcheck="false"></textarea></div>`;
   document.body.append(panel);
   const container = panel.querySelector('.archive-settings-fields');
   const output = panel.querySelector('textarea');
@@ -175,6 +205,14 @@
       const legend = document.createElement('legend');
       legend.textContent = section;
       group.append(legend);
+      if (section === 'Closed shapes') {
+        const count = document.createElement('p');
+        count.className = 'eye-controls-help';
+        count.dataset.shapeCount = '';
+        count.setAttribute('role', 'status');
+        count.textContent = '0 closed shapes';
+        group.append(count);
+      }
       container.append(group);
     }
     const row = document.createElement('div');

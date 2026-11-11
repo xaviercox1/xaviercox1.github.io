@@ -145,5 +145,15 @@
   if (location.hash === '#archive') {
     window.jeffWorkshop.openHome();
     turn(true, false, true);
+    let returning = false;
+    try {
+      returning = sessionStorage.getItem('xavier-workshop-return-archive') === '1';
+      sessionStorage.removeItem('xavier-workshop-return-archive');
+    } catch { /* The archive still opens without browser storage. */ }
+    if (returning && !reducedMotion.matches) {
+      const scene = target.closest('.home-scene');
+      scene.classList.add('is-return-revealing');
+      scene.addEventListener('animationend', () => scene.classList.remove('is-return-revealing'), { once: true });
+    }
   }
 })();

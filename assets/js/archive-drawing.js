@@ -41,6 +41,10 @@
   let cardHeight = 0;
   let padding = 0;
   let points = [];
+  let shapes = [];
+  let currentStroke = [];
+  let shapeCount = 0;
+  const shapeStatus = document.querySelector('[data-shape-count]');
   let lastPoint = null;
   let timer = 0;
   let phase = 0;
@@ -58,6 +62,23 @@
     timer = 0;
     lastFrameAt = null;
     lastPoint = null;
+    currentStroke = [];
+  }
+
+  function endStroke() {
+    lastPoint = null;
+    currentStroke = [];
+  }
+
+  function clearDrawing() {
+    points = [];
+    shapes = [];
+    stop();
+    render();
+  }
+
+  function hasInk() {
+    return points.length || (settings.drawingShapesEnabled && shapes.length);
   }
 
   // Invert the quadrilateral's projective map, including perspective distortion.
@@ -87,6 +108,56 @@
     if (lifetime) points = points.filter(point => now - point.time < lifetime);
     const excess = points.length - Math.round(settings.drawingMaxPoints);
     if (excess > 0) points.splice(0, excess);
+    const retained = new Set(points);
+    currentStroke = currentStroke.filter(point => retained.has(point));
+    const shapeLifetime = settings.drawingShapeLifetimeSeconds * 1000;
+    if (shapeLifetime > 0) shapes = shapes.filter(shape => now - shape.created < shapeLifetime);
+    const excessShapes = shapes.length - Math.max(0, Math.round(settings.drawingMaxShapes));
+    if (excessShapes > 0) shapes.splice(0, excessShapes);
+    if (shapeStatus && shapeCount !== shapes.length) {
+      shapeCount = shapes.length;
+      shapeStatus.textContent = `${shapeCount} closed ${shapeCount === 1 ? 'shape' : 'shapes'}`;
+    }
+  }
+
+  function addPoint(point) {
+    points.push(point);
+    if (point.start) currentStroke = [];
+    currentStroke.push(point);
+    if (!settings.drawingShapesEnabled || currentStroke.length < 6) return;
+    const close = Math.abs(settings.drawingShapeClosePx);
+    const minimum = Math.abs(settings.drawingShapeMinSizePx);
+    let candidate = -1, nearest = Infinity;
+    for (let i = 0; i < currentStroke.length - 4; i++) {
+      const previous = currentStroke[i];
+      if (point.distance - previous.distance < Math.max(minimum * 3, close * 4)) continue;
+      const dx = (point.x - previous.x) * cardWidth;
+      const dy = (point.y - previous.y) * cardHeight;
+      const distance = dx * dx + dy * dy;
+      if (distance <= close * close && distance < nearest) { candidate = i; nearest = distance; }
+    }
+    if (candidate < 0) return;
+    const loop = currentStroke.slice(candidate);
+    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity, area = 0;
+    loop.forEach((vertex, index) => {
+      minX = Math.min(minX, vertex.x); maxX = Math.max(maxX, vertex.x);
+      minY = Math.min(minY, vertex.y); maxY = Math.max(maxY, vertex.y);
+      const next = loop[(index + 1) % loop.length];
+      area += vertex.x * next.y - next.x * vertex.y;
+    });
+    // Ignore short backtracks and tiny accidental crossings.
+    if ((maxX - minX) * cardWidth < minimum || (maxY - minY) * cardHeight < minimum ||
+        Math.abs(area) * cardWidth * cardHeight / 2 < minimum * minimum / 4) return;
+    shapes.push({
+      created: point.time,
+      points: loop.map(({ x, y, distance, seed }) => ({ x, y, distance, seed })),
+    });
+    // Keep any tail before the loop, then start a fresh trace at its closing point.
+    const consumed = new Set(loop.slice(1));
+    points = points.filter(vertex => !consumed.has(vertex));
+    const anchor = { ...point, start: true };
+    points.push(anchor);
+    currentStroke = [anchor];
   }
 
   function random(x, y, seed) {
@@ -117,7 +188,7 @@
   }
 
   function updateStrokeShadow() {
-    if (!shadowContext || !settings.drawingShadowEnabled || !points.length || !active() || !settings.lightEnabled || !light) {
+    if (!shadowContext || !settings.drawingShadowEnabled || !hasInk() || !active() || !settings.lightEnabled || !light) {
       strokeShadow.hidden = true;
       return;
     }
@@ -133,7 +204,7 @@
   }
 
   function copyStrokeShadow() {
-    if (!shadowContext || !settings.drawingShadowEnabled || !points.length || !active()) {
+    if (!shadowContext || !settings.drawingShadowEnabled || !hasInk() || !active()) {
       strokeShadow.hidden = true;
       if (shadowCanvas.width !== 1) shadowCanvas.width = shadowCanvas.height = 1;
       return;
@@ -155,16 +226,37 @@
   function render() {
     trim(performance.now());
     context.clearRect(0, 0, width, height);
-    if (!settings.drawingEnabled || !points.length) { copyStrokeShadow(); return; }
+    if (!settings.drawingEnabled || !hasInk()) { copyStrokeShadow(); return; }
     const passes = Math.round(settings.drawingPasses);
     context.strokeStyle = settings.drawingColor;
     context.lineWidth = settings.drawingWidthPx;
     context.lineCap = context.lineJoin = 'round';
     // Keep overlapping sketch passes from becoming fully opaque.
     const opacity = Math.min(1, Math.max(0, settings.drawingOpacityPercent / 100));
-    context.globalAlpha = 1 - (1 - opacity) ** (1 / passes);
+    const strokeAlpha = 1 - (1 - opacity) ** (1 / passes);
+    const fillOpacity = opacity * Math.min(1, Math.max(0, settings.drawingShapeOpacityPercent / 100));
+    const fillAlpha = 1 - (1 - fillOpacity) ** (1 / passes);
+    context.fillStyle = settings.drawingColor;
     for (let pass = 0; pass < passes; pass++) {
+      if (settings.drawingShapesEnabled) {
+        for (const shape of shapes) {
+          context.beginPath();
+          shape.points.forEach((point, index) => {
+            const seed = point.seed + pass * 31.37;
+            const distance = point.distance / (settings.drawingBendLengthPx || 1);
+            const x = padding + point.x * cardWidth + wiggle(distance, phase, seed) * settings.drawingWigglePx;
+            const y = padding + point.y * cardHeight + wiggle(distance, phase, seed + 17.53) * settings.drawingWigglePx;
+            if (!index) context.moveTo(x, y); else context.lineTo(x, y);
+          });
+          context.closePath();
+          context.globalAlpha = fillAlpha;
+          context.fill();
+          context.globalAlpha = strokeAlpha;
+          context.stroke();
+        }
+      }
       context.beginPath();
+      context.globalAlpha = strokeAlpha;
       for (const point of points) {
         const seed = point.seed + pass * 31.37;
         // Neighbours share a smooth random field, measured along the stroke.
@@ -208,11 +300,14 @@
     }
     lastFrameAt = now;
     render();
-    if (points.length && ((!reducedMotion.matches && settings.drawingWiggleHz !== 0 && settings.drawingWigglePx !== 0) || settings.drawingLifetimeSeconds > 0)) schedule();
+    const animating = !reducedMotion.matches && settings.drawingFps > 0 && settings.drawingWiggleHz !== 0 && settings.drawingWigglePx !== 0;
+    const expiring = (points.length && settings.drawingLifetimeSeconds > 0) || (shapes.length && settings.drawingShapeLifetimeSeconds > 0);
+    if ((hasInk() && animating) || expiring) schedule();
   }
 
   function schedule() {
-    if (settings.drawingFps <= 0 && settings.drawingLifetimeSeconds <= 0) {
+    const expiring = (points.length && settings.drawingLifetimeSeconds > 0) || (shapes.length && settings.drawingShapeLifetimeSeconds > 0);
+    if (settings.drawingFps <= 0 && !expiring) {
       if (active()) render();
       return;
     }
@@ -244,28 +339,29 @@
   window.addEventListener('pointermove', event => {
     // Touch keeps native scrolling and the swipe-to-flip gesture.
     if (!active() || event.pointerType === 'touch' || (event.pointerType === 'pen' && !event.buttons)) {
-      lastPoint = null;
+      endStroke();
       return;
     }
     if (event.target instanceof Element && !archive.contains(event.target) &&
         event.target.closest('a, button, input, textarea, select, .archive-controls')) {
-      lastPoint = null;
+      endStroke();
       return;
     }
     const point = localPoint(event.clientX, event.clientY);
-    if (!point || !width || !height) { lastPoint = null; return; }
+    if (!point || !width || !height) { endStroke(); return; }
     const inside = point.x >= 0 && point.x <= 1 && point.y >= 0 && point.y <= 1;
     if (!inside && !lastPoint) return;
     point.x = (point.x * width - padding) / cardWidth;
     point.y = (point.y * height - padding) / cardHeight;
     const now = performance.now();
+    trim(now);
     const spacing = Math.abs(settings.drawingSpacingPx) || 1;
     const distance = lastPoint ? Math.hypot((point.x - lastPoint.x) * cardWidth, (point.y - lastPoint.y) * cardHeight) : 0;
     if (inside && lastPoint && distance < spacing) return;
     const steps = lastPoint ? Math.min(100, Math.ceil(distance / spacing)) : 1;
     const origin = lastPoint || { ...point, distance: 0, seed: Math.random() * 10000 };
     for (let step = 1; step <= steps; step++) {
-      points.push({
+      addPoint({
         x: origin.x + (point.x - origin.x) * step / steps,
         y: origin.y + (point.y - origin.y) * step / steps,
         seed: origin.seed,
@@ -275,21 +371,28 @@
       });
     }
     // Finish an exiting segment beyond the fade, even when a fast move skips it.
-    lastPoint = inside ? { ...point, distance: origin.distance + distance, seed: origin.seed } : null;
+    if (inside) lastPoint = { ...point, distance: origin.distance + distance, seed: origin.seed };
+    else endStroke();
     trim(now);
     schedule();
   });
-  window.addEventListener('pointerout', event => { if (!event.relatedTarget) lastPoint = null; });
-  window.addEventListener('pointercancel', () => { lastPoint = null; });
-  archive.querySelector('.archive-content').addEventListener('scroll', () => { lastPoint = null; }, { passive: true });
+  window.addEventListener('pointerout', event => { if (!event.relatedTarget) endStroke(); });
+  window.addEventListener('pointercancel', endStroke);
+  archive.querySelector('.archive-content').addEventListener('scroll', endStroke, { passive: true });
   window.addEventListener('blur', stop);
   window.addEventListener('focus', sync);
   document.addEventListener('visibilitychange', sync);
-  window.addEventListener('archivechange', sync);
-  window.addEventListener('jeffphasechange', sync);
+  window.addEventListener('archivechange', event => {
+    if (!event.detail?.open) clearDrawing();
+    else sync();
+  });
+  window.addEventListener('jeffphasechange', () => {
+    if (!document.body.classList.contains('is-archive-open')) clearDrawing();
+    else sync();
+  });
   window.addEventListener('archivedrawingchange', () => { render(); sync(); });
   window.addEventListener('archivelightframe', event => { light = event.detail; updateStrokeShadow(); });
-  window.addEventListener('archiveclear', () => { points = []; stop(); render(); });
+  window.addEventListener('archiveclear', clearDrawing);
   reducedMotion.addEventListener('change', sync);
   // Start only after the turn settles; also suspend while About is visible.
   new MutationObserver(sync).observe(document.body, { attributes: true, attributeFilter: ['class'] });

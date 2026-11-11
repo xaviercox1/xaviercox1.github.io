@@ -1,0 +1,11 @@
+/* Match the newer pages' 900 ms blur/fade without changing project layouts. */
+.project-archive-page.is-project-leaving > :not(.cursor-dot):not(.cursor-blur):not(script):not(style) {
+  animation: archive-project-exit 900ms ease forwards;
+  pointer-events: none;
+}
+@keyframes archive-project-exit {
+  to { opacity: 0; filter: blur(14px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .project-archive-page.is-project-leaving > :not(.cursor-dot):not(.cursor-blur):not(script):not(style) { animation: none; }
+}

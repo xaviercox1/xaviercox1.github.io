@@ -388,6 +388,28 @@
 .archive-light-indicator { position: fixed; z-index: 31; display: grid; place-items: center; width: 26px; height: 26px; padding: 0; border: 1px solid #f5edc9; border-radius: 50%; background: rgba(0,0,0,.65); color: #f5edc9; transform: translate(-50%,-50%); pointer-events: none; font-size: 20px; line-height: 1; }
 .archive-light-indicator::after { content: 'LIGHT'; position: absolute; top: calc(100% + 5px); font-size: 9px; letter-spacing: .08em; }
 .archive-light-indicator[hidden] { display: none; }
+.archive-header-shade {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 9; /* Above the drawing scene, below the fixed navigation. */
+  display: var(--archive-header-display, block);
+  height: calc(var(--archive-header-solid, 40px) + var(--archive-header-fade, 120px));
+  background: linear-gradient(to bottom, #000 0, #000 var(--archive-header-solid, 40px), transparent 100%);
+  opacity: 0;
+  pointer-events: none;
+}
+.is-archive-open:not(.is-about-open) .archive-header-shade { opacity: 1; }
+.archive-footer-shade {
+  position: fixed;
+  inset: auto 0 0;
+  z-index: 9;
+  display: var(--archive-footer-display, block);
+  height: calc(var(--archive-footer-solid, 40px) + var(--archive-footer-fade, 120px));
+  background: linear-gradient(to top, #000 0, #000 var(--archive-footer-solid, 40px), transparent 100%);
+  opacity: 0;
+  pointer-events: none;
+}
+.is-archive-open:not(.is-about-open) .archive-footer-shade { opacity: 1; }
 .archive-face, .archive-face * { user-select: text; -webkit-user-select: text; }
 .archive-face::selection, .archive-face *::selection { background: #000; color: #fff; text-shadow: none; }
 .archive-face::-moz-selection, .archive-face *::-moz-selection { background: #000; color: #fff; text-shadow: none; }

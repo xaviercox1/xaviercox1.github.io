@@ -37,6 +37,30 @@ window.portfolioWorks = [
     "featured": true
   },
   {
+    "title": "Intrinsik · Live 1",
+    "src": "landscape-promo.mp4",
+    "thumb": "Content/GalleryRedesign/13-intrinsik-live-1.jpg",
+    "year": "2026",
+    "medium": "Live VJ · TouchDesigner · MIDI",
+    "description": "",
+    "youtube": null,
+    "width": 1920,
+    "height": 1080,
+    "featured": true
+  },
+  {
+    "title": "Intrinsik · Live 2",
+    "src": "landscape-promo2.mp4",
+    "thumb": "Content/GalleryRedesign/14-intrinsik-live-2.jpg",
+    "year": "2026",
+    "medium": "Live VJ · TouchDesigner · MIDI",
+    "description": "",
+    "youtube": null,
+    "width": 1920,
+    "height": 1080,
+    "featured": true
+  },
+  {
     "title": "Intrinsik",
     "src": "Content/Intrinsik Industrique/Videos/Industrique3.mp4?v=20261031-h264",
     "thumb": "Content/GalleryRedesign/02-intrinsik.jpg",
@@ -123,28 +147,6 @@ window.portfolioWorks = [
     "height": 3840
   },
   {
-    "title": "Intrinsik · Live 1",
-    "src": "landscape-promo.mp4",
-    "thumb": "Content/GalleryRedesign/13-intrinsik-live-1.jpg",
-    "year": "2026",
-    "medium": "Live VJ · TouchDesigner · MIDI",
-    "description": "",
-    "youtube": null,
-    "width": 1920,
-    "height": 1080
-  },
-  {
-    "title": "Intrinsik · Live 2",
-    "src": "landscape-promo2.mp4",
-    "thumb": "Content/GalleryRedesign/14-intrinsik-live-2.jpg",
-    "year": "2026",
-    "medium": "Live VJ · TouchDesigner · MIDI",
-    "description": "",
-    "youtube": null,
-    "width": 1920,
-    "height": 1080
-  },
-  {
     "title": "Audio Reactive Piece",
     "src": "Content/New Portfolio/Audio Reactive/combination.mp4",
     "thumb": "Content/GalleryRedesign/15-audio-reactive-piece.jpg",
@@ -154,17 +156,6 @@ window.portfolioWorks = [
     "youtube": null,
     "width": 1920,
     "height": 1920
-  },
-  {
-    "title": "Back Inside",
-    "src": "Content/Back Inside.mp4",
-    "thumb": "Content/GalleryRedesign/16-back-inside.jpg",
-    "year": "2026",
-    "medium": "Moving image",
-    "description": "",
-    "youtube": null,
-    "width": 1280,
-    "height": 720
   },
   {
     "title": "Magma",
