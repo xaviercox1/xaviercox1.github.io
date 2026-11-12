@@ -12,12 +12,15 @@
   shadow.inert = true;
   const lettering = document.createElement('div');
   lettering.className = 'archive-shadow-content';
-  for (const child of content.children) lettering.append(child.cloneNode(true));
-  lettering.querySelectorAll('[id], [tabindex], a').forEach(element => {
-    element.removeAttribute('id');
-    element.removeAttribute('tabindex');
-    element.removeAttribute('href');
-  });
+  function copyLettering() {
+    lettering.replaceChildren(...[...content.childNodes].map(child => child.cloneNode(true)));
+    lettering.querySelectorAll('[id], [tabindex], a').forEach(element => {
+      element.removeAttribute('id');
+      element.removeAttribute('tabindex');
+      element.removeAttribute('href');
+    });
+  }
+  copyLettering();
   shadow.append(lettering);
   archive.append(shadow);
 
@@ -33,6 +36,34 @@
       document.body.classList.contains('is-archive-open') &&
       !document.body.classList.contains('is-archive-flipping') &&
       !document.body.classList.contains('is-about-open');
+  }
+
+  function updateSelectionShadow() {
+    // Mirror selected text in local layout space, so the solid highlight follows
+    // the same light projection as the glyphs without measuring rotated rectangles.
+    copyLettering();
+    const selection = window.getSelection();
+    if (!selection?.rangeCount || selection.isCollapsed) return;
+    const range = selection.getRangeAt(0);
+    if (!content.contains(range.startContainer) || !content.contains(range.endContainer)) return;
+    const source = document.createTreeWalker(content, NodeFilter.SHOW_TEXT);
+    const copy = document.createTreeWalker(lettering, NodeFilter.SHOW_TEXT);
+    const pairs = [];
+    let node, clone;
+    while ((node = source.nextNode()) && (clone = copy.nextNode())) pairs.push([node, clone]);
+    for (const [original, mirrored] of pairs) {
+      if (!original.textContent.trim() || !range.intersectsNode(original)) continue;
+      const start = original === range.startContainer ? range.startOffset : 0;
+      const end = original === range.endContainer ? range.endOffset : original.length;
+      if (start >= end) continue;
+      const part = document.createRange();
+      part.setStart(mirrored, start);
+      part.setEnd(mirrored, end);
+      const solid = document.createElement('span');
+      solid.className = 'archive-selection-occluder';
+      part.surroundContents(solid);
+    }
+    if (reducedMotion.matches && active()) update();
   }
 
   function offset(element) {
@@ -167,6 +198,7 @@
   window.addEventListener('jeffphasechange', sync);
   window.addEventListener('resize', sync);
   document.addEventListener('visibilitychange', sync);
+  document.addEventListener('selectionchange', updateSelectionShadow);
   content.addEventListener('scroll', update, { passive: true });
   reducedMotion.addEventListener('change', sync);
   new ResizeObserver(sync).observe(archive);

@@ -540,7 +540,14 @@
     const archiveSettings = window.archiveSettings?.settings;
     const widthPercent = archiveSettings?.cardWidthPercent ?? options.placeholderWidthPercent;
     const heightPercent = archiveSettings?.cardMaxHeightPercent ?? 80;
-    const width = Math.min(1920, innerWidth * widthPercent / 100, innerHeight * heightPercent / 100 * 16 / 9);
+    const narrowScale = Math.max(0.1, archiveSettings?.narrowVideoScale ?? 1.8);
+    const narrowWidthPercent = Math.min(96, widthPercent * narrowScale);
+    // Keep the preferred size at 760px as a floor, shrinking only to fit smaller
+    // viewports. One continuous calculation avoids a jump at that reference width.
+    const minimumWidth = 760 * narrowWidthPercent / 100;
+    // Hold the defined base size until the viewport's safe margins reach it.
+    const preferredWidth = Math.max(minimumWidth, 1920 * widthPercent / 100);
+    const width = Math.min(1920, preferredWidth, innerWidth * narrowWidthPercent / 100, innerHeight * heightPercent / 100 * 16 / 9);
     return { width, height: width * 9 / 16 };
   }
 

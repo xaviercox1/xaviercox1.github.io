@@ -10,7 +10,7 @@
   <link rel="preload" href="Content/Fonts/RobotoFlex-Variable.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="stylesheet" href="assets/css/base.css?v=20261031-publish" />
   <link rel="stylesheet" href="assets/css/home.css?v=20261111-edge-shapes" />
-  <link rel="stylesheet" href="assets/css/gallery.css?v=20261031-publish" />
+  <link rel="stylesheet" href="assets/css/gallery.css?v=20261112-profile-feed" />
 </head>
 <body class="gallery-redesign-page">
   <div class="cursor-blur" aria-hidden="true"></div>
@@ -44,7 +44,9 @@
     <span id="grid-copy-status" role="status" aria-live="polite"></span>
   </aside>
   <dialog class="grid-viewer" id="grid-viewer" aria-labelledby="grid-viewer-title">
-    <button class="grid-viewer__close" id="grid-viewer-close" type="button" aria-label="Close work">×</button>
+    <button class="grid-viewer__close" id="grid-viewer-close" type="button" aria-label="Close work"><span class="grid-viewer__dismiss" aria-hidden="true">×</span><svg class="grid-viewer__back" viewBox="0 0 24 24" aria-hidden="true"><path d="m14 5-7 7 7 7" /></svg></button>
+    <span class="grid-viewer__heading" aria-hidden="true">GALLERY</span>
+    <div class="grid-viewer__feed" id="grid-viewer-feed" aria-label="Gallery posts" hidden></div>
     <div class="grid-viewer__media" id="grid-viewer-media"></div>
     <h2 id="grid-viewer-title"></h2>
     <p id="grid-viewer-status" role="status"></p>
@@ -52,7 +54,7 @@
   <script defer src="assets/js/gallery-data.js?v=20261111-live-gallery"></script>
   <script defer src="assets/js/cursor.js?v=20261031-publish"></script>
   <script defer src="assets/js/typography.js?v=20261031-publish"></script>
-  <script defer src="assets/js/gallery.js?v=20261111-earth-tones"></script>
+  <script defer src="assets/js/gallery.js?v=20261112-profile-feed"></script>
   <script defer src="assets/js/page-jeff.js?v=20261031-publish"></script>
 </body>
 </html>

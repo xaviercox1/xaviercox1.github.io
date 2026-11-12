@@ -508,6 +508,8 @@
 (() => {
   const content = document.querySelector('.industrique-hero');
   if (!content) return;
+  const primary = content.querySelector('.industrique-primary');
+  const page = content.closest('.industrique-page');
   const desktopMotion = matchMedia('(min-width: 761px) and (hover: hover) and (pointer: fine)');
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
   const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
@@ -519,6 +521,17 @@
   let interacting = false;
   let rotationX = 0, rotationY = 0, rotationZ = 0;
 
+  function updatePivot() {
+    const y = primary.offsetTop + primary.offsetHeight / 2;
+    content.style.setProperty('--intrinsik-rotation-y', `${y}px`);
+    page.style.setProperty('--intrinsik-perspective-y', `${content.offsetTop + y}px`);
+  }
+  // Only the original composition defines the pivot and pointer response.
+  // More can grow the outer page without changing either reference.
+  new ResizeObserver(updatePivot).observe(primary);
+  window.addEventListener('resize', updatePivot);
+  updatePivot();
+
   function animate(now) {
     const dt = clamp((now - lastFrame) / 1000, 0, .05);
     lastFrame = now;
@@ -526,7 +539,7 @@
       frame = requestAnimationFrame(animate);
       return;
     }
-    const rect = content.getBoundingClientRect();
+    const rect = primary.getBoundingClientRect();
     const nx = pointerActive ? clamp((pointerX - rect.left - rect.width * .5) / (rect.width * .85), -1, 1) : 0;
     const ny = pointerActive ? clamp((pointerY - rect.top - rect.height * .347) / (rect.height * .85), -1, 1) : 0;
     const time = now * .001;

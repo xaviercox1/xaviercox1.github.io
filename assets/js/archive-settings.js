@@ -1,6 +1,9 @@
 // Tuning is opt-in: public visits always use the approved defaults.
 (() => {
   const defaults = {
+    promptScale: .45,
+    promptOffsetXPx: 33,
+    promptOffsetYPx: 14,
     flipDurationMs: 950,
     flipEasing: 'cubic-bezier(.65, 0, .25, 1)',
     flipAxis: 'X',
@@ -8,6 +11,7 @@
     scrollThresholdPx: 64,
     swipeThresholdPx: 48,
     cardWidthPercent: 49,
+    narrowVideoScale: 1.8, // Minimum size relative to the original card at 760px; shrinks to fit.
     cardMaxHeightPercent: 80,
     cornerRadiusPercent: 3.5,
     motionStrengthPercent: 30,
@@ -67,13 +71,17 @@
   const editing = new URLSearchParams(location.search).get('edit') === '1';
   const storageKey = 'xavier-archive-settings-v9';
   const fields = [
+    ['Jeff prompt', 'promptScale', 'Prompt size', '× original', .1, 2, .05],
+    ['Jeff prompt', 'promptOffsetXPx', 'Horizontal offset (positive = right)', 'px', -200, 200, 1],
+    ['Jeff prompt', 'promptOffsetYPx', 'Vertical offset (positive = up)', 'px', -200, 200, 1],
     ['Flip', 'flipDurationMs', 'Flip duration', 'ms', 100, 4000, 50],
     ['Flip', 'flipEasing', 'Flip easing', { 'cubic-bezier(.65, 0, .25, 1)': 'Smooth', 'cubic-bezier(.2, .8, .2, 1)': 'Quick start', 'ease-in-out': 'Gentle', 'linear': 'Linear' }],
     ['Flip', 'flipAxis', 'Flip axis', { X: 'Over the top', Y: 'Sideways' }],
     ['Flip', 'flipDirection', 'Flip direction', { 1: 'Forward', '-1': 'Reverse' }],
     ['Flip', 'scrollThresholdPx', 'Scroll threshold', 'px', 10, 240, 2],
     ['Flip', 'swipeThresholdPx', 'Swipe threshold', 'px', 20, 160, 2],
-    ['Card', 'cardWidthPercent', 'Card width', '% of viewport', 35, 96, 1],
+    ['Card', 'cardWidthPercent', 'Base card width', '% of 1920px canvas', 35, 96, 1],
+    ['Card', 'narrowVideoScale', 'Minimum video size (shrinks to fit)', '× original size at 760px', 1, 2, .05],
     ['Card', 'cardMaxHeightPercent', 'Maximum card height', '% of viewport', 35, 90, 1],
     ['Card', 'cornerRadiusPercent', 'Corner radius', '% of card height', 0, 20, .5],
     ['Card', 'motionStrengthPercent', 'Ambient movement', '%', 0, 100, 1],
@@ -145,6 +153,9 @@
   function apply() {
     const style = document.documentElement.style;
     const properties = {
+      '--jeff-prompt-scale': Math.max(.01, settings.promptScale),
+      '--jeff-prompt-x': `${settings.promptOffsetXPx}px`,
+      '--jeff-prompt-y': `${settings.promptOffsetYPx}px`,
       '--archive-duration': `${settings.flipDurationMs}ms`,
       '--archive-easing': settings.flipEasing,
       '--archive-turn': `rotate${settings.flipAxis}(${180 * settings.flipDirection}deg)`,
@@ -183,6 +194,12 @@
   panel.open = true;
   panel.innerHTML = `<summary>Archive settings</summary><div class="eye-controls-body"><p class="eye-controls-help">Changes preview live and save in this browser's edit mode. Sliders are guides; value boxes accept numbers beyond their ranges. Move your mouse over the archive to draw. Wiggle amount controls how far the stroke moves. Lower wiggle frequency makes slower, drawn-out shakes; longer bend length makes broader curves along the line. Complexity adds fine, irregular detail; zero keeps broad, simple bends. Drawing frame rate controls the stepped animation look. Text lift adds depth above the canvas. The light follows your mouse. Lighting controls adjust follow amount, smoothing, cursor offsets and depth. Zero smoothing follows immediately; zero offsets place the light at the cursor. Zero trail lifetime keeps strokes until cleared; the point limit removes the oldest marks. Copy the values to share your choices.</p><div class="eye-controls-actions archive-preview-actions"><button type="button" data-preview>Preview flip</button><button type="button" data-clear-drawing>Clear drawing</button><button type="button" data-settings-section="drawing" aria-controls="archive-settings-drawing">Drawing controls</button><button type="button" data-settings-section="text-depth-shadow" aria-controls="archive-settings-text-depth-shadow">Text depth &amp; shadow</button><button type="button" data-settings-section="lighting" aria-controls="archive-settings-lighting">Lighting controls</button><button type="button" data-settings-section="stroke-shadow" aria-controls="archive-settings-stroke-shadow">Stroke shadow</button><button type="button" data-settings-section="closed-shapes" aria-controls="archive-settings-closed-shapes">Closed shapes</button><button type="button" data-settings-section="page-edge-fades" aria-controls="archive-settings-page-edge-fades">Page edge fades</button></div><div class="archive-settings-fields"></div><div class="eye-controls-actions"><button type="button" data-copy>Copy values</button><button type="button" data-reset>Reset defaults</button><span role="status"></span></div><textarea aria-label="Archive settings to copy" readonly spellcheck="false"></textarea></div>`;
   document.body.append(panel);
+  const promptControls = document.createElement('button');
+  promptControls.type = 'button';
+  promptControls.dataset.settingsSection = 'jeff-prompt';
+  promptControls.setAttribute('aria-controls', 'archive-settings-jeff-prompt');
+  promptControls.textContent = 'Prompt controls';
+  panel.querySelector('.archive-preview-actions').prepend(promptControls);
   const container = panel.querySelector('.archive-settings-fields');
   const output = panel.querySelector('textarea');
   const status = panel.querySelector('[role="status"]');
@@ -270,6 +287,11 @@
   });
   panel.querySelectorAll('[data-settings-section]').forEach(button => {
     button.addEventListener('click', () => {
+      if (button.dataset.settingsSection === 'jeff-prompt') {
+        if (document.querySelector('.sim-wrapper').dataset.phase !== 'idle') window.jeffWorkshop.reset();
+        if (location.hash === '#archive') history.replaceState(history.state, '', location.pathname + location.search);
+        window.dispatchEvent(new Event('jeffpromptpreview'));
+      }
       const section = panel.querySelector(`#archive-settings-${button.dataset.settingsSection}`);
       section.scrollIntoView({ block: 'start' });
       section.querySelector('input').focus({ preventScroll: true });

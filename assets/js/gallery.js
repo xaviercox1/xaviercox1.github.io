@@ -6,15 +6,15 @@
   const copyStatus = document.querySelector('#grid-copy-status');
   const seedInput = document.querySelector('#grid-seed');
   const titlesInput = document.querySelector('#grid-titles');
-  const storageKey = 'xavier-gallery-grid-workshop-v2';
+  const phoneGallery = matchMedia('(max-width: 760px), (max-height: 500px) and (hover: none) and (pointer: coarse)');
+  const storageKey = 'xavier-gallery-grid-workshop-v3';
   const parameters = [
-    { key:'columns', label:'Columns (desktop)', min:1, max:8, step:1, value:4 },
-    { key:'gapPx', label:'Gap (px)', min:0, max:100, step:1, value:26 },
-    { key:'sidePaddingPx', label:'Side margins (px)', min:0, max:160, step:1, value:160 },
+    { key:'columns', label:'Columns (desktop)', min:1, max:8, step:1, value:3 },
+    { key:'gapPx', label:'Gap (px)', min:0, max:100, step:1, value:2 },
+    { key:'sidePaddingPx', label:'Side margins (px)', min:0, max:160, step:1, value:40 },
     { key:'topPaddingPx', label:'Space above grid (px)', min:48, max:240, step:1, value:70 },
-    { key:'gridWidthPercent', label:'Grid width (%)', min:45, max:100, step:1, value:77 },
-    { key:'sizeVariationPercent', label:'Random size variation (%)', min:0, max:45, step:1, value:0 },
-    { key:'cornerRadiusPx', label:'Corner radius (px)', min:0, max:48, step:1, value:5 },
+    { key:'gridWidthPercent', label:'Grid width (%)', min:45, max:100, step:1, value:100 },
+    { key:'cornerRadiusPx', label:'Corner radius (px)', min:0, max:48, step:1, value:0 },
   ];
   const randomSeed = () => 1 + Math.floor(Math.random() * 999999);
   const defaults = { ...Object.fromEntries(parameters.map(p => [p.key,p.value])), showTitles:false, seed:725815 };
@@ -40,6 +40,7 @@
   const scheduleLayout = () => { if (!layoutFrame) layoutFrame = requestAnimationFrame(layout); };
   // Keep the two exclusions already used by the current gallery.
   const works = window.portfolioWorks;
+  let orderedEntries = [];
   const entries = works.map(work => {
     const dimensions = work.width ? {width:work.width,height:work.height,preview:work.thumb} : null;
     const tile = document.createElement('figure');
@@ -58,6 +59,13 @@
     hover.className = 'grid-tile__hover';
     hover.textContent = work.title;
     button.append(img,hover);
+    if (work.src || work.youtube) {
+      const badge = document.createElement('span');
+      badge.className = 'grid-tile__video';
+      badge.setAttribute('aria-hidden','true');
+      badge.textContent = '▶';
+      button.append(badge);
+    }
     const caption = document.createElement('figcaption');
     caption.append(document.createTextNode(work.title));
     const year = document.createElement('span');
@@ -76,11 +84,7 @@
 
   function layout() {
     layoutFrame = 0;
-    const width = grid.clientWidth;
-    const columns = Math.min(Math.round(settings.columns),Math.max(1,Math.floor((width + settings.gapPx) / (150 + settings.gapPx))));
-    const gap = Math.min(settings.gapPx,width / Math.max(columns,1));
-    const columnWidth = (width - gap * (columns - 1)) / columns;
-    const heights = Array(columns).fill(0);
+    const columns = phoneGallery.matches ? 3 : Math.round(settings.columns);
     const random = seededRandom(settings.seed);
     const featured = entries.filter(entry => entry.work.featured);
     const order = entries.filter(entry => !entry.work.featured);
@@ -90,20 +94,10 @@
     }
     // Earth Tones stays at the top, including after reshuffles and resizes.
     order.unshift(...featured);
+    orderedEntries = order;
     // Match the DOM/tab order to the visual reading order after shuffling.
     order.forEach(entry => grid.append(entry.tile));
-    order.forEach(entry => {
-      const column = heights.indexOf(Math.min(...heights));
-      const tileWidth = columnWidth * (1 - random() * settings.sizeVariationPercent / 100);
-      const offset = (columnWidth - tileWidth) * random();
-      const mediaHeight = tileWidth / entry.ratio;
-      entry.tile.style.width = `${tileWidth}px`;
-      entry.tile.style.left = `${column * (columnWidth + gap) + offset}px`;
-      entry.tile.style.top = `${heights[column]}px`;
-      entry.button.style.height = `${mediaHeight}px`;
-      heights[column] += mediaHeight + (settings.showTitles ? entry.caption.offsetHeight : 0) + gap;
-    });
-    grid.style.height = `${Math.max(0,...heights) - gap}px`;
+    grid.style.setProperty('--grid-columns',columns);
     grid.dataset.columns = columns;
   }
 
@@ -113,6 +107,7 @@
     root.setProperty('--grid-top',`${settings.topPaddingPx}px`);
     root.setProperty('--grid-width',`${settings.gridWidthPercent}%`);
     root.setProperty('--grid-radius',`${settings.cornerRadiusPx}px`);
+    root.setProperty('--grid-gap',`${settings.gapPx}px`);
     grid.classList.toggle('show-grid-titles',settings.showTitles);
     seedInput.value = settings.seed;
     titlesInput.checked = settings.showTitles;
@@ -168,32 +163,122 @@
   const viewer = document.querySelector('#grid-viewer');
   const media = document.querySelector('#grid-viewer-media');
   const mediaStatus = document.querySelector('#grid-viewer-status');
-  function openWork(work) {
-    media.replaceChildren(); mediaStatus.textContent = '';
-    document.querySelector('#grid-viewer-title').textContent = `${work.title} · ${work.year}`;
+  const feed = document.querySelector('#grid-viewer-feed');
+  const closeButton = document.querySelector('#grid-viewer-close');
+  let feedObserver = null;
+  let galleryScrollY = 0;
+  let openedEntry = null;
+
+  function createMedia(work, status, lazy = false) {
     let element;
     if (work.src) {
       element = document.createElement('video');
-      element.controls = true; element.playsInline = true; element.preload = 'metadata'; element.poster = work.thumb; element.src = work.src;
+      element.controls = true; element.playsInline = true; element.preload = lazy ? 'none' : 'metadata'; element.poster = work.thumb; element.src = work.src;
       element.setAttribute('aria-label',work.title);
-      element.addEventListener('error',() => { mediaStatus.textContent = 'This video could not load. Please try again.'; });
+      element.addEventListener('error',() => { status.textContent = 'This video could not load. Please try again.'; });
     } else if (work.youtube) {
       element = document.createElement('iframe');
       element.title = work.title; element.allow = 'autoplay; encrypted-media; fullscreen'; element.allowFullscreen = true;
       element.referrerPolicy = 'strict-origin-when-cross-origin';
-      element.src = `https://www.youtube-nocookie.com/embed/${work.youtube}?autoplay=1&playsinline=1`;
+      const source = `https://www.youtube-nocookie.com/embed/${work.youtube}?autoplay=${lazy ? 0 : 1}&playsinline=1`;
+      if (lazy) element.dataset.src = source;
+      else element.src = source;
     } else {
       element = document.createElement('img'); element.src = work.image || work.thumb; element.alt = work.title;
+      if (lazy) element.loading = 'lazy';
+      element.decoding = 'async';
     }
-    media.append(element); viewer.showModal(); document.body.style.overflow = 'hidden';
-    if (work.src) element.play().catch(() => { mediaStatus.textContent = 'Press play to start the video.'; });
+    return element;
   }
-  document.querySelector('#grid-viewer-close').addEventListener('click',() => viewer.close());
+
+  function openFeed(work) {
+    viewer.classList.add('grid-viewer--feed');
+    feed.hidden = false;
+    closeButton.setAttribute('aria-label','Back to gallery grid');
+    let selectedPost;
+    let selectedVideo;
+    let selectedStatus;
+    feedObserver = new IntersectionObserver(changes => {
+      if (!viewer.open) return;
+      changes.forEach(change => {
+        const element = change.target.querySelector('video,iframe');
+        if (!element) return;
+        if (change.isIntersecting) {
+          if (element.dataset.src && !element.getAttribute('src')) element.src = element.dataset.src;
+        } else if (element.tagName === 'VIDEO') element.pause();
+        else element.removeAttribute('src');
+      });
+    },{root:feed,threshold:0});
+    (orderedEntries.length ? orderedEntries : entries).forEach(entry => {
+      const post = document.createElement('article');
+      post.className = 'grid-post';
+      post.setAttribute('aria-label',entry.work.title);
+      const header = document.createElement('header');
+      header.className = 'grid-post__header';
+      const title = document.createElement('h3');
+      title.textContent = entry.work.title;
+      const year = document.createElement('span');
+      year.textContent = entry.work.year;
+      header.append(title,year);
+      const frame = document.createElement('div');
+      frame.className = 'grid-post__media';
+      frame.style.setProperty('--post-ratio',entry.ratio);
+      const status = document.createElement('p');
+      status.className = 'grid-post__status';
+      status.setAttribute('role','status');
+      const element = createMedia(entry.work,status,true);
+      frame.append(element);
+      post.append(header,frame);
+      if (entry.work.description) {
+        const caption = document.createElement('p');
+        caption.className = 'grid-post__caption';
+        caption.textContent = entry.work.description;
+        post.append(caption);
+      }
+      post.append(status);
+      feed.append(post);
+      if (entry.work.src) element.addEventListener('play',() => {
+        feed.querySelectorAll('video').forEach(other => { if (other !== element) other.pause(); });
+      });
+      feedObserver.observe(frame);
+      if (entry.work === work) {
+        selectedPost = post;
+        selectedVideo = entry.work.src ? element : null;
+        selectedStatus = status;
+      }
+    });
+    viewer.showModal();
+    feed.scrollTop = selectedPost.offsetTop;
+    if (selectedVideo) selectedVideo.play().catch(() => { selectedStatus.textContent = 'Press play to start the video.'; });
+  }
+
+  function openWork(work) {
+    media.replaceChildren(); mediaStatus.textContent = '';
+    openedEntry = entries.find(entry => entry.work === work);
+    galleryScrollY = window.scrollY;
+    document.body.style.setProperty('--gallery-scroll-top',`${-galleryScrollY}px`);
+    document.body.classList.add('is-gallery-viewing');
+    document.querySelector('#grid-viewer-title').textContent = `${work.title} · ${work.year}`;
+    openFeed(work);
+  }
+  closeButton.addEventListener('click',() => viewer.close());
   viewer.addEventListener('close',() => {
-    const video = media.querySelector('video');
-    if (video) { video.pause(); video.removeAttribute('src'); video.load(); }
-    media.replaceChildren(); document.body.style.overflow = '';
+    feedObserver?.disconnect();
+    feedObserver = null;
+    viewer.querySelectorAll('video').forEach(video => { video.pause(); video.removeAttribute('src'); video.load(); });
+    viewer.querySelectorAll('iframe').forEach(frame => frame.removeAttribute('src'));
+    media.replaceChildren(); feed.replaceChildren(); feed.hidden = true;
+    viewer.classList.remove('grid-viewer--feed');
+    closeButton.setAttribute('aria-label','Close work');
+    document.body.classList.remove('is-gallery-viewing');
+    document.body.style.removeProperty('--gallery-scroll-top');
+    window.scrollTo(0,galleryScrollY);
+    openedEntry?.button.focus({preventScroll:true});
   });
+  document.addEventListener('visibilitychange',() => {
+    if (document.hidden) viewer.querySelectorAll('video').forEach(video => video.pause());
+  });
+  phoneGallery.addEventListener('change',scheduleLayout);
   new ResizeObserver(scheduleLayout).observe(grid);
   document.fonts.ready.then(scheduleLayout);
   if(new URLSearchParams(location.search).get('edit')==='1') setPanel(true);

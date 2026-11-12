@@ -1351,15 +1351,25 @@ a:hover {
 }
 
 .industrique-page {
+  position: relative;
   min-height: 100vh;
   width: 100%;
   padding: 84px 24px 54px;
 }
 
 .industrique-hero {
+  position: relative;
   width: min(1240px, 100%);
-  min-height: calc(100vh - 138px);
   margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Expanding More cannot resize or recenter the original rotating composition. */
+.industrique-primary {
+  flex: none;
+  min-height: calc(100vh - 138px);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -1367,9 +1377,9 @@ a:hover {
 }
 
 @media (min-width: 761px) and (hover: hover) and (pointer: fine) {
-  .industrique-page { perspective: 1400px; }
+  .industrique-page { perspective: 1400px; perspective-origin: 50% var(--intrinsik-perspective-y,50vh); }
   .industrique-hero {
-    transform-origin: center;
+    transform-origin: 50% var(--intrinsik-rotation-y,50vh);
     will-change: transform;
   }
 }
@@ -2079,6 +2089,10 @@ a:hover {
   }
 
   .industrique-hero {
+    gap: 22px;
+  }
+
+  .industrique-primary {
     min-height: auto;
     justify-content: flex-start;
     gap: 22px;

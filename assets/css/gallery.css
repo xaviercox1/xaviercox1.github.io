@@ -1,11 +1,12 @@
 .gallery-redesign-page { height: auto; min-height: 100svh; overflow-x: hidden; background: #000; }
 .gallery-redesign-page .workshop-nav { background: none; padding-bottom: 22px; }
 .gallery-redesign-page .workshop-nav a { border-bottom: 0; text-decoration: none; }
-.grid-main { padding: var(--grid-top,70px) min(var(--grid-padding,160px),max(0px,calc((100vw - 360px) / 2))) 80px; }
-.portfolio-grid { position: relative; width: var(--grid-width,77%); margin-inline: auto; }
-.grid-tile { position: absolute; margin: 0; }
-.grid-tile__open { display: block; position: relative; width: 100%; padding: 0; border: 0; border-radius: var(--grid-radius,5px); overflow: hidden; background: #080808; color: inherit; font: inherit; text-align: left; }
-.grid-tile__open img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.grid-main { padding: var(--grid-top,70px) min(var(--grid-padding,40px),max(0px,calc((100vw - 360px) / 2))) 80px; }
+.portfolio-grid { display: grid; grid-template-columns: repeat(var(--grid-columns,3),minmax(0,1fr)); gap: var(--grid-gap,2px); position: relative; width: min(var(--grid-width,100%),1080px); margin-inline: auto; }
+.grid-tile { position: relative; min-width: 0; margin: 0; }
+.grid-tile__open { display: block; position: relative; width: 100%; aspect-ratio: 3 / 4; padding: 0; border: 0; border-radius: var(--grid-radius,0px); overflow: hidden; background: #080808; color: inherit; font: inherit; text-align: left; }
+.grid-tile__open img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.grid-tile__video { display: block; position: absolute; top: 7px; right: 7px; color: #fff; font-size: 12px; line-height: 1; text-shadow: 0 1px 4px #000; }
 .grid-tile__open:focus-visible { outline: 1px solid #f5f5f5; outline-offset: 4px; }
 .grid-tile__hover { position: absolute; inset: auto 0 0; padding: 24px 12px 10px; background: linear-gradient(transparent,rgba(0,0,0,.75)); font-size: 12px; opacity: 0; filter: blur(4px); transition: opacity 200ms ease,filter 200ms ease; }
 .grid-tile__open:hover .grid-tile__hover,.grid-tile__open:focus-visible .grid-tile__hover { opacity: 1; filter: none; }
@@ -42,6 +43,37 @@
 .grid-viewer__media iframe { width: min(100%,1200px); aspect-ratio: 16 / 9; max-height: 100%; border: 0; }
 .grid-viewer h2 { font-size: 13px; font-weight: 400; margin: 12px 0 0; }
 #grid-viewer-status { font-size: 12px; color: #aaa; }
+.grid-viewer__back,.grid-viewer__heading { display: none; }
+.grid-viewer__feed[hidden] { display: none; }
+:is(.gallery-redesign-page,.blog-redesign-page).is-gallery-viewing { position: fixed; top: var(--gallery-scroll-top,0px); left: 0; right: 0; overflow: hidden; }
+/* Phone profile grid: consistent crops, narrow gutters and no outer margins. */
+@media (max-width:760px), (max-height:500px) and (hover:none) and (pointer:coarse) {
+  .gallery-redesign-page .grid-main { padding: max(70px,calc(env(safe-area-inset-top) + 54px)) 0 env(safe-area-inset-bottom); }
+  .gallery-redesign-page .portfolio-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 2px; width: 100%; }
+  .gallery-redesign-page .grid-tile { position: relative; min-width: 0; }
+  .gallery-redesign-page .grid-tile__open { aspect-ratio: 3 / 4; border-radius: 0; }
+  .gallery-redesign-page .grid-tile__open img { object-fit: cover; }
+  .gallery-redesign-page .grid-tile__hover,.gallery-redesign-page .grid-tile figcaption { display: none; }
+  .gallery-redesign-page .grid-tile__video { display: block; position: absolute; top: 7px; right: 7px; color: #fff; font-size: 12px; line-height: 1; text-shadow: 0 1px 4px #000; }
+  .gallery-redesign-page .grid-tile__open:focus-visible { outline-offset: -3px; }
+}
+/* Every tile opens the same vertical feed, keeping full media ratios. */
+.grid-viewer.grid-viewer--feed { padding: calc(52px + env(safe-area-inset-top)) 0 0; background: #000; overflow: hidden; }
+.grid-viewer.grid-viewer--feed[open] { display: block; }
+.grid-viewer--feed .grid-viewer__close { position: absolute; display: grid; place-items: center; z-index: 2; top: env(safe-area-inset-top); left: max(4px,env(safe-area-inset-left),calc((100% - 640px) / 2)); right: auto; width: 48px; height: 52px; padding: 12px; }
+.grid-viewer--feed .grid-viewer__dismiss { display: none; }
+.grid-viewer--feed .grid-viewer__back { display: block; width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.grid-viewer--feed .grid-viewer__heading { display: grid; place-items: center; position: absolute; top: env(safe-area-inset-top); left: 60px; right: 60px; height: 52px; font-size: 13px; font-weight: 500; letter-spacing: .06em; }
+.grid-viewer--feed > :is(.grid-viewer__media,.blog-viewer-media,h2,#grid-viewer-status,#blog-viewer-status) { display: none; }
+.grid-viewer__feed { position: relative; width: min(100%,640px); height: 100%; margin-inline: auto; overflow-y: auto; overscroll-behavior-y: contain; -webkit-overflow-scrolling: touch; padding-bottom: env(safe-area-inset-bottom); }
+.grid-post { margin: 0 0 20px; }
+.grid-post__header { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 14px 12px; }
+.grid-post__header h3 { margin: 0; font-size: 13px; font-weight: 500; }
+.grid-post__header :is(span,time) { flex: none; font-size: 12px; color: #999; }
+.grid-post__media { display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: var(--post-ratio,1); max-height: max(180px,calc(100svh - 140px)); background: #080808; }
+.grid-post__media img,.grid-post__media video,.grid-post__media iframe { display: block; width: 100%; height: 100%; min-height: 0; object-fit: contain; border: 0; }
+.grid-post__caption,.grid-post__status { margin: 10px 12px 0; font-size: 12px; line-height: 1.5; color: #aaa; }
+.grid-post__status:empty { display: none; }
 @media (max-width:600px) { .grid-controls { max-height: 62dvh; } .gallery-redesign-page .workshop-nav { font-size: 13px; } }
 @media (prefers-reduced-motion:reduce) { .grid-tile__hover { transition: none; } }
 @media (pointer:coarse) { .grid-viewer__close { width: 44px; height: 44px; } }

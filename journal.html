@@ -10,8 +10,8 @@
   <link rel="preload" href="Content/Fonts/RobotoFlex-Variable.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="stylesheet" href="assets/css/base.css?v=20261031-publish" />
   <link rel="stylesheet" href="assets/css/home.css?v=20261111-edge-shapes" />
-  <link rel="stylesheet" href="assets/css/gallery.css?v=20261031-publish" />
-  <link rel="stylesheet" href="assets/css/journal.css?v=20261031-publish" />
+  <link rel="stylesheet" href="assets/css/gallery.css?v=20261112-profile-feed" />
+  <link rel="stylesheet" href="assets/css/journal.css?v=20261112-profile-feed" />
 </head>
 <body class="blog-redesign-page is-blog-entering">
   <div class="cursor-blur" aria-hidden="true"></div>
@@ -42,15 +42,17 @@
     <button id="blog-export-draft" type="button">EXPORT TEXT + LAYOUT</button>
     <span id="blog-settings-status" role="status" aria-live="polite"></span>
   </aside>
-  <dialog id="blog-viewer" class="blog-viewer" aria-label="Journal media viewer">
-    <button id="blog-viewer-close" class="blog-viewer-close" type="button" aria-label="Close entry">×</button>
+  <dialog id="blog-viewer" class="blog-viewer grid-viewer" aria-label="Journal media viewer">
+    <button id="blog-viewer-close" class="blog-viewer-close grid-viewer__close" type="button" aria-label="Close entry"><span class="grid-viewer__dismiss" aria-hidden="true">×</span><svg class="grid-viewer__back" viewBox="0 0 24 24" aria-hidden="true"><path d="m14 5-7 7 7 7" /></svg></button>
+    <span class="grid-viewer__heading" aria-hidden="true">JOURNAL</span>
+    <div class="grid-viewer__feed" id="blog-viewer-feed" aria-label="Journal posts" hidden></div>
     <div id="blog-viewer-media" class="blog-viewer-media"></div>
     <p id="blog-viewer-status" role="status"></p>
   </dialog>
   <script defer src="assets/js/journal-data.js?v=20261031-publish"></script>
   <script defer src="assets/js/cursor.js?v=20261031-publish"></script>
   <script defer src="assets/js/typography.js?v=20261031-publish"></script>
-  <script defer src="assets/js/journal.js?v=20261031-publish"></script>
+  <script defer src="assets/js/journal.js?v=20261112-profile-feed"></script>
   <script defer src="assets/js/page-jeff.js?v=20261031-publish"></script>
 </body>
 </html>

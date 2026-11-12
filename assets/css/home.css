@@ -13,6 +13,13 @@
   z-index: 1;
 }
 .home-redesign-page .eye-field { z-index: 2; }
+/* The 126% Jeff plane's centre stays the pivot for its outer motion too. */
+.home-redesign-page .eye-art { transform-origin: 63% 63%; }
+
+/* The hint shares Jeff's plane, so its corner anchor follows every 3D turn. */
+.jeff-click-prompt { position: absolute; left: calc(92% + var(--jeff-prompt-x,33px)); bottom: calc(98% + var(--jeff-prompt-y,14px)); width: calc(42% * var(--jeff-prompt-scale,.45)); max-width: calc(180px * var(--jeff-prompt-scale,.45)); height: auto; z-index: 5; transform: translateZ(.1px); backface-visibility: hidden; mix-blend-mode: screen; pointer-events: none; opacity: 0; transition: opacity 100ms ease; }
+.jeff-click-prompt.is-visible { opacity: 1; }
+.sim-wrapper:not([data-phase="idle"]) .jeff-click-prompt { opacity: 0; }
 
 /* The video stays below the reusable red cover, in the same rotating plane. */
 .showreel-media { display: none; position: absolute; inset: 0; z-index: 0; overflow: hidden; border-radius: var(--showreel-radius, 0px); backface-visibility: hidden; }
@@ -39,9 +46,10 @@
 .is-native-showreel .showreel-loader,
 .is-native-showreel .showreel-surface,
 .is-native-showreel .showreel-controls { display: none; }
-.is-native-showreel .showreel-media { background: #f00; }
+/* Native video edges can expose their container through subpixel rounding. */
+.is-native-showreel .showreel-media { background: #000; }
 .is-native-showreel .showreel-media video { pointer-events: auto; }
-.is-native-showreel.has-native-player .eye-backdrop { opacity: 0; transition: opacity 2000ms ease; }
+.is-native-showreel.has-native-player .eye-backdrop { opacity: 0; visibility: hidden; transition: opacity 2000ms ease, visibility 0s 2000ms; }
 
 .showreel-surface { position: absolute; inset: 0; z-index: 2; border: 0; padding: 0; background: none; pointer-events: auto; border-radius: var(--showreel-radius); }
 .showreel-surface[hidden], .showreel-controls[hidden] { display: none; }
@@ -381,6 +389,7 @@
 .archive-shadow { position: absolute; inset: 0; border-radius: inherit; overflow: hidden; pointer-events: none; color: #000; text-shadow: none; transform: translateZ(.02px); backface-visibility: hidden; }
 .archive-shadow[hidden] { display: none; }
 .archive-shadow-content { position: absolute; inset: 0; padding: var(--archive-padding, 24px); transform-origin: 0 0; }
+.archive-selection-occluder { background: #000; color: #000; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
 .archive-stroke-shadow { position: absolute; inset: 0; border-radius: inherit; overflow: hidden; pointer-events: none; transform: translateZ(.03px); backface-visibility: hidden; }
 .archive-stroke-shadow[hidden] { display: none; }
 .archive-stroke-shadow__plane { position: absolute; inset: 0; transform-origin: 0 0; }

@@ -319,6 +319,13 @@
 
   function sync() {
     stop();
+    // Freeze the existing sketch while the card turns; clear it only once the
+    // video side has fully settled (including instant and timeout completions).
+    if (!document.body.classList.contains('is-archive-open') &&
+        !document.body.classList.contains('is-archive-flipping')) {
+      clearDrawing();
+      return;
+    }
     updateStrokeShadow();
     if (active()) { render(); schedule(); }
   }
@@ -382,10 +389,7 @@
   window.addEventListener('blur', stop);
   window.addEventListener('focus', sync);
   document.addEventListener('visibilitychange', sync);
-  window.addEventListener('archivechange', event => {
-    if (!event.detail?.open) clearDrawing();
-    else sync();
-  });
+  window.addEventListener('archivechange', sync);
   window.addEventListener('jeffphasechange', () => {
     if (!document.body.classList.contains('is-archive-open')) clearDrawing();
     else sync();
