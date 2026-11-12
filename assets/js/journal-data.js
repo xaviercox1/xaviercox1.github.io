@@ -461,20 +461,6 @@ window.blogEntries = [
     "duration": 631.9020016680568
   },
   {
-    "id": "xavier-cox",
-    "sourceName": "Xavier Cox.gif",
-    "date": "2026-08-20",
-    "timestamp": "2026-08-20T09:52:25",
-    "dateSource": "file-created",
-    "title": "",
-    "text": "",
-    "kind": "gif",
-    "src": "Content/Blog/xavier-cox.gif",
-    "poster": "Content/Blog/xavier-cox-poster.jpg",
-    "width": 1080,
-    "height": 720
-  },
-  {
     "id": "img-6090",
     "sourceName": "IMG_6090.HEIC",
     "date": "2026-08-06",
