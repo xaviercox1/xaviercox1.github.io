@@ -4,6 +4,7 @@ window.blogEntries = [
     "id": "more-v15044gf0000db9toafog65hggm9imc0",
     "sourceName": "v15044gf0000db9toafog65hggm9imc0.MP4",
     "date": "2026-10-31",
+    "hidden": true,
     "timestamp": "2026-10-31T13:07:34",
     "dateSource": "file-created",
     "title": "",
@@ -53,7 +54,8 @@ window.blogEntries = [
     "text": "",
     "kind": "pdf",
     "src": "Content/Blog/the-atlas-upstairs.pdf",
-    "poster": "Content/Blog/the-atlas-upstairs-page-1.jpg",
+    "poster": "Content/Blog/the-atlas-upstairs-page-2.jpg",
+    "defaultPage": 2,
     "pages": [
       "Content/Blog/the-atlas-upstairs-page-1.jpg",
       "Content/Blog/the-atlas-upstairs-page-2.jpg"
@@ -65,6 +67,7 @@ window.blogEntries = [
     "id": "img-6750",
     "sourceName": "IMG_6750.HEIC",
     "date": "2026-10-18",
+    "hidden": true,
     "timestamp": "2026-10-18T16:23:27",
     "dateSource": "capture",
     "title": "",

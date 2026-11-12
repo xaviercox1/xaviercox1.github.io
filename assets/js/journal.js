@@ -1,5 +1,6 @@
 (() => {
   const feed = document.querySelector('#blog-feed');
+  const visibleEntries = window.blogEntries.filter(entry=>!entry.hidden);
   const panel = document.querySelector('#blog-controls');
   const panelToggle = document.querySelector('#blog-layout-toggle');
   const tuningEnabled = new URLSearchParams(location.search).get('edit')==='1';
@@ -34,7 +35,7 @@
     [...new Set(window.blogEntries.map(e=>e.date))].forEach(date=>{if(typeof text?.dayTitles?.[date]==='string') draft.dayTitles[date]=text.dayTitles[date].slice(0,200);});
   } catch { /* Storage is optional; the media and controls still work. */ }
   window.blogEntries.forEach(entry=>{draft.entries[entry.id] ||= {title:entry.title||'',text:entry.text||''};});
-  const dates = [...new Set(window.blogEntries.map(entry=>entry.date))].sort();
+  const dates = [...new Set(visibleEntries.map(entry=>entry.date))].sort();
   const formatDate = date=>date.split('-').reverse().join('/');
   function saveDraft() {
     try { localStorage.setItem(draftKey,JSON.stringify(draft)); }
@@ -47,6 +48,9 @@
     return input;
   }
   const pagePositions = new Map(), pdfViews = new Map();
+  visibleEntries.filter(entry=>entry.kind==='pdf').forEach(entry=>{
+    pagePositions.set(entry.id,clamp((entry.defaultPage??1)-1,0,entry.pages.length-1));
+  });
   let dayObserver;
   const imageObserver = 'IntersectionObserver' in window ? new IntersectionObserver(items=>{
     items.forEach(item=>{if(item.isIntersecting){const image=item.target;if(image.dataset.src){image.src=image.dataset.src;delete image.dataset.src;}imageObserver.unobserve(image);}});
@@ -109,7 +113,7 @@
     const dayInput=editorField(`Optional title for ${formatDate(date)}`,'Optional title for this day');dayInput.value=draft.dayTitles[date]||'';
     dayInput.addEventListener('input',()=>{draft.dayTitles[date]=dayInput.value;dayTitle.textContent=dayInput.value;dayTitle.hidden=!dayInput.value.trim();saveDraft();});dayEditor.append(dayInput);
     const media=document.createElement('div');media.className='blog-day-media';
-    const entries=window.blogEntries.filter(entry=>entry.date===date).sort((a,b)=>a.timestamp.localeCompare(b.timestamp));
+    const entries=visibleEntries.filter(entry=>entry.date===date).sort((a,b)=>a.timestamp.localeCompare(b.timestamp));
     entries.forEach((entry,index)=>{
       const article=document.createElement('article');article.className='blog-entry';article.dataset.entry=entry.id;
       let visual;
@@ -191,7 +195,7 @@
     viewer.classList.add('grid-viewer--feed');viewerFeed.hidden=false;
     viewerClose.setAttribute('aria-label','Back to journal grid');
     const orderedDates=settings.newestFirst?[...dates].reverse():[...dates];
-    const ordered=orderedDates.flatMap(date=>window.blogEntries.filter(entry=>entry.date===date).sort((a,b)=>a.timestamp.localeCompare(b.timestamp)));
+    const ordered=orderedDates.flatMap(date=>visibleEntries.filter(entry=>entry.date===date).sort((a,b)=>a.timestamp.localeCompare(b.timestamp)));
     const disposers=[];
     let selectedPost,selectedVideo,selectedStatus;
     ordered.forEach(entry=>{
